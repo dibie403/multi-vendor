@@ -6,7 +6,7 @@ body {
 }
 
 h1, h2, h3, h4, h5, h6 {
-  color: #444444;
+  color: #1A5D1A;
 }
 
 
@@ -29,12 +29,39 @@ h1, h2, h3, h4, h5, h6 {
 .content-section {
   background: #ffffff;
   padding: 10px 20px;
+  border: 1px solid #dddddd;
   border-radius: 3px;
   margin-bottom: 20px;
 }
 .footer-text{
   color:#FFD700;
 }
+
+/* Style for the list group items */
+.list-group-item {
+  background-color: #f8f9fa; /* Default background color */
+  color: Green; /* Text color */
+  padding: 10px 15px;
+  border: 1px solid #ddd; /* Border around each item */
+  text-decoration: none; /* Remove underline from links */
+  transition: background-color 0.3s ease, color 0.3s ease; /* Smooth hover effect */
+}
+
+.list-group-item a {
+  text-decoration: none;
+  color: inherit; /* Use the same color as the list item */
+}
+
+/* Hover effect */
+.list-group-item:hover {
+  background-color: #014421; /* Change background color on hover */
+  color: white; /* Change text color on hover */
+}
+
+.list-group-item:hover a {
+  color: white; /* Make sure link text also changes color on hover */
+}
+
 
 /* Section Title */
 .section-title {

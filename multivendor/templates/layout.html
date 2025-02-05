@@ -22,14 +22,18 @@
     <header class="site-header">
       <nav class="navbar navbar-expand-md navbar-dark bg-steel fixed-top">
         <div class="container">
-          <a class="navbar-brand mr-4" href="/">Scribes🎯</a>
+          <a class="navbar-brand mr-4" href="/">BLAZES🛒🛍️</a>
           <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarToggle" aria-controls="navbarToggle" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
           </button>
           <div class="collapse navbar-collapse" id="navbarToggle" >
             <div class="navbar-nav mr-auto">
                 <a class="nav-item nav-link" href="#">Home</a>
-                <a class="nav-item nav-link" href="#">New Post</a>
+                <a class="nav-item nav-link" href="#" >
+                  <img class="rounded-circle account-img2 md-2 gold-icon" src="{{ url_for('static', filename='images/icons8-user-32.png') }}">
+
+                  
+                </a>
             </div>
             <!-- Navbar Right Side -->
             <div class="navbar-nav">
@@ -41,69 +45,45 @@
     </header>
 
     <main role="main" class="container">
-      <div class="row">
-         <div class="col-md-8 mb-4">
-          <div class="content-section">
-          {% with messages = get_flashed_messages(with_categories=True) %}
-          {% if messages %}
-            {% for category, message in messages %}
-              <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
-                {{ message }}
-                <button type="button" class="btn-close" data-dismiss="alert" aria-label="Close"></button>
-              </div>
-            {% endfor %}
-          {% endif %}
-        {% endwith %}
-          {% block content1 %}{% endblock %}
-        </div>
-      </div>
+   <div class="row">
+      {% block content1_wrapper %}
+         {% if self.content1()|trim %}
+            <div class="col-md-8 mb-4">
+               {% block content1 %}{% endblock %}
+            </div>
+         {% endif %}
+      {% endblock %}
 
-        <div class="col-md-4">
-           <div class="content-section">
-          {% with messages = get_flashed_messages(with_categories=True) %}
-          {% if messages %}
-            {% for category, message in messages %}
-              <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
-                {{ message }}
-                <button type="button" class="btn-close" data-dismiss="alert" aria-label="Close"></button>
-              </div>
-            {% endfor %}
-          {% endif %}
-        {% endwith %}
-          {% block content2 %}{% endblock %}
-         </div>
-       </div>
+      {% block content2_wrapper %}
+         {% if self.content2()|trim %}
+            <div class="col-md-4">
+               <div class="content-section">
+                  {% block content2 %}{% endblock %}
+               </div>
+            </div>
+         {% endif %}
+      {% endblock %}
 
-        <div class="col-md-12">
-          {% with messages = get_flashed_messages(with_categories=True) %}
-          {% if messages %}
-            {% for category, message in messages %}
-              <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
-                {{ message }}
-                <button type="button" class="btn-close" data-dismiss="alert" aria-label="Close"></button>
-              </div>
-            {% endfor %}
-          {% endif %}
-        {% endwith %}
-          {% block content3 %}{% endblock %}
-        </div>
+      {% block content3_wrapper %}
+         {% if self.content3()|trim %}
+            <div class="col-md-12">
+               {% block content3 %}{% endblock %}
+            </div>
+         {% endif %}
+      {% endblock %}
 
-        <div class="col-md-12">
-           <div class="content-section mt-4">
-          {% with messages = get_flashed_messages(with_categories=True) %}
-          {% if messages %}
-            {% for category, message in messages %}
-              <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
-                {{ message }}
-                <button type="button" class="btn-close" data-dismiss="alert" aria-label="Close"></button>
-              </div>
-            {% endfor %}
-          {% endif %}
-        {% endwith %}
-          {% block content4 %}{% endblock %}
-         </div>
-    </div>
-    </main>
+      {% block content4_wrapper %}
+         {% if self.content4()|trim %}
+            <div class="col-md-12">
+               <div class="content-section">
+                  {% block content4 %}{% endblock %}
+               </div>
+            </div>
+         {% endif %}
+      {% endblock %}
+   </div>
+</main>
+
 
     <footer class="bg-steel pt-4">
       <div class="container">

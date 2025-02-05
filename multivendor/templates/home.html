@@ -44,12 +44,28 @@
     <span class="sr-only">Next</span>
   </a>
 </div>
+<div class="search-box mt-4">
+    <form method="POST" action="#" style="display: flex; align-items: center;">
+      <input 
+        type="text" 
+        name="content" 
+        placeholder="Search..." 
+        style="border: 2px solid #ddd; outline: none; padding: 10px 15px; border-radius: 25px; width: 250px; font-size: 16px; margin-right: 10px;">
+      <button 
+        type="submit" 
+        style="background-color: #4caf50; color: white; border: none; padding: 5px 15px; cursor: pointer; font-size: 14px; border-radius: 15px; transition: background-color 0.3s ease;"
+        onmouseover="this.style.backgroundColor='#45a049'"
+        onmouseout="this.style.backgroundColor='#4caf50'">
+        Search
+      </button>
+    </form>
+  </div>
 
 <style>
 /* Base Image Styling */
 .carousel-item img {
   width: 100%;
-  height: 300px;
+  height: 250px;
   object-fit: cover;
   position: relative;
 }
@@ -138,13 +154,17 @@
     </li>
   </ul>
 {% endblock %}
+
 {% block content3 %}
 <div class="content-section">
 
-  <h1 class="my-4 section-title">Featured Products</h1>
+
+
+  <h1 class="my-4 section-title">Featured Products 🛍️ </h1>
 
   <div class="container">
     <div class="row product-grid">
+      {% for i in range(12): %}
       <!-- Product 1 -->
       <div class="col-6 col-sm-4 col-md-2 product-item" data-toggle="modal" data-target="#productModal1">
         <div class="card product-card">
@@ -153,7 +173,46 @@
             <button class="love-icon" onclick="event.stopPropagation(); toggleLove(this)">🤍</button>
           </div>
           <div class="card-body text-center">
-            <h5 class="card-title">Wireless Headphones</h5>
+            <small class="card-title">Wireless Headphones</small>
+            <p class="card-text price">$59.99</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Product Modal 1 -->
+      <div class="modal fade" id="productModal1" tabindex="-1" role="dialog" aria-labelledby="productModalLabel1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title">Wireless Headphones</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body text-center">
+              <img src="{{ url_for('static', filename='images/download2.jpeg') }}" class="img-fluid mb-3" alt="Wireless Headphones">
+              <p>High-quality wireless headphones with noise cancellation and long battery life.</p>
+              <p class="price">$59.99</p>
+              <button class="btn btn-add-cart">Add to Cart 🛒</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+    <h1 class="my-4 section-title">Top Sales🔥</h1>
+
+    <div class="container">
+     <div class="row product-grid">
+      {% for i in range(6): %}
+       <!-- Product 1 -->
+      <div class="col-6 col-sm-4 col-md-2 product-item" data-toggle="modal" data-target="#productModal1">
+        <div class="card product-card">
+          <div class="image-container">
+            <img src="{{ url_for('static', filename='images/pngegg (1).png') }}" class="card-img-top" alt="Wireless Headphones">
+            <button class="love-icon" onclick="event.stopPropagation(); toggleLove(this)">🤍</button>
+          </div>
+          <div class="card-body text-center">
+            <small class="card-title">Wireless Headphones</small>
             <p class="card-text price">$59.99</p>
           </div>
         </div>
@@ -178,179 +237,47 @@
           </div>
         </div>
       </div>
+    {% endfor %}
 
-      <!-- Product 2 -->
-      <div class="col-6 col-sm-4 col-md-2 product-item" data-toggle="modal" data-target="#productModal2">
+    <h1 class="my-4 section-title ">Best Selling🛒</h1>
+
+    <div class="container">
+     <div class="row product-grid">
+      {% for i in range(3): %}
+       <!-- Product 1 -->
+      <div class="col-6 col-sm-4 col-md-2 product-item" data-toggle="modal" data-target="#productModal1">
         <div class="card product-card">
           <div class="image-container">
-            <img src="{{ url_for('static', filename='images/pngegg (1).png') }}" class="card-img-top" alt="Smartwatch">
+            <img src="{{ url_for('static', filename='images/pngegg (1).png') }}" class="card-img-top" alt="Wireless Headphones">
             <button class="love-icon" onclick="event.stopPropagation(); toggleLove(this)">🤍</button>
           </div>
           <div class="card-body text-center">
-            <h5 class="card-title">Smartwatch</h5>
-            <p class="card-text price">$129.99</p>
+            <small class="card-title">Wireless Headphones</small>
+            <p class="card-text price">$59.99</p>
           </div>
         </div>
       </div>
 
-      <!-- Product Modal 2 -->
-      <div class="modal fade" id="productModal2" tabindex="-1" role="dialog" aria-labelledby="productModalLabel2" aria-hidden="true">
+      <!-- Product Modal 1 -->
+      <div class="modal fade" id="productModal1" tabindex="-1" role="dialog" aria-labelledby="productModalLabel1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" role="document">
           <div class="modal-content">
             <div class="modal-header">
-              <h5 class="modal-title">Smartwatch</h5>
+              <h5 class="modal-title">Wireless Headphones</h5>
               <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                 <span aria-hidden="true">&times;</span>
               </button>
             </div>
             <div class="modal-body text-center">
-              <img src="{{ url_for('static', filename='images/pngegg (1).png') }}" class="img-fluid mb-3" alt="Smartwatch">
-              <p>Track your fitness, receive notifications, and more with this sleek smartwatch.</p>
-              <p class="price">$129.99</p>
+              <img src="{{ url_for('static', filename='images/pngegg (1).png') }}" class="img-fluid mb-3" alt="Wireless Headphones">
+              <p>High-quality wireless headphones with noise cancellation and long battery life.</p>
+              <p class="price">$59.99</p>
               <button class="btn btn-add-cart">Add to Cart 🛒</button>
             </div>
           </div>
         </div>
       </div>
-
-      <!-- Product 3 -->
-      <div class="col-6 col-sm-4 col-md-2 product-item" data-toggle="modal" data-target="#productModal3">
-        <div class="card product-card">
-          <div class="image-container">
-            <img src="{{ url_for('static', filename='images/pngegg (1).png') }}" class="card-img-top" alt="Bluetooth Speaker">
-            <button class="love-icon" onclick="event.stopPropagation(); toggleLove(this)">🤍</button>
-          </div>
-          <div class="card-body text-center">
-            <h5 class="card-title">Bluetooth Speaker</h5>
-            <p class="card-text price">$39.99</p>
-          </div>
-        </div>
-      </div>
-
-      <!-- Product Modal 3 -->
-      <div class="modal fade" id="productModal3" tabindex="-1" role="dialog" aria-labelledby="productModalLabel3" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered" role="document">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title">Bluetooth Speaker</h5>
-              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-              </button>
-            </div>
-            <div class="modal-body text-center">
-              <img src="{{ url_for('static', filename='images/pngegg (1).png') }}" class="img-fluid mb-3" alt="Bluetooth Speaker">
-              <p>Portable Bluetooth speaker with rich sound quality and long-lasting battery.</p>
-              <p class="price">$39.99</p>
-              <button class="btn btn-add-cart">Add to Cart 🛒</button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Product 4 -->
-      <div class="col-6 col-sm-4 col-md-2 product-item" data-toggle="modal" data-target="#productModal4">
-        <div class="card product-card">
-          <div class="image-container">
-            <img src="{{ url_for('static', filename='images/pngegg (1).png') }}" class="card-img-top" alt="Gaming Mouse">
-            <button class="love-icon" onclick="event.stopPropagation(); toggleLove(this)">🤍</button>
-          </div>
-          <div class="card-body text-center">
-            <h5 class="card-title">Gaming Mouse</h5>
-            <p class="card-text price">$24.99</p>
-          </div>
-        </div>
-      </div>
-
-      <!-- Product Modal 4 -->
-      <div class="modal fade" id="productModal4" tabindex="-1" role="dialog" aria-labelledby="productModalLabel4" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered" role="document">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title">Gaming Mouse</h5>
-              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-              </button>
-            </div>
-            <div class="modal-body text-center">
-              <img src="{{ url_for('static', filename='images/pngegg (1).png') }}" class="img-fluid mb-3" alt="Gaming Mouse">
-              <p>Precision gaming mouse with customizable DPI settings and RGB lighting.</p>
-              <p class="price">$24.99</p>
-              <button class="btn btn-add-cart">Add to Cart 🛒</button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Product 5 -->
-      <div class="col-6 col-sm-4 col-md-2 product-item" data-toggle="modal" data-target="#productModal5">
-        <div class="card product-card">
-          <div class="image-container">
-            <img src="{{ url_for('static', filename='images/pngegg (1).png') }}" class="card-img-top" alt="Laptop Stand">
-            <button class="love-icon" onclick="event.stopPropagation(); toggleLove(this)">🤍</button>
-          </div>
-          <div class="card-body text-center">
-            <h5 class="card-title">Laptop Stand</h5>
-            <p class="card-text price">$19.99</p>
-          </div>
-        </div>
-      </div>
-
-      <!-- Product Modal 5 -->
-      <div class="modal fade" id="productModal5" tabindex="-1" role="dialog" aria-labelledby="productModalLabel5" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered" role="document">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title">Laptop Stand</h5>
-              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-              </button>
-            </div>
-            <div class="modal-body text-center">
-              <img src="{{ url_for('static', filename='images/pngegg (1).png') }}" class="img-fluid mb-3" alt="Laptop Stand">
-              <p>Ergonomic laptop stand for improved posture and cooling efficiency.</p>
-              <p class="price">$19.99</p>
-              <button class="btn btn-add-cart">Add to Cart 🛒</button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Product 6 -->
-      <div class="col-6 col-sm-4 col-md-2 product-item" data-toggle="modal" data-target="#productModal6">
-        <div class="card product-card">
-          <div class="image-container">
-            <img src="{{ url_for('static', filename='images/product6.jpg') }}" class="card-img-top" alt="Wireless Charger">
-            <button class="love-icon" onclick="event.stopPropagation(); toggleLove(this)">🤍</button>
-          </div>
-          <div class="card-body text-center">
-            <h5 class="card-title">Wireless Charger</h5>
-            <p class="card-text price">$29.99</p>
-          </div>
-        </div>
-      </div>
-
-      <!-- Product Modal 6 -->
-      <div class="modal fade" id="productModal6" tabindex="-1" role="dialog" aria-labelledby="productModalLabel6" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered" role="document">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title">Wireless Charger</h5>
-              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-              </button>
-            </div>
-            <div class="modal-body text-center">
-              <img src="{{ url_for('static', filename='images/product6.jpg') }}" class="img-fluid mb-3" alt="Wireless Charger">
-              <p>Fast wireless charger compatible with all Qi-enabled devices.</p>
-              <p class="price">$29.99</p>
-              <button class="btn btn-add-cart">Add to Cart 🛒</button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-    </div>
-  </div>
+    {% endfor %}     
 </div>
 <script>
 function toggleLove(icon) {

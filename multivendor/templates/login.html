@@ -1,0 +1,192 @@
+{% extends "layout.html" %}
+
+{% block content3 %}
+<style>
+  body {
+    background: #ffffff; 
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    padding: 20px;
+  }
+
+  .content-section {
+    max-width: 450px;
+    margin: auto;
+    background: #fafafa;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.1);
+    animation: fadeIn 1s ease-in-out;
+  }
+
+  .header-title {
+    text-align: center;
+    font-size: 28px;
+    font-weight: 700;
+    color: #0d6efd;
+    margin-bottom: 12px;
+  }
+
+  .sub-header {
+    text-align: center;
+    font-size: 16px;
+    color: #666;
+    margin-bottom: 25px;
+  }
+
+  .form-group label {
+    font-weight: 600;
+    color: #0d6efd;
+  }
+
+  .form-control {
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    padding: 12px;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .form-control:focus {
+    border-color: #0d6efd;
+    box-shadow: 0 0 10px rgba(13, 110, 253, 0.5);
+  }
+
+  .btn-custom {
+    background-color: green;
+    color: white;
+    border: none;
+    padding: 14px;
+    width: 100%;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: bold;
+    transition: background 0.3s ease;
+  }
+
+  .btn-custom:hover {
+    background-color: #0a58ca;
+  }
+
+  .border-top {
+    margin-top: 30px;
+    text-align: center;
+  }
+
+  a {
+    color: green;
+    text-decoration: none;
+  }
+
+  a:hover {
+    text-decoration: underline;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Responsive Design */
+  @media (max-width: 576px) {
+    .content-section {
+      padding: 20px;
+    }
+
+    .header-title {
+      font-size: 24px;
+    }
+
+    .sub-header {
+      font-size: 14px;
+    }
+
+    .btn-custom {
+      padding: 12px;
+    }
+  }
+</style>
+
+<div class="content-section">
+  <div class="header-title">🚀 Join Today!</div>
+  <div class="sub-header">Customize your store and connect with potential customers.</div>
+
+  <form method="POST" action="">
+    {{ form.hidden_tag() }}
+    <fieldset class="form-group">
+      
+      <!-- Username Field -->
+      <div class="form-group">
+        {{ form.username.label(class="form-control-label") }}
+        {% if form.username.errors %}
+          {{ form.username(class="form-control is-invalid") }}
+          <div class="invalid-feedback">
+            {% for error in form.username.errors %}
+              <span>{{ error }}</span>
+            {% endfor %}
+          </div>
+        {% else %}
+          {{ form.username(class="form-control") }}
+        {% endif %}
+      </div>
+
+      <!-- Email Field -->
+      <div class="form-group">
+        {{ form.email.label(class="form-control-label") }}
+        {% if form.email.errors %}
+          {{ form.email(class="form-control is-invalid") }}
+          <div class="invalid-feedback">
+            {% for error in form.email.errors %}
+              <span>{{ error }}</span>
+            {% endfor %}
+          </div>
+        {% else %}
+          {{ form.email(class="form-control") }}
+        {% endif %}
+      </div>
+
+      <!-- Password Field -->
+      <div class="form-group">
+        {{ form.password.label(class="form-control-label") }}
+        {% if form.password.errors %}
+          {{ form.password(class="form-control is-invalid") }}
+          <div class="invalid-feedback">
+            {% for error in form.password.errors %}
+              <span>{{ error }}</span>
+            {% endfor %}
+          </div>
+        {% else %}
+          {{ form.password(class="form-control") }}
+        {% endif %}
+      </div>
+
+      <!-- Confirm Password Field -->
+      <div class="form-group">
+        {{ form.confirm_password.label(class="form-control-label") }}
+        {% if form.confirm_password.errors %}
+          {{ form.confirm_password(class="form-control is-invalid") }}
+          <div class="invalid-feedback">
+            {% for error in form.confirm_password.errors %}
+              <span>{{ error }}</span>
+            {% endfor %}
+          </div>
+        {% else %}
+          {{ form.confirm_password(class="form-control") }}
+        {% endif %}
+      </div>
+
+    </fieldset>
+
+    <!-- Submit Button -->
+    <div class="form-group">
+      {{ form.submit(class="btn-custom") }}
+    </div>
+  </form>
+
+  <!-- Login Redirect -->
+  <div class="border-top pt-3">
+    <small class="text-muted">
+      Already have an account? <a href="#">Sign in here</a>
+    </small>
+  </div>
+</div>
+
+{% endblock %}
