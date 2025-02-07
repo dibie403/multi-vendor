@@ -2,62 +2,115 @@
 
 {% block content3 %}
 <style>
-  body {
-    background: #fafafa; 
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    padding: 20px;
+ body {
+  background: #fafafa; 
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.main-container {
+  flex-grow: 1;  /* Ensures the container fills available space */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+}
+
+.content-box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #fff;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+  animation: fadeIn 1s ease-in-out;
+  width: 100%;
+  max-width: 700px;
+}
+
+.image-container {
+  width: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding-right: 15px;
+}
+
+.image-container img {
+  width: 100%;
+  height: auto;
+  border-radius: 12px;
+}
+
+.form-container {
+  width: 50%;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 768px) {
+  .content-box {
+    flex-direction: column;
+    text-align: center;
+    padding: 15px;
   }
 
-  .content-section {
-    max-width: 450px;
-    margin: auto;
-    background: #fff;
-    padding: 30px;
-    border-radius: 12px;
-    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.1);
-    animation: fadeIn 1s ease-in-out;
+  .image-container {
+    width: 100%;
+    padding-right: 0;
+    margin-bottom: 15px;
   }
+
+  .form-container {
+    width: 100%;
+  }
+}
 
   .header-title {
     text-align: center;
-    font-size: 28px;
+    font-size: 22px;
     font-weight: 700;
     color: green;
-    margin-bottom: 12px;
+    margin-bottom: 10px;
   }
+  
 
   .sub-header {
     text-align: center;
-    font-size: 16px;
+    font-size: 14px;
     color: #666;
-    margin-bottom: 25px;
+    margin-bottom: 20px;
   }
 
   .form-group label {
     font-weight: 600;
     color: green;
+    font-size: 14px;
   }
 
   .form-control {
     border: 1px solid #ccc;
-    border-radius: 10px;
-    padding: 12px;
-    transition: border-color 0.3s ease, box-shadow 0.3s ease;
-  }
-
-  .form-control:focus {
-    border-color: #0d6efd;
-    box-shadow: 0 0 10px rgba(13, 110, 253, 0.5);
+    border-radius: 8px;
+    padding: 10px;
+    font-size: 14px;
   }
 
   .btn-custom {
     background-color: green;
     color: white;
     border: none;
-    padding: 14px;
+    padding: 10px;
     width: 100%;
-    border-radius: 10px;
-    font-size: 16px;
+    border-radius: 8px;
+    font-size: 14px;
     font-weight: bold;
     transition: background 0.3s ease;
   }
@@ -66,28 +119,10 @@
     background-color: #0a58ca;
   }
 
-  .btn-social {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 12px;
-    width: 100%;
-    border-radius: 10px;
-    font-size: 16px;
-    font-weight: bold;
-    transition: background 0.3s ease;
-    margin-bottom: 10px;
-    border: none;
-    cursor: pointer;
-  }
-
-  .btn-google { background-color: #db4437; color: white; }
-  .btn-facebook { background-color: #4267B2; color: white; }
-  .btn-other { background-color: #555; color: white; }
-
   .border-top {
-    margin-top: 30px;
+    margin-top: 20px;
     text-align: center;
+    font-size: 14px;
   }
 
   a {
@@ -99,162 +134,199 @@
     text-decoration: underline;
   }
 
-  .invalid-feedback {
-    color: red;
-    font-size: 0.9em;
-  }
-
-  .form-control.is-invalid {
-    border-color: red;
-  }
-
-  .hidden {
-    display: none;
-  }
-
   @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(-20px); }
+    from { opacity: 0; transform: translateY(-10px); }
     to { opacity: 1; transform: translateY(0); }
   }
 
-  /* Responsive Design */
-  @media (max-width: 576px) {
-    .content-section {
-      padding: 20px;
+  @media (max-width: 768px) {
+    .content-box {
+      flex-direction: column;
+      text-align: center;
+      padding: 15px;
     }
 
-    .header-title {
-      font-size: 24px;
+    .image-container {
+      width: 100%;
+      padding-right: 0;
+      margin-bottom: 15px;
     }
 
-    .sub-header {
-      font-size: 14px;
-    }
-
-    .btn-custom {
-      padding: 12px;
-    }
-
-    input.is-invalid {
-      border: 2px solid red !important;
+    .form-container {
+      width: 100%;
     }
   }
 </style>
 
-<div class="content-section mb-4">
-  <div class="header-title">🚀 Join Today!</div>
-  <div class="sub-header">Customize your store and connect with potential customers.</div>
-
-  <!-- Social Sign-in Buttons -->
-  <div class="text-center">
-    <button class="btn-social btn-google">
-      <!-- Replace with Google icon -->
-      Sign in with Google
-    </button>
-    <button class="btn-social btn-facebook">
-      <!-- Replace with Facebook icon -->
-      Sign in with Facebook
-    </button>
-    <button class="btn-social btn-other">
-      <!-- Replace with other provider icons -->
-      Sign in with Another Account
-    </button>
-  </div>
-
-  <hr>
-
-  <form method="POST" action="">
-    {{ form.hidden_tag() }}
-    <fieldset class="form-group">
-
-      <!-- Status (Register As) Dropdown -->
-      <div class="form-group">
-        {{ form.status.label(class="form-control-label") }}
-        {% if form.status.errors %}
-          {{ form.status(class="form-control is-invalid", id="statusSelect") }}
-          <div class="invalid-feedback">
-            {% for error in form.status.errors %}
-              <span>{{ error }}</span>
-            {% endfor %}
-          </div>
-        {% else %}
-          {{ form.status(class="form-control", id="statusSelect") }}
-        {% endif %}
-      </div>
-
-      <!-- Username Field -->
-      <div class="form-group">
-        {{ form.username.label(class="form-control-label") }}
-        {% if form.username.errors %}
-          {{ form.username(class="form-control is-invalid") }}
-          <div class="invalid-feedback">
-            {% for error in form.username.errors %}
-              <span>{{ error }}</span>
-            {% endfor %}
-          </div>
-        {% else %}
-          {{ form.username(class="form-control") }}
-        {% endif %}
-      </div>
-
-      <!-- Email Field -->
-      <div class="form-group">
-        {{ form.email.label(class="form-control-label") }}
-        {% if form.email.errors %}
-          {{ form.email(class="form-control is-invalid") }}
-          <div class="invalid-feedback">
-            {% for error in form.email.errors %}
-              <span>{{ error }}</span>
-            {% endfor %}
-          </div>
-        {% else %}
-          {{ form.email(class="form-control") }}
-        {% endif %}
-      </div>
-
-      <!-- Password Field -->
-      <div class="form-group">
-        {{ form.password.label(class="form-control-label") }}
-        {% if form.password.errors %}
-          {{ form.password(class="form-control is-invalid") }}
-          <div class="invalid-feedback">
-            {% for error in form.password.errors %}
-              <span>{{ error }}</span>
-            {% endfor %}
-          </div>
-        {% else %}
-          {{ form.password(class="form-control") }}
-        {% endif %}
-      </div>
-
-      <!-- Confirm Password Field -->
-      <div class="form-group">
-        {{ form.confirm_password.label(class="form-control-label") }}
-        {% if form.confirm_password.errors %}
-          {{ form.confirm_password(class="form-control is-invalid") }}
-          <div class="invalid-feedback">
-            {% for error in form.confirm_password.errors %}
-              <span>{{ error }}</span>
-            {% endfor %}
-          </div>
-        {% else %}
-          {{ form.confirm_password(class="form-control") }}
-        {% endif %}
-      </div>
-
-    </fieldset>
-
-    <!-- Submit Button -->
-    <div class="form-group">
-      {{ form.submit(class="btn-custom") }}
+<div class="main-container">
+  <div class="content-box">
+    <!-- Image Section -->
+    <div class="image-container">
+      <img src="/static/images/karsten-winegeart-4bC1Ef88OYI-unsplash.jpg" alt="Form Image">
     </div>
-  </form>
 
-  <div class="border-top pt-3">
-    <small class="text-muted">
-      Already have an account? <a href="#">Sign in here</a>
-    </small>
+    <!-- Form Section -->
+  <div class="form-container">
+    <div class="header-title">🚀 Join Today!</div>
+    <div class="sub-header">Customize your store and connect with potential customers.</div>
+
+    <!-- Social Sign-in Buttons -->
+
+
+    <hr>
+
+    <form method="POST" action="">
+      {{ form.hidden_tag() }}
+      <fieldset class="form-group">
+
+        <!-- Status (Register As) Dropdown -->
+        <div class="form-group">
+          {{ form.status.label(class="form-control-label") }}
+          {% if form.status.errors %}
+            {{ form.status(class="form-control is-invalid", id="statusSelect") }}
+            <div class="invalid-feedback">
+              {% for error in form.status.errors %}
+                <span>{{ error }}</span>
+              {% endfor %}
+            </div>
+          {% else %}
+            {{ form.status(class="form-control", id="statusSelect") }}
+          {% endif %}
+        </div>
+
+        <!-- Username Field -->
+        <div class="form-group">
+          {{ form.username.label(class="form-control-label") }}
+          {% if form.username.errors %}
+            {{ form.username(class="form-control is-invalid") }}
+            <div class="invalid-feedback">
+              {% for error in form.username.errors %}
+                <span>{{ error }}</span>
+              {% endfor %}
+            </div>
+          {% else %}
+            {{ form.username(class="form-control") }}
+          {% endif %}
+        </div>
+
+        <!-- Email Field -->
+        <div class="form-group">
+          {{ form.email.label(class="form-control-label") }}
+          {% if form.email.errors %}
+            {{ form.email(class="form-control is-invalid") }}
+            <div class="invalid-feedback">
+              {% for error in form.email.errors %}
+                <span>{{ error }}</span>
+              {% endfor %}
+            </div>
+          {% else %}
+            {{ form.email(class="form-control") }}
+          {% endif %}
+        </div>
+
+        <!-- Password Field -->
+        <div class="form-group">
+          {{ form.password.label(class="form-control-label") }}
+          {% if form.password.errors %}
+            {{ form.password(class="form-control is-invalid") }}
+            <div class="invalid-feedback">
+              {% for error in form.password.errors %}
+                <span>{{ error }}</span>
+              {% endfor %}
+            </div>
+          {% else %}
+            {{ form.password(class="form-control") }}
+          {% endif %}
+        </div>
+
+        <!-- Confirm Password Field -->
+        <div class="form-group">
+          {{ form.confirm_password.label(class="form-control-label") }}
+          {% if form.confirm_password.errors %}
+            {{ form.confirm_password(class="form-control is-invalid") }}
+            <div class="invalid-feedback">
+              {% for error in form.confirm_password.errors %}
+                <span>{{ error }}</span>
+              {% endfor %}
+            </div>
+          {% else %}
+            {{ form.confirm_password(class="form-control") }}
+          {% endif %}
+        </div>
+        <!-- Shop Fields (Initially Hidden) -->
+      <div id="shopFields" class="hidden">
+        <!-- Shop Name -->
+        <div class="form-group">
+          {{ form.shop_name.label(class="form-control-label") }}
+          {% if form.shop_name.errors %}
+            {{ form.shop_name(class="form-control is-invalid") }}
+            <div class="invalid-feedback">
+              {% for error in form.shop_name.errors %}
+                <span>{{ error }}</span>
+              {% endfor %}
+            </div>
+          {% else %}
+            {{ form.shop_name(class="form-control") }}
+          {% endif %}
+        </div>
+
+        <!-- Shop Motto -->
+        <div class="form-group">
+          {{ form.shop_motto.label(class="form-control-label") }}
+          {% if form.shop_motto.errors %}
+            {{ form.shop_motto(class="form-control is-invalid") }}
+            <div class="invalid-feedback">
+              {% for error in form.shop_motto.errors %}
+                <span>{{ error }}</span>
+              {% endfor %}
+            </div>
+          {% else %}
+            {{ form.shop_motto(class="form-control") }}
+          {% endif %}
+        </div>
+      </div>
+
+
+      </fieldset>
+
+      <!-- Submit Button -->
+      <div class="form-group">
+        {{ form.submit(class="btn-custom") }}
+      </div>
+    </form>
+
+
+
+      <div class="border-top pt-3">
+        <small class="text-muted">
+          Already have an account? <a href="#">Sign in here</a>
+        </small>
+      </div>
+    </div>
   </div>
 </div>
+
+<!-- JavaScript to Show/Hide Shop Fields -->
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    var statusSelect = document.getElementById("statusSelect");
+    var shopFields = document.getElementById("shopFields");
+
+    function toggleShopFields() {
+      if (statusSelect.value === "seller") {
+        shopFields.style.display = "block"; // Show fields
+      } else {
+        shopFields.style.display = "none"; // Hide fields
+      }
+    }
+
+    // Run the function on page load (in case of form re-submission)
+    toggleShopFields();
+
+    // Listen for changes in the dropdown
+    statusSelect.addEventListener("change", toggleShopFields);
+  });
+</script>
+
 
 {% endblock %}
