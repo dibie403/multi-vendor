@@ -41,37 +41,19 @@
   padding-right: 15px;
 }
 
-.image-container img {
-  width: 100%;
-  height: auto;
-  border-radius: 12px;
-}
+
 
 .form-container {
   width: 50%;
 }
 
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(-10px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-@media (max-width: 768px) {
-  .content-box {
-    flex-direction: column;
-    text-align: center;
-    padding: 15px;
-  }
-
-  .image-container {
-    width: 100%;
-    padding-right: 0;
-    margin-bottom: 15px;
-  }
-
   .form-container {
     width: 100%;
   }
+  .image-container img {
+      height: 700px;
+      width: 300px;
+      border-radius: 12px;
 }
 
   .header-title {
@@ -139,163 +121,199 @@
     to { opacity: 1; transform: translateY(0); }
   }
 
-  @media (max-width: 768px) {
+  @media (max-width: 568px) {
     .content-box {
+    flex-direction: column;
+    padding: 15px;
+  }
+    .image-container img {
       flex-direction: column;
       text-align: center;
-      padding: 15px;
+      height: 200px;
     }
 
     .image-container {
       width: 100%;
       padding-right: 0;
-      margin-bottom: 15px;
+      margin-bottom: 20px;
     }
 
     .form-container {
       width: 100%;
     }
   }
+
+  @keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 768px) {
+  .content-box {
+  flex-direction: column;
+  padding: 15px;
+  }
+
+  .image-container {
+    width: 100%;
+    padding-right: 0;
+    margin-bottom: 15px;
+  }
+}
+
+
+</style>
+
+ 
 </style>
 
 <div class="main-container">
-  <div class="content-box">
+  <div class="content-box" style='margin-top: 3rem;'>
     <!-- Image Section -->
     <div class="image-container">
-      <img src="/static/images/karsten-winegeart-4bC1Ef88OYI-unsplash.jpg" alt="Form Image">
+      <img src="/static/images/karsten-winegeart-4bC1Ef88OYI-unsplash3.jpg" alt="Form Image">
     </div>
 
     <!-- Form Section -->
-  <div class="form-container">
-    <div class="header-title">🚀 Join Today!</div>
-    <div class="sub-header">Customize your store and connect with potential customers.</div>
+    <div class="form-container">
+      <div class="header-title">🚀 Join Today!</div>
+      <div class="sub-header">Customize your store and connect with potential customers.</div>
 
-    <!-- Social Sign-in Buttons -->
+      <hr>
 
+      <form method="POST" action="">
+        {{ form.hidden_tag() }}
+        <fieldset class="form-group">
 
-    <hr>
+          <!-- Status (Register As) Dropdown -->
+          <div class="form-group">
+            {{ form.status.label(class="form-control-label", for="status") }}
+            {% if form.status.errors %}
+              {{ form.status(class="form-control is-invalid", id="status") }}
+              <div class="invalid-feedback">
+                {% for error in form.status.errors %}
+                  <span>{{ error }}</span>
+                {% endfor %}
+              </div>
+            {% else %}
+              {{ form.status(class="form-control", id="status") }}
+            {% endif %}
+          </div>
 
-    <form method="POST" action="">
-      {{ form.hidden_tag() }}
-      <fieldset class="form-group">
+          <!-- Username Field -->
+          <div class="form-group">
+            {{ form.username.label(class="form-control-label", for="username") }}
+            {% if form.username.errors %}
+              {{ form.username(class="form-control is-invalid", id="username") }}
+              <div class="invalid-feedback">
+                {% for error in form.username.errors %}
+                  <span>{{ error }}</span>
+                {% endfor %}
+              </div>
+            {% else %}
+              {{ form.username(class="form-control", id="username") }}
+            {% endif %}
+          </div>
 
-        <!-- Status (Register As) Dropdown -->
-        <div class="form-group">
-          {{ form.status.label(class="form-control-label") }}
-          {% if form.status.errors %}
-            {{ form.status(class="form-control is-invalid", id="statusSelect") }}
-            <div class="invalid-feedback">
-              {% for error in form.status.errors %}
-                <span>{{ error }}</span>
-              {% endfor %}
-            </div>
-          {% else %}
-            {{ form.status(class="form-control", id="statusSelect") }}
-          {% endif %}
-        </div>
-
-        <!-- Username Field -->
-        <div class="form-group">
-          {{ form.username.label(class="form-control-label") }}
-          {% if form.username.errors %}
-            {{ form.username(class="form-control is-invalid") }}
-            <div class="invalid-feedback">
-              {% for error in form.username.errors %}
-                <span>{{ error }}</span>
-              {% endfor %}
-            </div>
-          {% else %}
-            {{ form.username(class="form-control") }}
-          {% endif %}
-        </div>
-
-        <!-- Email Field -->
-        <div class="form-group">
-          {{ form.email.label(class="form-control-label") }}
-          {% if form.email.errors %}
-            {{ form.email(class="form-control is-invalid") }}
-            <div class="invalid-feedback">
-              {% for error in form.email.errors %}
-                <span>{{ error }}</span>
-              {% endfor %}
-            </div>
-          {% else %}
-            {{ form.email(class="form-control") }}
-          {% endif %}
-        </div>
-
-        <!-- Password Field -->
-        <div class="form-group">
-          {{ form.password.label(class="form-control-label") }}
-          {% if form.password.errors %}
-            {{ form.password(class="form-control is-invalid") }}
-            <div class="invalid-feedback">
-              {% for error in form.password.errors %}
-                <span>{{ error }}</span>
-              {% endfor %}
-            </div>
-          {% else %}
-            {{ form.password(class="form-control") }}
-          {% endif %}
-        </div>
-
-        <!-- Confirm Password Field -->
-        <div class="form-group">
-          {{ form.confirm_password.label(class="form-control-label") }}
-          {% if form.confirm_password.errors %}
-            {{ form.confirm_password(class="form-control is-invalid") }}
-            <div class="invalid-feedback">
-              {% for error in form.confirm_password.errors %}
-                <span>{{ error }}</span>
-              {% endfor %}
-            </div>
-          {% else %}
-            {{ form.confirm_password(class="form-control") }}
-          {% endif %}
-        </div>
-        <!-- Shop Fields (Initially Hidden) -->
-      <div id="shopFields" class="hidden">
-        <!-- Shop Name -->
-        <div class="form-group">
-          {{ form.shop_name.label(class="form-control-label") }}
-          {% if form.shop_name.errors %}
-            {{ form.shop_name(class="form-control is-invalid") }}
-            <div class="invalid-feedback">
-              {% for error in form.shop_name.errors %}
-                <span>{{ error }}</span>
-              {% endfor %}
-            </div>
-          {% else %}
-            {{ form.shop_name(class="form-control") }}
-          {% endif %}
-        </div>
-
-        <!-- Shop Motto -->
-        <div class="form-group">
-          {{ form.shop_motto.label(class="form-control-label") }}
-          {% if form.shop_motto.errors %}
-            {{ form.shop_motto(class="form-control is-invalid") }}
-            <div class="invalid-feedback">
-              {% for error in form.shop_motto.errors %}
-                <span>{{ error }}</span>
-              {% endfor %}
-            </div>
-          {% else %}
-            {{ form.shop_motto(class="form-control") }}
-          {% endif %}
-        </div>
-      </div>
-
-
-      </fieldset>
-
-      <!-- Submit Button -->
+          <!-- Email Field -->
+          <div class="form-group">
+            {{ form.email.label(class="form-control-label", for="email") }}
+            {% if form.email.errors %}
+              {{ form.email(class="form-control is-invalid", id="email") }}
+              <div class="invalid-feedback">
+                {% for error in form.email.errors %}
+                  <span>{{ error }}</span>
+                {% endfor %}
+              </div>
+            {% else %}
+              {{ form.email(class="form-control", id="email") }}
+            {% endif %}
+          </div>
+          <!-- Phone Number Field -->
       <div class="form-group">
-        {{ form.submit(class="btn-custom") }}
+        {{ form.phone.label(class="form-control-label") }}
+        {% if form.phone.errors %}
+          {{ form.phone(class="form-control is-invalid") }}
+          <div class="invalid-feedback">
+            {% for error in form.phone.errors %}
+              <span>{{ error }}</span>
+            {% endfor %}
+          </div>
+        {% else %}
+          {{ form.phone(class="form-control") }}
+        {% endif %}
       </div>
-    </form>
 
+          <!-- Password Field -->
+          <div class="form-group">
+            {{ form.password.label(class="form-control-label", for="password") }}
+            {% if form.password.errors %}
+              {{ form.password(class="form-control is-invalid", id="password") }}
+              <div class="invalid-feedback">
+                {% for error in form.password.errors %}
+                  <span>{{ error }}</span>
+                {% endfor %}
+              </div>
+            {% else %}
+              {{ form.password(class="form-control", id="password") }}
+            {% endif %}
+          </div>
 
+          <!-- Confirm Password Field -->
+          <div class="form-group">
+            {{ form.confirm_password.label(class="form-control-label", for="confirm_password") }}
+            {% if form.confirm_password.errors %}
+              {{ form.confirm_password(class="form-control is-invalid", id="confirm_password") }}
+              <div class="invalid-feedback">
+                {% for error in form.confirm_password.errors %}
+                  <span>{{ error }}</span>
+                {% endfor %}
+              </div>
+            {% else %}
+              {{ form.confirm_password(class="form-control", id="confirm_password") }}
+            {% endif %}
+          </div>
+
+          <!-- Shop Fields (Initially Hidden) -->
+          <div id="shopFields" class="hidden">
+            <!-- Shop Name -->
+            <div class="form-group">
+              {{ form.shop_name.label(class="form-control-label", for="shop_name") }}
+              {% if form.shop_name.errors %}
+                {{ form.shop_name(class="form-control is-invalid", id="shop_name") }}
+                <div class="invalid-feedback">
+                  {% for error in form.shop_name.errors %}
+                    <span>{{ error }}</span>
+                  {% endfor %}
+                </div>
+              {% else %}
+                {{ form.shop_name(class="form-control", id="shop_name") }}
+              {% endif %}
+            </div>
+
+            <!-- Shop Motto -->
+            <div class="form-group">
+              {{ form.shop_motto.label(class="form-control-label", for="shop_motto") }}
+              {% if form.shop_motto.errors %}
+                {{ form.shop_motto(class="form-control is-invalid", id="shop_motto") }}
+                <div class="invalid-feedback">
+                  {% for error in form.shop_motto.errors %}
+                    <span>{{ error }}</span>
+                  {% endfor %}
+                </div>
+              {% else %}
+                {{ form.shop_motto(class="form-control", id="shop_motto") }}
+              {% endif %}
+            </div>
+          </div>
+
+        </fieldset>
+
+        <!-- Submit Button -->
+        <div class="form-group">
+          {{ form.submit(class="btn-custom") }}
+        </div>
+      </form>
 
       <div class="border-top pt-3">
         <small class="text-muted">
@@ -309,7 +327,7 @@
 <!-- JavaScript to Show/Hide Shop Fields -->
 <script>
   document.addEventListener("DOMContentLoaded", function() {
-    var statusSelect = document.getElementById("statusSelect");
+    var statusSelect = document.getElementById("status");
     var shopFields = document.getElementById("shopFields");
 
     function toggleShopFields() {
@@ -327,6 +345,7 @@
     statusSelect.addEventListener("change", toggleShopFields);
   });
 </script>
+
 
 
 {% endblock %}
