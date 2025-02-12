@@ -47,13 +47,13 @@
   width: 50%;
 }
 
-  .form-container {
-    width: 100%;
-  }
-  .image-container img {
-      height: 700px;
-      width: 300px;
-      border-radius: 12px;
+.form-container {
+  width: 100%;
+}
+.image-container img {
+    height: 700px;
+    width: 300px;
+    border-radius: 12px;
 }
 
   .header-title {
@@ -116,6 +116,28 @@
     text-decoration: underline;
   }
 
+@media (max-width: 750px) {
+  .content-box {
+  flex-direction: column;
+  padding: 15px;
+  }
+
+.image-container img {
+    flex-direction: column;
+    text-align: center;
+    height: 200px;
+}
+.image-container {
+  width: 100%;
+  padding-right: 0;
+  margin-bottom: 20px;
+}
+.form-container {
+  width: 100%;
+  }
+}
+
+/* Adjustments for small mobile */
   @keyframes fadeIn {
     from { opacity: 0; transform: translateY(-10px); }
     to { opacity: 1; transform: translateY(0); }
@@ -143,37 +165,14 @@
     }
   }
 
-  @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(-10px); }
-  to { opacity: 1; transform: translateY(0); }
-}
+/* Adjustments for Tablets */
 
-@media (max-width: 768px) {
-  .content-box {
-  flex-direction: column;
-  padding: 15px;
-  }
-
-  .image-container img {
-      flex-direction: column;
-      text-align: center;
-      height: 200px;
-    }
-  .image-container {
-    width: 100%;
-    padding-right: 0;
-    margin-bottom: 15px;
-  }
-   .form-container {
-      width: 100%;
-    }
-}
 
 
 </style>
 
  
-</style>
+
 
 <div class="main-container">
   <div class="content-box" style='margin-top: 3rem;'>
@@ -252,20 +251,20 @@
         {% endif %}
       </div>
 
-          <!-- Password Field -->
-          <div class="form-group">
-            {{ form.password.label(class="form-control-label", for="password") }}
-            {% if form.password.errors %}
-              {{ form.password(class="form-control is-invalid", id="password") }}
-              <div class="invalid-feedback">
-                {% for error in form.password.errors %}
-                  <span>{{ error }}</span>
-                {% endfor %}
-              </div>
-            {% else %}
-              {{ form.password(class="form-control", id="password") }}
-            {% endif %}
+      <!-- Password Field -->
+      <div class="form-group">
+        {{ form.password.label(class="form-control-label", for="password") }}
+        {% if form.password.errors %}
+          {{ form.password(class="form-control is-invalid", id="password") }}
+          <div class="invalid-feedback">
+            {% for error in form.password.errors %}
+              <span>{{ error }}</span>
+            {% endfor %}
           </div>
+        {% else %}
+          {{ form.password(class="form-control", id="password") }}
+        {% endif %}
+      </div>
 
           <!-- Confirm Password Field -->
           <div class="form-group">

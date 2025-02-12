@@ -1,121 +1,10 @@
 {% extends "layout.html" %}
 
 {% block content3 %}
-<style>
-  body {
-    background: #fafafa; 
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    padding: 20px;
-  }
 
-  .content-section {
-    max-width: 450px;
-    margin: auto;
-    background: #fff;
-    padding: 30px;
-    border-radius: 12px;
-    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.1);
-    animation: fadeIn 1s ease-in-out;
-  }
-
-  .header-title {
-    text-align: center;
-    font-size: 28px;
-    font-weight: 700;
-    color: green;
-    margin-bottom: 12px;
-  }
-
-  .sub-header {
-    text-align: center;
-    font-size: 16px;
-    color: #666;
-    margin-bottom: 25px;
-  }
-
-  .form-group label {
-    font-weight: 600;
-    color: green;
-  }
-
-  .form-control {
-    border: 1px solid #ccc;
-    border-radius: 10px;
-    padding: 12px;
-    transition: border-color 0.3s ease, box-shadow 0.3s ease;
-  }
-
-  .form-control:focus {
-    border-color: #0d6efd;
-    box-shadow: 0 0 10px rgba(13, 110, 253, 0.5);
-  }
-
-  .btn-custom {
-    background-color: green;
-    color: white;
-    border: none;
-    padding: 14px;
-    width: 100%;
-    border-radius: 10px;
-    font-size: 16px;
-    font-weight: bold;
-    transition: background 0.3s ease;
-  }
-
-  .btn-custom:hover {
-    background-color: #0a58ca;
-  }
-
-  .border-top {
-    margin-top: 30px;
-    text-align: center;
-  }
-
-  a {
-    color: green;
-    text-decoration: none;
-  }
-
-  a:hover {
-    text-decoration: underline;
-  }
-
-  .invalid-feedback {
-    color: red;
-    font-size: 0.9em;
-  }
-
-  .form-control.is-invalid {
-    border-color: red;
-  }
-
-  @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(-20px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-
-  /* Responsive Design */
-  @media (max-width: 576px) {
-    .content-section {
-      padding: 20px;
-    }
-
-    .header-title {
-      font-size: 24px;
-    }
-
-    .sub-header {
-      font-size: 14px;
-    }
-
-    .btn-custom {
-      padding: 12px;
-    }
-  }
-</style>
-
-<div class="content-section mb-4">
-  <div class="header-title">🚀 Log In</div>
+  
+<div class="content-section11 mb-4">
+  <div class="header-title11">🚀 Log In</div>
   <div class="sub-header">Welcome back! Please log in to continue.</div>
 
   <form method="POST" action="{{ url_for('login') }}">
@@ -123,7 +12,7 @@
     <fieldset class="form-group">
 
       <!-- Email Field -->
-      <div class="form-group">
+      <div class="form-group11">
         {{ form.email.label(class="form-control-label") }}
         {% if form.email.errors %}
           {{ form.email(class="form-control is-invalid", type="email") }}
@@ -138,7 +27,7 @@
       </div>
 
       <!-- Password Field -->
-      <div class="form-group">
+      <div class="form-group11">
         {{ form.password.label(class="form-control-label") }}
         {% if form.password.errors %}
           {{ form.password(class="form-control is-invalid") }}
@@ -153,7 +42,7 @@
       </div>
 
       <!-- Remember Me Field -->
-      <div class="form-group form-check">
+      <div class="form-group11 form-check">
         {{ form.remember(class="form-check-input") }}
         {{ form.remember.label(class="form-check-label") }}
       </div>
@@ -161,8 +50,8 @@
     </fieldset>
 
     <!-- Submit Button -->
-    <div class="form-group">
-      {{ form.submit(class="btn-custom") }}
+    <div class="form-group11">
+      {{ form.submit(class="btn-custom11") }}
     </div>
   </form>
 

@@ -36,9 +36,21 @@ h1, h2, h3, h4, h5, h6 {
 .footer-text{
   color:#FFD700;
 }
+.account-img2 {
+  height: 25px;
+  width: 25px;
+  margin-right: 20px;
+  margin-bottom: 16px;
+}
 
 
-/* style for register/login */
+/* Change text color to green when an item is clicked drop down */
+.dropdown-item:active, 
+.dropdown-item:focus, 
+.dropdown-item:hover {
+    background-color: #e6f7e6 !important; /* Light green background */
+    color: green !important; /* Green text */
+}
 
 
 
@@ -68,6 +80,117 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 
+
+/* styling for login/update */
+
+  .content-section11 {
+    max-width: 450px;
+    margin: auto;
+    background: #fff;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.1);
+    animation: fadeIn 1s ease-in-out;
+  }
+
+  .header-title11 {
+    text-align: center;
+    font-size: 28px;
+    font-weight: 700;
+    color: green;
+    margin-bottom: 12px;
+  }
+
+  .sub-header11 {
+    text-align: center;
+    font-size: 16px;
+    color: #666;
+    margin-bottom: 25px;
+  }
+
+  .form-group11 label {
+    font-weight: 600;
+    color: green;
+  }
+
+  .form-control11 {
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    padding: 12px;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .form-control11:focus {
+    border-color: #0d6efd;
+    box-shadow: 0 0 10px rgba(13, 110, 253, 0.5);
+  }
+
+  .btn-custom11 {
+    background-color: green;
+    color: white;
+    border: none;
+    padding: 14px;
+    width: 100%;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: bold;
+    transition: background 0.3s ease;
+  }
+
+  .btn-custom11:hover {
+    background-color: #0a58ca;
+  }
+
+  .border-top11 {
+    margin-top: 30px;
+    text-align: center;
+  }
+
+  a {
+    color: green;
+    text-decoration: none;
+  }
+
+  a:hover {
+    text-decoration: underline;
+  }
+
+  .invalid-feedback {
+    color: red;
+    font-size: 0.9em;
+  }
+
+  .form-control.is-invalid {
+    border-color: red;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Responsive Design */
+  @media (max-width: 576px) {
+    .content-section {
+      padding: 20px;
+    }
+
+    .header-title {
+      font-size: 24px;
+    }
+
+    .sub-header {
+      font-size: 14px;
+    }
+
+    .btn-custom {
+      padding: 12px;
+    }
+  }
+
+
+
+
 /* styling for caurosel */
 /* Base Image Styling */
 .carousel-item img {
@@ -75,6 +198,7 @@ h1, h2, h3, h4, h5, h6 {
   height: 250px;
   object-fit: cover;
   position: relative;
+  border-radius: 10px;
 }
 
 /* Caption Styling */

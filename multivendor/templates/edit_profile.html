@@ -1,0 +1,91 @@
+{% extends "layout.html" %}
+
+{% block content1 %}
+
+  
+<div class="content-section mb-4">
+  <div class="header-title11">🚀 Update Your User Profile</div>
+  <div class="sub-header">Make Changes to your Profile</div>
+
+  <form method="POST", action="" enctype="multipart/form-data">
+    {{ form.hidden_tag() }}
+    <fieldset class="form-group">
+
+       <!-- Username Field -->
+          <div class="form-group">
+            {{ form.username.label(class="form-control-label", for="username") }}
+            {% if form.username.errors %}
+              {{ form.username(class="form-control is-invalid", id="username") }}
+              <div class="invalid-feedback">
+                {% for error in form.username.errors %}
+                  <span>{{ error }}</span>
+                {% endfor %}
+              </div>
+            {% else %}
+              {{ form.username(class="form-control", id="username") }}
+            {% endif %}
+          </div>
+
+          <!-- Email Field -->
+          <div class="form-group">
+            {{ form.email.label(class="form-control-label", for="email") }}
+            {% if form.email.errors %}
+              {{ form.email(class="form-control is-invalid", id="email") }}
+              <div class="invalid-feedback">
+                {% for error in form.email.errors %}
+                  <span>{{ error }}</span>
+                {% endfor %}
+              </div>
+            {% else %}
+              {{ form.email(class="form-control", id="email") }}
+            {% endif %}
+          </div>
+          <!-- Phone Number Field -->
+        <div class="form-group">
+          {{ form.phone.label(class="form-control-label") }}
+          {% if form.phone.errors %}
+            {{ form.phone(class="form-control is-invalid") }}
+            <div class="invalid-feedback">
+              {% for error in form.phone.errors %}
+                <span>{{ error }}</span>
+              {% endfor %}
+            </div>
+        {% else %}
+          {{ form.phone(class="form-control") }}
+        {% endif %}
+      </div>
+  <!-- Status (Register As) Dropdown -->
+      <div class="form-group">
+        {{ form.status.label(class="form-control-label", for="status") }}
+        {% if form.status.errors %}
+          {{ form.status(class="form-control is-invalid", id="status") }}
+          <div class="invalid-feedback">
+            {% for error in form.status.errors %}
+              <span>{{ error }}</span>
+            {% endfor %}
+          </div>
+        {% else %}
+          {{ form.status(class="form-control", id="status") }}
+        {% endif %}
+      </div>
+
+      <div class="form-group">
+          {{ form.picture.label() }}  <!-- Label should use form-control-label --> 
+          {{ form.picture(class="form-control-file") }} 
+          {% if form.picture.errors %}
+              {% for error in form.picture.errors %}
+                 <span class='text-danger'> {{ error }}</span><br>
+              {% endfor %}
+          {% endif %}
+      </div>
+
+    </fieldset>
+
+    <!-- Submit Button -->
+    <div class="form-group11">
+      {{ form.submit(class="btn-custom") }}
+    </div>
+  </form>
+
+</div>
+{% endblock %}
