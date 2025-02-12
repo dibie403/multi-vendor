@@ -63,7 +63,7 @@ class UpdateProfileForm(FlaskForm):
 		username = StringField('Username', validators=[DataRequired(), Length(min=3, max=20)])
 		email = StringField('Email', validators=[DataRequired(), Email()])
 		phone = StringField('Phone Number', validators=[DataRequired()])
-		status = SelectField('Register As', choices=[('buyer', 'Buyer'), ('seller', 'Seller')], validators=[DataRequired()])
+		status = SelectField('Register As', choices=[('True', 'Seller'), ('False', 'Buyer')], validators=[DataRequired()])
 		picture=FileField('Update Profile Picture',validators=[FileAllowed(['jpg','png'])])
 		submit=SubmitField('Update')
 

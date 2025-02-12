@@ -117,7 +117,7 @@ def profile_edit():
            
         try:
             # Convert status to boolean (True for seller, False for buyer)
-            is_seller = form.status.data == "seller"
+            current_user.status = form.status.data == 'True'
             if form.picture.data:
                 picture_file = save_picture(form.picture.data)
 
@@ -127,7 +127,7 @@ def profile_edit():
             current_user.username = form.username.data
             current_user.email = form.email.data
             current_user.phone_number = form.phone.data
-            current_user.status = is_seller  # True for sellers, False for buyers
+            current_user.status = current_user.status # True for sellers, False for buyers
             current_user.slug = form.username.data.lower().replace(" ", "-")  # Generate a slug
             
             db.session.commit()
@@ -142,7 +142,7 @@ def profile_edit():
         form.username.data = current_user.username
         form.email.data = current_user.email
         form.phone.data = current_user.phone_number
-        form.status.data = current_user.status
+        form.status.data = "True" if current_user.status else "False"
 
     return render_template('edit_profile.html', form=form)
 
