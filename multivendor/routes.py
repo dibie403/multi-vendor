@@ -5,7 +5,7 @@ from PIL import Image
 from flask import render_template, url_for, flash, redirect, request
 from multivendor import app,db,bcrypt
 from flask_login import login_user,current_user,logout_user,login_required
-from multivendor.forms import RegistrationForm,LoginForm,UpdateProfileForm
+from multivendor.forms import RegistrationForm,LoginForm,UpdateProfileForm,AddProductForm
 from multivendor.models import User
 
 
@@ -13,7 +13,7 @@ from multivendor.models import User
 
 
 @app.route("/")
-@app.route("/home")
+@app.route("/home/power")
 def home():
     image_file = None
     if current_user.is_authenticated:
@@ -22,7 +22,7 @@ def home():
     return render_template('home.html',title='home',image_file=image_file)
 
 
-@app.route("/register", methods=['GET', 'POST'])
+@app.route("/home/register", methods=['GET', 'POST'])
 def register():
     if current_user.is_authenticated:
         return redirect(url_for('home'))
@@ -47,7 +47,8 @@ def register():
                 shop_name=form.shop_name.data if is_seller else None,  # Only store shop name if seller
                 shop_motto=form.shop_motto.data if is_seller else None,  # Only store shop motto if seller
                 status=is_seller,  # True for sellers, False for buyers
-                slug=form.username.data.lower().replace(" ", "-")  # Generate a slug
+                slug=form.username.data.lower().replace(" ", "-"),  # Generate a slug
+                slug1 = form.shop_name.data.lower().replace(" ", "-")  
             )
 
             db.session.add(user)
@@ -84,9 +85,10 @@ def logout():
     return redirect(url_for('home'))
 
 
-@app.route("/shop")
-@login_required
-def shop():
+
+
+@app.route("/store/<string:username>")
+def shop2(username):
     image_file = None
     if current_user.is_authenticated:
         image_file = url_for('static', filename='profile_pics/' + current_user.image_file)
@@ -108,7 +110,7 @@ def save_picture(form_picture):
 
     return picture_fn
 
-@app.route("/Profile-Edit", methods=['GET', 'POST'])
+@app.route("/home/Profile-Edit", methods=['GET', 'POST'])
 def profile_edit():
     form = UpdateProfileForm()
     
@@ -145,6 +147,27 @@ def profile_edit():
         form.status.data = "True" if current_user.status else "False"
 
     return render_template('edit_profile.html', form=form)
+
+@app.route("/plazo/{current_user.username}")
+def plazo():
+    image_file = None
+    if current_user.is_authenticated:
+        image_file = url_for('static', filename='profile_pics/' + current_user.image_file)
+
+
+    return render_template('home.html',title='shop',image_file=image_file)
+
+
+
+
+@app.route("/add-Product", methods=['GET', 'POST'])
+def New_product():
+    form = AddProductForm()
+    
+   
+
+    return render_template('add_product.html', form=form)
+
 
 
 

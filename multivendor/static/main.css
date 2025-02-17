@@ -79,6 +79,69 @@ h1, h2, h3, h4, h5, h6 {
   color: white; /* Make sure link text also changes color on hover */
 }
 
+/* sytling for shop search and icon*/
+  .container11 {
+    display: flex;
+    align-items: center;
+    flex-wrap: nowrap;  /* Prevents wrapping */
+    justify-content: space-between; /* Ensures spacing */
+    padding: 10px;
+    overflow-x: auto; /* Allows horizontal scrolling on small screens if necessary */
+  }
+
+  .article-img {
+    width: 30px;
+    height: auto;
+  }
+
+  .search-box11 {
+    flex-grow: 1; /* Allows search bar to expand */
+    max-width: 350px;
+  }
+
+  .search-box11 form {
+    display: flex;
+    align-items: center;
+  }
+
+  .search-box11 input {
+    border: 2px solid #ddd;
+    outline: none;
+    padding: 8px 12px;
+    border-radius: 25px;
+    width: 100%;
+    font-size: 14px;
+  }
+
+  .search-box11 button {
+    background-color: #4caf50;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    cursor: pointer;
+    font-size: 14px;
+    border-radius: 15px;
+    transition: background-color 0.3s ease;
+  }
+
+  .search-box11 button:hover {
+    background-color: #45a049;
+  }
+
+ .icon-group {
+    display: flex;
+    align-items: center;
+    gap: 20px; /* Reduces space between icons */
+    margin-left: auto; /* Pushes group to the right */
+  }
+  /* Ensure no stacking on mobile */
+  @media (max-width: 600px) {
+    .container {
+      flex-wrap: nowrap;  /* Prevents wrapping */
+      overflow-x: auto; /* Allows horizontal scrolling if needed */
+    }
+  }
+
 
 
 /* styling for login/update */
@@ -171,19 +234,19 @@ h1, h2, h3, h4, h5, h6 {
 
   /* Responsive Design */
   @media (max-width: 576px) {
-    .content-section {
+    .content-section11 {
       padding: 20px;
     }
 
-    .header-title {
+    .header-title11 {
       font-size: 24px;
     }
 
-    .sub-header {
+    .sub-header11 {
       font-size: 14px;
     }
 
-    .btn-custom {
+    .btn-custom11 {
       padding: 12px;
     }
   }
@@ -394,3 +457,5 @@ h1, h2, h3, h4, h5, h6 {
     height: 120px;
   }
 }
+
+

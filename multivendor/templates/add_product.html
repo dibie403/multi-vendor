@@ -1,0 +1,106 @@
+{% extends "layout.html" %}
+
+{% block content1 %}
+
+  
+<div class="content-section mb-4">
+  <div class="header-title11">🚀Add New Product</div>
+  <div class="sub-header11">Add New Product To Your Store</div>
+
+  <form method="POST", action="" enctype="multipart/form-data">
+    {{ form.hidden_tag() }}
+    <fieldset class="form-group">
+
+       <!-- Productname Field -->
+          <div class="form-group11">
+            {{ form.name.label(class="form-control-label", for="name") }}
+            {% if form.name.errors %}
+              {{ form.name(class="form-control is-invalid", id="name") }}
+              <div class="invalid-feedback">
+                {% for error in form.name.errors %}
+                  <span>{{ error }}</span>
+                {% endfor %}
+              </div>
+            {% else %}
+              {{ form.name(class="form-control", id="name") }}
+            {% endif %}
+          </div>
+
+          <!-- description Field -->
+          <div class="form-group11">
+            {{ form.description.label(class="form-control-label", for="description") }}
+            {% if form.description.errors %}
+              {{ form.name(class="form-control is-invalid", id="description") }}
+              <div class="invalid-feedback">
+                {% for error in form.description.errors %}
+                  <span>{{ error }}</span>
+                {% endfor %}
+              </div>
+            {% else %}
+              {{ form.description(class="form-control", id="description") }}
+            {% endif %}
+          </div>
+
+          <!-- Email Field -->
+          <div class="form-group11">
+            {{ form.amount.label(class="form-control-label", for="amount") }}
+            {% if form.amount.errors %}
+              {{ form.amount(class="form-control is-invalid", id="amount") }}
+              <div class="invalid-feedback">
+                {% for error in form.amount.errors %}
+                  <span>{{ error }}</span>
+                {% endfor %}
+              </div>
+            {% else %}
+              {{ form.amount(class="form-control", id="amount") }}
+            {% endif %}
+          </div>
+         <!-- Category Dropdown -->
+          <div class="form-group11">
+            {{ form.category.label(class="form-control-label") }}
+            {% if form.category.errors %}
+              {{ form.category(class="form-control is-invalid") }}
+              <div class="invalid-feedback">
+                {% for error in form.category.errors %}
+                  <span>{{ error }}</span>
+                {% endfor %}
+              </div>
+            {% else %}
+              {{ form.category(class="form-control") }}
+            {% endif %}
+          </div>
+            <!-- Shelf Dropdown -->
+          <div class="form-group11">
+            {{ form.shelf.label(class="form-control-label") }}
+            {% if form.shelf.errors %}
+              {{ form.shelf(class="form-control is-invalid") }}
+              <div class="invalid-feedback">
+                {% for error in form.shelf.errors %}
+                  <span>{{ error }}</span>
+                {% endfor %}
+              </div>
+            {% else %}
+              {{ form.shelf(class="form-control") }}
+            {% endif %}
+          </div>
+
+      <div class="form-group11">
+          {{ form.picture.label() }}  <!-- Label should use form-control-label --> 
+          {{ form.picture(class="form-control-file") }} 
+          {% if form.picture.errors %}
+              {% for error in form.picture.errors %}
+                 <span class='text-danger'> {{ error }}</span><br>
+              {% endfor %}
+          {% endif %}
+      </div>
+
+    </fieldset>
+
+    <!-- Submit Button -->
+    <div class="form-group11">
+      {{ form.submit(class="btn-custom") }}
+    </div>
+  </form>
+
+</div>
+{% endblock %}

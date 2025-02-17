@@ -19,6 +19,7 @@ class User(db.Model,UserMixin):
     phone_number = db.Column(db.String(20), unique=True, nullable=False)
     status = db.Column(db.Boolean, nullable=False,default=False)
     slug = db.Column(db.String(100), unique=True, nullable=False)
+    slug1=db.Column(db.String(100), unique=True, nullable=False)
     products = db.relationship('Product', backref='seller', lazy=True)
     
     
@@ -35,6 +36,7 @@ class Product(db.Model):
     date = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     image = db.Column(db.String(255), nullable=False)
+    shelf = db.Column(db.String(100), nullable=False)
     slug = db.Column(db.String(100), unique=True, nullable=False)
     
     
@@ -48,7 +50,17 @@ class Image(db.Model):
     image = db.Column(db.String(255), nullable=False)
     product_id=db.Column(db.Integer, db.ForeignKey('product.id'), nullable=False)
     slug = db.Column(db.String(100), unique=True, nullable=False)
-    slug1 = db.Column(db.String(100), unique=True, nullable=False)
     product = db.relationship('Product', backref=db.backref('images', lazy=True))
 
 
+class Love(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    product_id = db.Column(db.Integer, db.ForeignKey('product.id'), nullable=False)
+
+    # Define relationships
+    user = db.relationship('User', backref=db.backref('loves', lazy=True))
+    product = db.relationship('Product', backref=db.backref('loves', lazy=True))
+
+    def __repr__(self):
+        return f"Like('{self.user_id}', '{self.post_id}')"

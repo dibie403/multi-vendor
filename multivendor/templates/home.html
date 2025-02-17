@@ -11,7 +11,7 @@
 
   <div class="carousel-inner">
     <div class="carousel-item active">
-      <img src="static/images/20250207_051158.jpg" class="d-block w-100" alt="Slide 1">
+      <img src="{{ url_for('static', filename='images/20250207_051158.jpg') }}" class="d-block w-100" alt="Slide 1">
       <div class="carousel-caption custom-caption">
         <h4>🔥 Big Sale Today!</h4>
         <p>Up to 50% OFF on selected items.</p>
@@ -19,7 +19,7 @@
     </div>
 
     <div class="carousel-item">
-      <img src="static/images/corosel.png" class="d-block w-100" alt="Slide 2">
+     <img src="{{ url_for('static', filename='images/corosel.png') }}" class="d-block w-100" alt="Slide 2">
       <div class="carousel-caption custom-caption">
         <h4>🛍️ Shop the Trend</h4>
         <p>New arrivals, great deals!</p>
@@ -27,7 +27,7 @@
     </div>
 
     <div class="carousel-item">
-      <img src="static/images/corosel.png" class="d-block w-100" alt="Slide 3">
+      <img src="{{ url_for('static', filename='images/corosel.png') }}" class="d-block w-100" alt="Slide 3">
       <div class="carousel-caption custom-caption">
         <h4>🚚 Free Shipping!</h4>
         <p>Orders above $99 only.</p>

@@ -90,3 +90,72 @@ class UpdateProfileForm(FlaskForm):
 				   raise ValidationError('phone number already Exist,Please use a unique Email')
 
 		
+
+class AddProductForm(FlaskForm):
+    # Product Name
+    name = StringField(
+        'Product Name', 
+        validators=[DataRequired(), Length(min=3, max=20)]
+    )
+
+    # Description
+    description = TextAreaField(
+        'Description', 
+        validators=[DataRequired()]
+    )
+
+    # Amount
+    amount = StringField(
+        'Amount', 
+        validators=[DataRequired(), Length(min=3, max=20)]
+    )
+
+    # Category Dropdown
+    category = SelectField(
+        'Category', 
+        choices=[
+            ('shoes', 'Shoes'), 
+            ('clothes', 'Clothes'), 
+            ('perfume', 'Perfume'), 
+            ('electronics', 'Electronics'), 
+            ('books', 'Books'), 
+            ('phones', 'Phones'),
+            ('laptops', 'Laptops'),
+            ('home_appliances', 'Home Appliances'),
+            ('beauty', 'Beauty & Personal Care'),
+            ('health', 'Health & Wellness'),
+            ('sports', 'Sports & Outdoors'),
+            ('toys', 'Toys & Games'),
+            ('automotive', 'Automotive'),
+            ('furniture', 'Furniture'),
+            ('groceries', 'Groceries'),
+            ('watches', 'Watches & Accessories'),
+            ('jewelry', 'Jewelry'),
+            ('handbags', 'Handbags & Accessories'),
+            ('gaming', 'Gaming & Consoles'),
+            ('office_supplies', 'Office Supplies'),
+            ('others', 'Others')
+        ],
+        validators=[DataRequired()]
+    )
+
+    # Shelf Dropdown
+    shelf = SelectField(
+        'Shelf', 
+        choices=[
+            ('featured', 'Featured'), 
+            ('top_sales', 'Top Sales'), 
+            ('best_selling', 'Best Selling')
+        ],
+        validators=[DataRequired()]
+    )
+
+    # Product Image Upload
+    picture = FileField(
+        'Add Product Image', 
+        validators=[FileAllowed(['jpg', 'png'])]
+    )
+
+    # Submit Button
+    submit = SubmitField('Update')
+
