@@ -1,8 +1,8 @@
-"""first push
+"""first migration
 
-Revision ID: 5f52ad164e3f
+Revision ID: fec9fac943c8
 Revises: 
-Create Date: 2025-02-07 03:54:27.348878
+Create Date: 2025-02-11 16:48:42.084787
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '5f52ad164e3f'
+revision = 'fec9fac943c8'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -24,6 +24,7 @@ def upgrade():
     sa.Column('email', sa.String(length=120), nullable=False),
     sa.Column('image_file', sa.String(length=255), nullable=False),
     sa.Column('password', sa.String(length=60), nullable=False),
+    sa.Column('shop_image_file', sa.String(length=255), nullable=True),
     sa.Column('is_admin', sa.Boolean(), nullable=False),
     sa.Column('shop_name', sa.String(length=20), nullable=True),
     sa.Column('shop_motto', sa.Text(), nullable=True),
@@ -32,6 +33,8 @@ def upgrade():
     sa.Column('slug', sa.String(length=100), nullable=False),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('email'),
+    sa.UniqueConstraint('phone_number'),
+    sa.UniqueConstraint('shop_motto'),
     sa.UniqueConstraint('shop_name'),
     sa.UniqueConstraint('slug'),
     sa.UniqueConstraint('username')
@@ -55,9 +58,11 @@ def upgrade():
     sa.Column('image', sa.String(length=255), nullable=False),
     sa.Column('product_id', sa.Integer(), nullable=False),
     sa.Column('slug', sa.String(length=100), nullable=False),
+    sa.Column('slug1', sa.String(length=100), nullable=False),
     sa.ForeignKeyConstraint(['product_id'], ['product.id'], ),
     sa.PrimaryKeyConstraint('id'),
-    sa.UniqueConstraint('slug')
+    sa.UniqueConstraint('slug'),
+    sa.UniqueConstraint('slug1')
     )
     # ### end Alembic commands ###
 

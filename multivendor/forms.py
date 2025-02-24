@@ -159,3 +159,26 @@ class AddProductForm(FlaskForm):
     # Submit Button
     submit = SubmitField('Update')
 
+
+class UpdateshopForm(FlaskForm):
+		# Shop Fields (optional for buyers)
+		shop_name = StringField('Shop Name', validators=[DataRequired(), Length(max=20)])
+		shop_motto = TextAreaField('Shop Motto', validators=[DataRequired()])
+		shop_about=TextAreaField('About Your Store', validators=[DataRequired()])
+		picture=FileField('Update Profile Picture',validators=[FileAllowed(['jpg','png'])])
+		submit = SubmitField('Sign Up')
+
+		#function to handle wether the user alredy exist in the database
+
+		def validate_shop(self,shop_name):
+			user=User.query.filter_by(username=show_name.data).first()
+
+			if user:
+				raise ValidationError('Shop name already taken,Please pick a unique shop name')
+
+		def validate_shopMotor(self,shop_motto):
+			user=User.query.filter_by(username=shop_motto.data).first()
+
+			if user:
+				raise ValidationError('Brand slogan already taken,Please pick a unique slogan')
+

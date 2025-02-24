@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Copying Link...</title>
+    <script>
+      // Function to copy the provided text to the clipboard and then redirect.
+      function copyAndRedirect(text) {
+        // Use the Clipboard API if available
+        if (navigator.clipboard && window.isSecureContext) {
+            navigator.clipboard.writeText(text).then(function() {
+                // Successfully copied; redirect now.
+                window.location.href = "{{ url_for('shop2', username=current_user.username) }}";
+            }, function(err) {
+                // If there's an error, you might want to handle it.
+                console.error('Could not copy text: ', err);
+                window.location.href = "{{ url_for('shop2', username=current_user.username) }}";
+            });
+        } else {
+            // Fallback for older browsers
+            let tempInput = document.createElement("input");
+            tempInput.value = text;
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            try {
+                document.execCommand("copy");
+            } catch (err) {
+                console.error('Fallback: Oops, unable to copy', err);
+            }
+            document.body.removeChild(tempInput);
+            window.location.href = "{{ url_for('shop2', username=current_user.username) }}";
+        }
+      }
+      
+      // Once the page loads, execute the copy operation.
+      window.onload = function() {
+          copyAndRedirect("{{ link }}");
+      };
+    </script>
+</head>
+<body>
+    <p>Copying link...</p>
+</body>
+</html>

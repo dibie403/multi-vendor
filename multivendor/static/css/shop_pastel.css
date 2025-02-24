@@ -1,0 +1,161 @@
+/* Super Cool Pastel Pink Theme for Shop */
+
+body {
+  background: #fff5f7; /* Soft pastel pink */
+  color: #5a5a5a; /* Gentle dark gray for readability */
+  font-family: 'Poppins', sans-serif;
+  margin-top: 5rem;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  color: #d63384; /* Bright pink headings */
+  font-weight: 700;
+}
+
+.bg-steel {
+  background-color: rgba(255, 182, 193, 0.8); /* Soft blush pink */
+}
+
+.site-header .navbar-nav .nav-link {
+  color: White; /* Hot pink */
+  transition: color 0.3s ease-in-out;
+}
+
+.site-header .navbar-nav .nav-link:hover {
+  color: #fff;
+  background: #ff69b4;
+  padding: 5px 10px;
+  border-radius: 10px;
+}
+
+.site-header .navbar-nav .nav-link.active {
+  font-weight: 600;
+  color: #e75480;
+}
+
+/* Carousel */
+.carousel-item img {
+  height: 250px;
+  object-fit: cover;
+  border-radius: 10px;
+  filter: contrast(1.1) brightness(1.1);
+}
+
+.custom-caption {
+  background: rgba(255, 105, 180, 0.8); /* Soft warm pink overlay */
+  padding: 12px 18px;
+  border-radius: 12px;
+  color: #ffffff;
+  font-weight: bold;
+}
+
+/* Shop Search & Icon Section */
+.container11 {
+  background: #ffe4e1; /* Misty rose */
+  padding: 20px;
+  border-radius: 10px;
+}
+
+.search-box11 input {
+  border: 2px solid #ff69b4;
+  border-radius: 10px;
+  padding: 10px;
+}
+
+.search-box11 button {
+  background-color: #d63384;
+  color: #fff;
+  border-radius: 10px;
+  padding: 10px 15px;
+  transition: background 0.3s;
+}
+
+.search-box11 button:hover {
+  background-color: #e75480;
+}
+
+.icon-group {
+  background-color: #ffe4e1;
+  padding: 10px;
+  border-radius: 10px;
+}
+
+.icon-group .btn {
+  background: #ffb6c1;
+  color: #fff;
+  padding: 8px 12px;
+  border-radius: 10px;
+  transition: background 0.3s;
+}
+
+.icon-group .btn:hover {
+  background: #d63384;
+}
+
+/* Section Title */
+.section-title {
+  color: #ff69b4;
+  font-size: 1.8rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* Product Grid & Cards */
+.product-card {
+  background: #fff;
+  border: 2px solid #ffb6c1;
+  border-radius: 15px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease-in-out;
+}
+
+.product-card:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.love-icon {
+  background: transparent;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  transition: color 0.3s ease-in-out;
+}
+
+.love-icon.active {
+  color: #d63384;
+}
+
+.btn-add-cart {
+  background-color: #ff69b4;
+  color: #fff;
+  border-radius: 20px;
+  padding: 10px 16px;
+  border: none;
+  transition: background 0.3s ease-in-out;
+}
+
+.btn-add-cart:hover {
+  background-color: #e75480;
+}
+
+/* Sidebar Links */
+.list-group-item {
+  background-color: #ffebf0;
+  color: #d63384;
+  padding: 12px 16px;
+  border-radius: 10px;
+  border: none;
+  transition: background 0.3s;
+}
+
+.list-group-item:hover {
+  background-color: #ff69b4;
+  color: white;
+}
+
+.list-group-item a {
+  color: inherit;
+  text-decoration: none;
+  font-weight: bold;
+}

@@ -133,7 +133,11 @@ h1, h2, h3, h4, h5, h6 {
     align-items: center;
     gap: 20px; /* Reduces space between icons */
     margin-left: auto; /* Pushes group to the right */
+    background-color: #fafafa;
+    border-radius: 15px;
   }
+
+ 
   /* Ensure no stacking on mobile */
   @media (max-width: 600px) {
     .container {
@@ -332,7 +336,8 @@ h1, h2, h3, h4, h5, h6 {
   text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
 }
 
-/* Product Grid */
+
+/* PRODUCT GRID */
 .product-grid {
   display: flex;
   flex-wrap: wrap;
@@ -340,32 +345,38 @@ h1, h2, h3, h4, h5, h6 {
   gap: 15px;
 }
 
-/* Product Item */
+/* PRODUCT ITEM */
 .product-item {
   padding: 5px;
   max-width: 150px;
   cursor: pointer;
 }
 
-/* Product Card */
+/* PRODUCT CARD */
 .product-card {
   border: none;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
-  border-radius: 15px;
   overflow: hidden;
   background-color: #fff;
   position: relative;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 .product-card:hover {
   transform: translateY(-8px);
-  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+
 }
 
-/* Image Container */
+.product-card img {
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+  border-radius: 5px;
+}
+
+/* IMAGE CONTAINER */
 .image-container {
   position: relative;
+  width: 100%;
 }
 
 .image-container img {
@@ -379,7 +390,7 @@ h1, h2, h3, h4, h5, h6 {
   transform: scale(1.05);
 }
 
-/* Love Icon */
+/* LOVE ICON */
 .love-icon {
   position: absolute;
   top: 8px;
@@ -402,22 +413,34 @@ h1, h2, h3, h4, h5, h6 {
   color: green;
 }
 
-/* Card Body */
+/* CARD BODY */
 .card-body {
   padding: 10px;
-  background: #f4f4f4;
+  background: white;
   transition: background 0.3s ease;
-}
-
-.card-title{
-  color:GREEN;
+  text-align: center;
 }
 
 .product-card:hover .card-body {
   background: #e8ffe8;
 }
 
-/* Price Styling */
+.card-title {
+  color: green;
+}
+
+.badge {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background-color: #000;
+    color: #fff;
+    font-size: 0.75rem;
+    padding: 0.3rem 0.5rem;
+    border-radius: 3px;
+  }
+
+/* PRICE STYLING */
 .price {
   font-size: 1rem;
   font-weight: bold;
@@ -439,23 +462,6 @@ h1, h2, h3, h4, h5, h6 {
 .btn-add-cart:hover {
   background-color: #228B22;
   transform: scale(1.05);
-}
-
-/* Responsive Design */
-@media (max-width: 768px) {
-  .product-item {
-    max-width: 120px;
-  }
-}
-
-@media (max-width: 480px) {
-  .product-item {
-    max-width: 100px;
-  }
-
-  .image-container img {
-    height: 120px;
-  }
 }
 
 

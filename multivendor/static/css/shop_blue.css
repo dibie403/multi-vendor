@@ -1,0 +1,132 @@
+/* Wine-Themed Shop Design - Elegant & Luxurious */
+
+/* Import Custom Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Raleway:wght@300;400;600&display=swap');
+
+body {
+  background: #2b0d17; /* Deep Wine Background */
+  color: #f5e1e1;
+  font-family: 'Raleway', sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+/* Navbar */
+.navbar {
+  background: rgba(43, 13, 23, 0.9);
+  border-bottom: 2px solid #7c1e35;
+  padding: 15px;
+}
+.navbar .nav-link {
+  color: #f5e1e1;
+  font-weight: 600;
+  transition: 0.3s;
+}
+.navbar .nav-link:hover {
+  color: #e6a4b4;
+}
+
+/* Carousel */
+.carousel-item img {
+  height: 300px;
+  object-fit: cover;
+  border-radius: 12px;
+  filter: brightness(0.7) contrast(1.2);
+}
+/* Search Box */
+.search-container {
+  display: flex;
+  justify-content: center;
+  padding: 20px;
+}
+.search-box input {
+  width: 60%;
+  padding: 12px;
+  border-radius: 20px;
+  border: 2px solid #a61c3c;
+  background: #4a1123;
+  color: #f5e1e1;
+  font-size: 16px;
+  text-align: center;
+}
+.search-box button {
+  background-color: #a61c3c;
+  color: #fff;
+  padding: 10px 18px;
+  border-radius: 20px;
+  border: none;
+  margin-left: 10px;
+  transition: 0.3s;
+}
+.search-box button:hover {
+  background-color: #d33b57;
+}
+
+/* Product Cards - Glassmorphism Effect */
+.products {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  padding: 50px 20px;
+  gap: 30px;
+}
+.product-card {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border-radius: 20px;
+  width: 200px;
+  padding: 20px;
+  text-align: center;
+  box-shadow: 0 5px 15px rgba(167, 28, 60, 0.4);
+  transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+  margin-top: 10px;
+  size: 50px;
+}
+.product-card:hover {
+  transform: scale(1.05);
+  box-shadow: 0 8px 20px rgba(167, 28, 60, 0.5);
+}
+.product-card img {
+  width: 80%;
+  border-radius: 10px;
+  transition: 0.3s;
+}
+.product-card:hover img {
+  filter: brightness(1.2);
+}
+.product-card h3 {
+  font-size: 22px;
+  color: #f5e1e1;
+  margin-top: 10px;
+}
+.product-card p {
+  color: #e6a4b4;
+  font-size: 14px;
+}
+.product-card .price {
+  font-size: 20px;
+  color: #ffbaba;
+  font-weight: bold;
+}
+.product-card button {
+  background-color: #a61c3c;
+  color: #fff;
+  padding: 10px 20px;
+  border-radius: 20px;
+  border: none;
+  font-size: 16px;
+  margin-top: 10px;
+  transition: 0.3s;
+}
+.product-card button:hover {
+  background-color: #d33b57;
+}
+
+/* Footer */
+.footer {
+  background: #4a1123;
+  text-align: center;
+  padding: 20px;
+  color: #f5e1e1;
+  font-size: 14px;
+}

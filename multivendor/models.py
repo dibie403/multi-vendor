@@ -16,6 +16,7 @@ class User(db.Model,UserMixin):
     is_admin = db.Column(db.Boolean, nullable=False,default=False)
     shop_name= db.Column(db.String(20), nullable=True, unique=True)
     shop_motto= db.Column(db.Text, nullable=True,unique=True)
+    shop_about= db.Column(db.Text, nullable=True,unique=False)
     phone_number = db.Column(db.String(20), unique=True, nullable=False)
     status = db.Column(db.Boolean, nullable=False,default=False)
     slug = db.Column(db.String(100), unique=True, nullable=False)
@@ -25,7 +26,7 @@ class User(db.Model,UserMixin):
     
     
     def __repr__(self):
-        return f"User('{self.username}', '{self.status}','{self.image_file}')"
+        return f"User('{self.username}', '{self.slug1}','{self.image_file}', '{self.shop_about}')"
 
 class Product(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -42,7 +43,7 @@ class Product(db.Model):
     
 
     def __repr__(self):
-        return f"Product('{self.title}', '{self.slug}')"
+        return f"Product('{self.name}', '{self.image}')"
 
 
 class Image(db.Model):

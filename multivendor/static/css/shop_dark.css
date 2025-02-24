@@ -1,0 +1,131 @@
+/* Dark Theme for Shop */
+
+/* Importing Font */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+
+body {
+  background: #0d0d0d;
+  color: #e0e0e0;
+  font-family: 'Poppins', sans-serif;
+  margin-top: 5rem;
+  padding: 0;
+}
+
+/* Navbar */
+.navbar {
+  background: rgba(10, 10, 10, 0.9);
+  border-bottom: 2px solid #222;
+}
+.site-header .navbar-nav .nav-link {
+  color: White; /* Hot pink */
+  transition: color 0.3s ease-in-out;
+}
+.navbar .nav-link {
+  color: white;
+  transition: 0.3s ease-in-out;
+}
+.navbar .nav-link:hover {
+  color: #ff4c4c;
+}
+
+/* Carousel */
+.carousel-item img {
+  height: 300px;
+  object-fit: cover;
+  border-radius: 12px;
+  filter: brightness(0.7) contrast(1.2);
+}
+.custom-caption {
+  background: rgba(0, 0, 0, 0.7);
+  padding: 12px 18px;
+  border-radius: 10px;
+  color: #f0f0f0;
+}
+
+/* Search Box */
+.container11 {
+  background: #181818;
+  padding: 20px;
+  border-radius: 10px;
+}
+.search-box11 input {
+  border: 2px solid #444;
+  background: #222;
+  color: #f0f0f0;
+  border-radius: 8px;
+  padding: 10px;
+}
+.search-box button {
+  background-color: #a61c3c;
+  color: #fff;
+  padding: 10px 18px;
+  border-radius: 20px;
+  border: none;
+  margin-left: 10px;
+  transition: 0.3s;
+}
+.search-box button:hover {
+  background-color: #d33b57;
+}
+
+
+
+.icon-group .btn {
+  background: #3498db;
+  color: #ffffff;
+  padding: 8px 12px;
+  border-radius: 10px;
+  transition: background 0.3s;
+}
+
+
+
+
+/* Product Cards */
+.product-card {
+  background: rgba(255, 255, 255, 0.08); /* Glassmorphism effect */
+  backdrop-filter: blur(10px);
+  border-radius: 15px;
+  padding: 20px;
+  transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+}
+.product-card:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 18px rgba(255, 0, 0, 0.4);
+}
+
+/* Product Image */
+.product-card img {
+  width: 100%;
+  border-radius: 12px;
+  transition: 0.3s ease-in-out;
+}
+.product-card:hover img {
+  filter: brightness(1.2);
+}
+
+/* Love Icon */
+.love-icon {
+  color: #777;
+  font-size: 22px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+.love-icon.active {
+  color: #ff4c4c;
+}
+
+/* Add to Cart Button */
+.btn-add-cart {
+  background-color: #ff4c4c;
+  color: #fff;
+  border-radius: 20px;
+  padding: 10px 18px;
+  border: none;
+  font-weight: 600;
+  transition: 0.3s;
+}
+.btn-add-cart:hover {
+  background-color: #ff1a1a;
+  transform: scale(1.05);
+}

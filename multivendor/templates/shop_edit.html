@@ -4,85 +4,59 @@
 
   
 <div class="content-section mb-4">
-  <div class="header-title11">🚀Add New Product</div>
-  <div class="sub-header11">Add New Product To Your Store</div>
+  <div class="header-title11">🚀Edit Shop Info</div>
+  <div class="sub-header11">Add More information about your store and customize it</div>
 
   <form method="POST", action="" enctype="multipart/form-data">
     {{ form.hidden_tag() }}
     <fieldset class="form-group">
 
-       <!-- Productname Field -->
+       <!-- shopname Field -->
           <div class="form-group11">
-            {{ form.name.label(class="form-control-label", for="name") }}
-            {% if form.name.errors %}
-              {{ form.name(class="form-control is-invalid", id="name") }}
+            {{ form.shop_name.label(class="form-control-label", for="shop_name") }}
+            {% if form.shop_name.errors %}
+              {{ form.shop_name(class="form-control is-invalid", id="shop_name") }}
               <div class="invalid-feedback">
-                {% for error in form.name.errors %}
+                {% for error in form.shop_name.errors %}
                   <span>{{ error }}</span>
                 {% endfor %}
               </div>
             {% else %}
-              {{ form.name(class="form-control", id="name") }}
+              {{ form.shop_name(class="form-control", id="name") }}
             {% endif %}
           </div>
 
           <!-- description Field -->
           <div class="form-group11">
-            {{ form.description.label(class="form-control-label", for="description") }}
-            {% if form.description.errors %}
-              {{ form.name(class="form-control is-invalid", id="description") }}
+            {{ form.shop_motto.label(class="form-control-label", for="shop_motto") }}
+            {% if form.shop_motto.errors %}
+              {{ form.shop_motto(class="form-control is-invalid", id="shop_motto") }}
               <div class="invalid-feedback">
-                {% for error in form.description.errors %}
+                {% for error in form.shop_motto.errors %}
                   <span>{{ error }}</span>
                 {% endfor %}
               </div>
             {% else %}
-              {{ form.description(class="form-control", id="description") }}
+              {{ form.shop_motto(class="form-control", id="shop_motto") }}
             {% endif %}
           </div>
 
-          <!-- Email Field -->
+           <!-- description Field -->
           <div class="form-group11">
-            {{ form.amount.label(class="form-control-label", for="amount") }}
-            {% if form.amount.errors %}
-              {{ form.amount(class="form-control is-invalid", id="amount") }}
+            {{ form.shop_about.label(class="form-control-label", for="shop_about") }}
+            {% if form.shop_about.errors %}
+              {{ form.shop_about(class="form-control is-invalid", id="shop_about") }}
               <div class="invalid-feedback">
-                {% for error in form.amount.errors %}
+                {% for error in form.shop_about.errors %}
                   <span>{{ error }}</span>
                 {% endfor %}
               </div>
             {% else %}
-              {{ form.amount(class="form-control", id="amount") }}
+              {{ form.shop_about(class="form-control", id="shop_about") }}
             {% endif %}
           </div>
-         <!-- Category Dropdown -->
-          <div class="form-group11">
-            {{ form.category.label(class="form-control-label") }}
-            {% if form.category.errors %}
-              {{ form.category(class="form-control is-invalid") }}
-              <div class="invalid-feedback">
-                {% for error in form.category.errors %}
-                  <span>{{ error }}</span>
-                {% endfor %}
-              </div>
-            {% else %}
-              {{ form.category(class="form-control") }}
-            {% endif %}
-          </div>
-            <!-- Shelf Dropdown -->
-          <div class="form-group11">
-            {{ form.shelf.label(class="form-control-label") }}
-            {% if form.shelf.errors %}
-              {{ form.shelf(class="form-control is-invalid") }}
-              <div class="invalid-feedback">
-                {% for error in form.shelf.errors %}
-                  <span>{{ error }}</span>
-                {% endfor %}
-              </div>
-            {% else %}
-              {{ form.shelf(class="form-control") }}
-            {% endif %}
-          </div>
+
+          
 
       <div class="form-group11">
           <label for="picture" class="d-block">Upload Product Images</label>

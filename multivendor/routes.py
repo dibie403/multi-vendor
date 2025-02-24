@@ -2,11 +2,12 @@
 import os
 import secrets
 from PIL import Image
-from flask import render_template, url_for, flash, redirect, request
+from flask import render_template, url_for, flash, redirect, request, jsonify
 from multivendor import app,db,bcrypt
 from flask_login import login_user,current_user,logout_user,login_required
-from multivendor.forms import RegistrationForm,LoginForm,UpdateProfileForm,AddProductForm
-from multivendor.models import User
+from multivendor.forms import RegistrationForm,LoginForm,UpdateProfileForm,AddProductForm,UpdateshopForm
+from multivendor.models import User,Product
+import re
 
 
 
@@ -87,7 +88,7 @@ def logout():
 
 
 
-@app.route("/store/<string:username>")
+@app.route("/store/<string:username>,")
 def shop2(username):
     image_file = None
     if current_user.is_authenticated:
@@ -103,7 +104,32 @@ def save_picture(form_picture):
     picture_fn=random_hex +f_ext
     picture_path=os.path.join(app.root_path, 'static/profile_pics', picture_fn)
 
-    output_size=(1000,600)
+    output_size=(250,250)
+    i=Image.open(form_picture)
+    i.thumbnail(output_size)
+    i.save(picture_path)
+
+    return picture_fn
+
+def save_picture1(form_picture):
+    random_hex=secrets.token_hex(8)
+    _,f_ext=os.path.split(form_picture.filename)
+    picture_fn=random_hex +f_ext
+    picture_path=os.path.join(app.root_path, 'static/product_images', picture_fn)
+
+    output_size=(250,250)
+    i=Image.open(form_picture)
+    i.thumbnail(output_size)
+    i.save(picture_path)
+
+    return picture_fn
+def save_picture2(form_picture):
+    random_hex=secrets.token_hex(8)
+    _,f_ext=os.path.split(form_picture.filename)
+    picture_fn=random_hex +f_ext
+    picture_path=os.path.join(app.root_path, 'static/corasel', picture_fn)
+
+    output_size=(250,250)
     i=Image.open(form_picture)
     i.thumbnail(output_size)
     i.save(picture_path)
@@ -160,13 +186,108 @@ def plazo():
 
 
 
+@app.route('/copy_link', methods=['GET'])
+def copy_link():
+    # Get the referrer URL (the page the request came from)
+    current_url = request.referrer  
+    flash('Store website link copied successfully!', 'success')
+    
+    # Render a template that will copy the URL and then redirect.
+    return render_template('copy_link.html', link=current_url)
+
+
+def generate_slug(name):
+    slug = re.sub(r'[^a-zA-Z0-9]+', '-', name.lower()).strip('-')
+    return slug
+
 @app.route("/add-Product", methods=['GET', 'POST'])
 def New_product():
     form = AddProductForm()
+    image_file = url_for('static', filename='profile_pics/' + current_user.image_file)
+    image = None  # Set image to None initially
+    
+    if form.validate_on_submit():
+        # Handle invalid file types
+        if form.picture.errors:
+            for error in form.picture.errors:
+                flash(f"File upload error: {error}", "danger")
+            return redirect(url_for('new_post'))
+        
+        # Save the image if provided
+        if form.picture.data:
+            try:
+                # Save image temporarily or upload to cloud storage
+                picture_file = save_picture1(form.picture.data)  # Saves image locally to static/post_images
+                image = picture_file  # Update image reference to the saved image
+                print(f"Image saved: {image}")  # Debug log
+            except Exception as e:
+                print(f"Error saving image: {e}")
+                flash("Error saving the image. Please try again.", 'danger')
+                return redirect(url_for('new_post'))
+        
+        # Generate the slug based on the title
+        slug = generate_slug(form.name.data)
+        
+        # Create and add the new post
+        product = Product(
+            name=form.name.data.upper(),
+            description=form.description.data,
+            amount=form.amount.data,
+            category= form.category.data,
+            shelf= form.shelf.data,
+            user_id=current_user.id,
+            slug=slug,
+            image=image  # Save image file reference (path or cloud URL)
+        )
+        db.session.add(product)
+        db.session.commit()
+        flash("Producted added successfully", "success")
+        return redirect(url_for('shop2',username=current_user.slug1))
     
    
 
-    return render_template('add_product.html', form=form)
+    return render_template('add_product.html', form=form,image_file=image_file)
+
+
+
+@app.route("/shop-edit", methods=['GET', 'POST'])
+def shop_edit():
+    form = UpdateshopForm()
+    image_file = None
+    if current_user.is_authenticated:
+        image_file = url_for('static', filename='profile_pics/' + current_user.image_file)
+    image = None  # Set image to None initially
+    
+    if form.validate_on_submit():
+
+        try:
+            
+            if form.picture.data:
+                picture_file = save_picture2(form.picture.data)
+
+                current_user.image_file = picture_file
+
+            # Correctly assign values without commas
+            current_user.shop_name = form.shop_name.data
+            current_user.shop_motto = form.shop_motto.data
+            current_user.shop_about = form.shop_about.data
+            current_user.slug1 = form.shop_name.data.lower().replace(" ", "-")  # Generate a slug
+            
+            db.session.commit()
+            flash('Profile Updated Successfully!', 'success')
+            return redirect(url_for('shop2',username=current_user.slug1))
+        except Exception as e:
+            db.session.rollback()  # Ensure rollback if there's an error
+            flash("An error occurred while processing your update. Please try again.", "danger")
+            print(e)
+        
+
+    elif request.method == 'GET':
+        form.shop_name.data = current_user.shop_name
+        form.shop_motto.data = current_user.shop_motto
+
+    return render_template('shop_edit.html', form=form,image_file=image_file)
+
 
 
 
