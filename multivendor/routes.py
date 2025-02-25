@@ -93,9 +93,13 @@ def shop2(username):
     image_file = None
     if current_user.is_authenticated:
         image_file = url_for('static', filename='profile_pics/' + current_user.image_file)
+    page = request.args.get('page', 1, type=int)
 
+    user= User.query.filter_by(slug1=username).first_or_404()
+    products=Product.query.filter_by(user_id=user.id).order_by(Product.date.desc()).paginate(page=page, per_page=10)
+    print(products)
 
-    return render_template('shop.html',title='shop',image_file=image_file)
+    return render_template('shop.html',title='shop',image_file=image_file,products=products)
 
 
 def save_picture(form_picture):
@@ -253,9 +257,7 @@ def New_product():
 @app.route("/shop-edit", methods=['GET', 'POST'])
 def shop_edit():
     form = UpdateshopForm()
-    image_file = None
-    if current_user.is_authenticated:
-        image_file = url_for('static', filename='profile_pics/' + current_user.image_file)
+    image_file = url_for('static', filename='profile_pics/' + current_user.image_file)
     image = None  # Set image to None initially
     
     if form.validate_on_submit():
