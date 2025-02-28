@@ -64,4 +64,4 @@ class Love(db.Model):
     product = db.relationship('Product', backref=db.backref('loves', lazy=True))
 
     def __repr__(self):
-        return f"Like('{self.user_id}', '{self.post_id}')"
+        return f"Like('{self.user_id}', '{self.product_id}')"

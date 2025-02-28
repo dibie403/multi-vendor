@@ -16,6 +16,10 @@ h1, h2, h3, h4, h5, h6 {
   color: blue;
 }
 
+.head{
+  color: black;
+}
+
 .bg-steel {
   background-color: rgba(240, 240, 240, 0.8); /* Soft Grayish White */
 }
@@ -28,7 +32,7 @@ h1, h2, h3, h4, h5, h6 {
 
 
 .site-header .navbar-nav .nav-link:hover {
-  color: #3498db;
+  color: #ffffff;
   background: #3498db; /* Bright Blue */
   padding: 5px 10px;
   border-radius: 10px;
@@ -261,21 +265,27 @@ h1, h2, h3, h4, h5, h6 {
   text-decoration: none;
   font-weight: bold;
 }
-
-
-/* Responsive Design */
-@media (max-width: 768px) {
-  .product-item {
-    max-width: 120px;
-  }
-}
-
-@media (max-width: 480px) {
-  .product-item {
-    max-width: 100px;
+.content-section11 {
+    max-width: 450px;
+    margin: auto;
+    background: black;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.1);
+    animation: fadeIn 1s ease-in-out;
   }
 
-  .image-container img {
-    height: 120px;
+.header-title11 {
+    text-align: center;
+    font-size: 28px;
+    font-weight: 700;
+    color: green;
+    margin-bottom: 12px;
   }
-}
+
+  .sub-header11 {
+    text-align: center;
+    font-size: 16px;
+    color: #666;
+    margin-bottom: 25px;
+  }

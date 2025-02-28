@@ -1,0 +1,48 @@
+{% extends "layout.html" %}
+
+{% block content3 %}
+<div class="content-section">
+
+    <h1 class="my-4 section-title">Loved Items🛍️ </h1>
+
+      <div>
+        <div class="row product-grid">
+          {% for love in loves %}
+         <!-- Product Item -->
+            <div class="col-6 col-sm-4 col-md-2 product-item" data-toggle="modal" data-target="#productModal{{ love.product.id }}">
+                <div class="product-card">
+                    <div class="image-container">
+                        <img src="{{ url_for('static', filename='product_images/' + love.product.image) }}" class="card-img-top" alt="{{love.product.name }}">
+                        
+                    </div>
+                    <div class="card-body text-center">
+                        <small class="card-title">{{ love.product.name }}</small>
+                        <p class="card-text price">${{love.product.amount }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Product Modal -->
+            <div class="modal fade" id="productModal{{love.product.id }}" tabindex="-1" role="dialog" aria-labelledby="productModalLabel{{ product.id }}" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">{{ love.product.name }}</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body text-center">
+                            <img src="{{ url_for('static', filename='product_images/' + love.product.image) }}" class="img-fluid mb-3" alt="{{ love.product.name }}">
+                            <p>{{ love.product.description }}</p>
+                            <p class="price">${{ love.product.amount }}</p>
+                            <button class="btn btn-add-cart" href="{{ url_for('register') }}">Add to cart 🛒</button>
+                            <button class="btn btn-warning" href="{{ url_for('register') }}">View product 🛒</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+    {% endfor %}
+</div>
+
+{% endblock %}

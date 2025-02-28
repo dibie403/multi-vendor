@@ -44,7 +44,7 @@
     <header class="site-header">
       <nav class="navbar navbar-expand-md navbar-dark bg-steel fixed-top">
         <div class="container">
-          <a class="navbar-brand mr-4" href="/" style="font-family: 'Montserrat', sans-serif;">VENDERA🛒🛍️</a>
+          <a class="head mr-4 " href="/" style="font-family: 'Montserrat', sans-serif;">VENDERA🛒🛍️</a>
           <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarToggle" aria-controls="navbarToggle" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
           </button>
@@ -67,7 +67,7 @@
                 <a class="nav-item nav-link" href="#">Notification</a>
 
                 {% if current_user.status %}
-                    <a class="nav-item nav-link" href="{{ url_for('shop2',username=current_user.slug1)}}">Shop</a>
+                    <a class="nav-item nav-link" href="{{ url_for('shop2',username=current_user.slug)}}">Shop</a>
                 {% endif %}
 
                 <!-- User Dropdown -->
@@ -79,7 +79,7 @@
                     <div class="dropdown-menu dropdown-menu-right" aria-labelledby="userDropdown">
                         <a class="dropdown-item" href="#">📦 Purchase History</a>
                         <a class="dropdown-item" href="#">🛍️ Orders</a>
-                        <a class="dropdown-item" href="#">❤️ Loved Items</a>
+                        <a class="dropdown-item" href="{{url_for('Loved_items')}}">❤️ Loved Items</a>
                         <a class="dropdown-item" href="{{url_for('profile_edit')}}">
                           <img class="rounded-circle account-img2 mt-3 mr-4" src="{{ image_file }}">
                           <span class="mr-2">{{current_user.username}}</span>

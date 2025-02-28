@@ -100,13 +100,9 @@
 
           <div class="image-container">
             <img src="{{ url_for('static', filename='product_images/a4e99f7d40fab227ecfbc1ef268e453foutput.png') }}" class="card-img-top" alt="Wireless Headphones">
-            {% if current_user.is_authenticated %}
-              <a href="{{url_for('login')}}">
+            
                <button class="love-icon" onclick="event.stopPropagation(); toggleLove(this)">🤍</button>
-              </a> 
-            {% else %}
-               <button class="love-icon" onclick="event.stopPropagation(); toggleLove(this)">⭐</button>
-            {% endif %}
+          
 
           </div>
           <div class="card-body text-center">

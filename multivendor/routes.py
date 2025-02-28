@@ -6,7 +6,7 @@ from flask import render_template, url_for, flash, redirect, request, jsonify
 from multivendor import app,db,bcrypt
 from flask_login import login_user,current_user,logout_user,login_required
 from multivendor.forms import RegistrationForm,LoginForm,UpdateProfileForm,AddProductForm,UpdateshopForm
-from multivendor.models import User,Product
+from multivendor.models import User,Product,Love
 import re
 
 
@@ -45,7 +45,7 @@ def register():
                 phone_number=form.phone.data,
                 password=hashed_password,  # You should hash the password before storing
                 is_admin=False,  # Assuming default is False
-                shop_name=form.shop_name.data if is_seller else None,  # Only store shop name if seller
+                shop_name=form.shop_name.data.upper() if is_seller else None,  # Only store shop name if seller
                 shop_motto=form.shop_motto.data if is_seller else None,  # Only store shop motto if seller
                 status=is_seller,  # True for sellers, False for buyers
                 slug=form.username.data.lower().replace(" ", "-"),  # Generate a slug
@@ -88,18 +88,20 @@ def logout():
 
 
 
-@app.route("/store/<string:username>,")
+@app.route("/store/<string:username>")
 def shop2(username):
     image_file = None
     if current_user.is_authenticated:
         image_file = url_for('static', filename='profile_pics/' + current_user.image_file)
     page = request.args.get('page', 1, type=int)
 
-    user= User.query.filter_by(slug1=username).first_or_404()
-    products=Product.query.filter_by(user_id=user.id).order_by(Product.date.desc()).paginate(page=page, per_page=10)
-    print(products)
+    user= User.query.filter_by(slug=username).first_or_404()
+    products=Product.query.filter_by(user_id=user.id).order_by(Product.date.desc()).paginate(page=page, per_page=2)
+    loved_products = {love.product_id for love in Love.query.filter_by(user_id=current_user.id).all()}
+    
+    print(user.shop_image_file)
 
-    return render_template('shop.html',title='shop',image_file=image_file,products=products)
+    return render_template('shop.html',title='shop',image_file=image_file,products=products,user=user,shop_theme='white',loved_products=loved_products)
 
 
 def save_picture(form_picture):
@@ -246,11 +248,11 @@ def New_product():
         db.session.add(product)
         db.session.commit()
         flash("Producted added successfully", "success")
-        return redirect(url_for('shop2',username=current_user.slug1))
+        return redirect(url_for('shop2',username=current_user.slug))
     
    
 
-    return render_template('add_product.html', form=form,image_file=image_file)
+    return render_template('add_product.html', form=form,image_file=image_file,shop_theme='white')
 
 
 
@@ -267,7 +269,7 @@ def shop_edit():
             if form.picture.data:
                 picture_file = save_picture2(form.picture.data)
 
-                current_user.image_file = picture_file
+                current_user.shop_image_file = picture_file
 
             # Correctly assign values without commas
             current_user.shop_name = form.shop_name.data
@@ -277,7 +279,7 @@ def shop_edit():
             
             db.session.commit()
             flash('Profile Updated Successfully!', 'success')
-            return redirect(url_for('shop2',username=current_user.slug1))
+            return redirect(url_for('shop2',username=current_user.slug))
         except Exception as e:
             db.session.rollback()  # Ensure rollback if there's an error
             flash("An error occurred while processing your update. Please try again.", "danger")
@@ -285,15 +287,41 @@ def shop_edit():
         
 
     elif request.method == 'GET':
-        form.shop_name.data = current_user.shop_name
+        form.shop_name.data = current_user.shop_name.upper()
         form.shop_motto.data = current_user.shop_motto
+        form.shop_about.data= current_user.shop_about
 
     return render_template('shop_edit.html', form=form,image_file=image_file)
 
 
 
+@app.route("/unlike_like_product/<int:product_id>", methods=["POST"])
+@login_required
+def unlike_like_product(product_id):
+    product = Product.query.get_or_404(product_id)
+
+    existing_like = Love.query.filter_by(user_id=current_user.id, product_id=product.id).first()
+    if existing_like:
+        db.session.delete(existing_like)
+        db.session.commit()
+        print("unlike")
+        return jsonify({"status": "unliked", "product_id": product_id})
+    else:
+        like = Love(user_id=current_user.id, product_id=product.id)
+        db.session.add(like)
+        db.session.commit()
+        print("like")
+        return jsonify({"status": "liked", "product_id": product_id})
 
 
-   
+@app.route("/Loved_items", methods=['GET', 'POST'])
+@login_required
+def Loved_items(): 
+    product= Product.query.filter_by(user_id=current_user.id).all() 
+    user= User.query.filter_by(id=current_user.id).first_or_404()
+    loves= Love.query.filter_by(user_id=current_user.id).all() 
+    return render_template('loved_items.html', loves=loves,product=product,user=user,shop_theme='white')
+
+  
 
 
