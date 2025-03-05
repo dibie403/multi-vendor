@@ -5,9 +5,10 @@ from PIL import Image
 from flask import render_template, url_for, flash, redirect, request, jsonify
 from multivendor import app,db,bcrypt
 from flask_login import login_user,current_user,logout_user,login_required
-from multivendor.forms import RegistrationForm,LoginForm,UpdateProfileForm,AddProductForm,UpdateshopForm
+from multivendor.forms import RegistrationForm,LoginForm,UpdateProfileForm,AddProductForm,UpdateshopForm,EditProductForm
 from multivendor.models import User,Product,Love
 import re
+from datetime import datetime
 
 
 
@@ -23,6 +24,12 @@ def home():
     return render_template('home.html',title='home',image_file=image_file)
 
 
+
+
+def generate_slug(text):
+    """Generate a slug by replacing special characters with '-' and ensuring lowercase"""
+    return re.sub(r"[^\w]+", "-", text.lower()).strip("-")
+
 @app.route("/home/register", methods=['GET', 'POST'])
 def register():
     if current_user.is_authenticated:
@@ -34,32 +41,41 @@ def register():
             # Convert status to boolean (True for seller, False for buyer)
             is_seller = form.status.data == "seller"
 
-            # If user is a seller, make sure they provide shop details
+            # If user is a seller, ensure they provide shop details
             if is_seller and (not form.shop_name.data or not form.shop_motto.data):
                 flash('Shop name and motto are required for sellers!', 'danger')
                 return render_template('register.html', form=form)
+
             hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
+
+            # Generate slugs
+            username_slug = generate_slug(form.username.data)
+            shop_slug = generate_slug(form.shop_name.data) if is_seller else None
+
             user = User(
                 username=form.username.data,
                 email=form.email.data,
                 phone_number=form.phone.data,
-                password=hashed_password,  # You should hash the password before storing
+                password=hashed_password,
                 is_admin=False,  # Assuming default is False
-                shop_name=form.shop_name.data.upper() if is_seller else None,  # Only store shop name if seller
-                shop_motto=form.shop_motto.data if is_seller else None,  # Only store shop motto if seller
+                shop_name=form.shop_name.data.upper() if is_seller else None,
+                shop_motto=form.shop_motto.data if is_seller else None,
                 status=is_seller,  # True for sellers, False for buyers
-                slug=form.username.data.lower().replace(" ", "-"),  # Generate a slug
-                slug1 = form.shop_name.data.lower().replace(" ", "-")  
+                slug=username_slug,  # Slug for username
+                slug1=shop_slug  # Slug for shop name
             )
 
             db.session.add(user)
             db.session.commit()
             flash('Account created successfully!', 'success')
             return redirect(url_for('login'))  # Redirect to login page
+
         except Exception as e:
             flash("An error occurred while processing your registration. Please try again.", "danger")
+            print(e)  # Debugging purposes
 
     return render_template('register.html', form=form)
+
 
 
 @app.route("/login",methods=['POST','GET'])
@@ -73,7 +89,7 @@ def login():
             login_user(user,remember=form.remember.data)
             next_page= request.args.get('next')
             return redirect(next_page) if next_page else redirect(url_for('home'))
-            #flash(f"Welcome {form.email.data}!, Check what's New on the Site😊", 'success')
+            flash("Login successful!", "success")
         else:
             flash(f"Unsuccessful login,Incorrect credentials", 'danger')
 
@@ -101,7 +117,7 @@ def shop2(username):
     
     print(user.shop_image_file)
 
-    return render_template('shop.html',title='shop',image_file=image_file,products=products,user=user,shop_theme='white',loved_products=loved_products)
+    return render_template('shop.html',title='shop',image_file=image_file,products=products,user=user,loved_products=loved_products)
 
 
 def save_picture(form_picture):
@@ -156,13 +172,14 @@ def profile_edit():
                 picture_file = save_picture(form.picture.data)
 
                 current_user.image_file = picture_file
+            user_slug = generate_slug(form.username.data)
 
             # Correctly assign values without commas
             current_user.username = form.username.data
             current_user.email = form.email.data
             current_user.phone_number = form.phone.data
             current_user.status = current_user.status # True for sellers, False for buyers
-            current_user.slug = form.username.data.lower().replace(" ", "-")  # Generate a slug
+            current_user.slug = user_slug # Generate a slug
             
             db.session.commit()
             flash('Profile Updated Successfully!', 'success')
@@ -232,7 +249,7 @@ def New_product():
                 return redirect(url_for('new_post'))
         
         # Generate the slug based on the title
-        slug = generate_slug(form.name.data)
+        slug = generate_slug1(form.name.data)
         
         # Create and add the new post
         product = Product(
@@ -247,7 +264,7 @@ def New_product():
         )
         db.session.add(product)
         db.session.commit()
-        flash("Producted added successfully", "success")
+        flash("Product added successfully", "success")
         return redirect(url_for('shop2',username=current_user.slug))
     
    
@@ -261,6 +278,8 @@ def shop_edit():
     form = UpdateshopForm()
     image_file = url_for('static', filename='profile_pics/' + current_user.image_file)
     image = None  # Set image to None initially
+
+   
     
     if form.validate_on_submit():
 
@@ -270,12 +289,13 @@ def shop_edit():
                 picture_file = save_picture2(form.picture.data)
 
                 current_user.shop_image_file = picture_file
+            shop_slug = generate_slug(form.shop_name.data)
 
             # Correctly assign values without commas
-            current_user.shop_name = form.shop_name.data
+            current_user.shop_name = form.shop_name.data.upper()
             current_user.shop_motto = form.shop_motto.data
             current_user.shop_about = form.shop_about.data
-            current_user.slug1 = form.shop_name.data.lower().replace(" ", "-")  # Generate a slug
+            current_user.slug1 = shop_slug # Generate a slug
             
             db.session.commit()
             flash('Profile Updated Successfully!', 'success')
@@ -287,11 +307,11 @@ def shop_edit():
         
 
     elif request.method == 'GET':
-        form.shop_name.data = current_user.shop_name.upper()
+        form.shop_name.data = current_user.shop_name
         form.shop_motto.data = current_user.shop_motto
         form.shop_about.data= current_user.shop_about
 
-    return render_template('shop_edit.html', form=form,image_file=image_file)
+    return render_template('shop_edit.html', form=form,image_file=image_file,shop_theme='white')
 
 
 
@@ -317,11 +337,105 @@ def unlike_like_product(product_id):
 @app.route("/Loved_items", methods=['GET', 'POST'])
 @login_required
 def Loved_items(): 
+    page = request.args.get('page', 1, type=int)
     product= Product.query.filter_by(user_id=current_user.id).all() 
     user= User.query.filter_by(id=current_user.id).first_or_404()
-    loves= Love.query.filter_by(user_id=current_user.id).all() 
+    loves= Love.query.filter_by(user_id=current_user.id).order_by(Love.date.desc()).paginate(page=page, per_page=2)
+    
     return render_template('loved_items.html', loves=loves,product=product,user=user,shop_theme='white')
 
+
+
+@app.route("/store/<string:username>/Product-page/<product_id>", methods=['GET', 'POST'])
+@login_required
+def product_page(product_id,username):
+    product=Product.query.filter_by(id=product_id).first_or_404()
+
+    
+    return render_template('product_view.html',product=product)
+
+@app.route('/Product-page/delete/<int:product_id>', methods=['POST', 'GET'])
+@login_required
+def delete_product(product_id):
+
+    # Get the post or raise 404 if it doesn't exist
+    product = Product.query.get_or_404(product_id)
+
+    for love in product.loves:
+        db.session.delete(love)
+
+
+    # Delete the post itself
+    db.session.delete(product)
+    db.session.commit()
+
+    flash("Product has been successfully.", "success")
+    return redirect(url_for('shop2',username=current_user.slug))
+
+import re
+from datetime import datetime
+from multivendor.models import Product  
+
+def generate_slug1(name):
+    """Generate a unique slug by replacing special characters and ensuring uniqueness in the database"""
+    base_slug = re.sub(r"[^\w]+", "-", name.lower()).strip("-")  # Clean the text
+    
+    # Generate a timestamp using datetime (YYYYMMDDHHMMSS)
+    timestamp = datetime.now().strftime("%Y%m%d%H%M%S")  # Example: 20250303143025
+    slug = f"{base_slug}-{timestamp}"
+
+    # Ensure uniqueness in the database
+    counter = 1
+    while Product.query.filter_by(slug=slug).first():
+        slug = f"{base_slug}-{timestamp}-{counter}"  # Append counter if necessary
+        counter += 1  # Increment counter
+
+    return slug
+
+
   
+
+@app.route("/edit-Product/<product_id>", methods=['GET', 'POST'])
+def edit_product(product_id):
+    form = EditProductForm()
+    #product = Product.query.get_or_404(product_id)
+    product = db.session.get(Product, product.id) 
+    image_file = url_for('static', filename='profile_pics/' + current_user.image_file)
+    
+    if form.validate_on_submit():
+        try:
+            # Save the image if provided
+            if form.picture.data:
+                picture_file = save_picture1(form.picture.data)  # Save the image
+                product.image = picture_file  # Update image reference
+            
+            # Generate a unique slug
+            slug = generate_slug1(form.name.data)
+            
+            product.name = form.name.data.upper()
+            product.description = form.description.data
+            product.amount = form.amount.data
+            product.category = form.category.data
+            product.shelf = form.shelf.data
+            product.slug = slug  # Assign the unique slug
+            
+            db.session.commit()
+            flash("Product successfully updated!", "success")
+
+            return redirect(url_for('shop2', username=current_user.slug))
+        
+        except Exception as e:
+            db.session.rollback()  # Rollback changes on error
+            flash("An error occurred while processing your update. Please try again.", "danger")
+            print(e)
+
+    elif request.method == 'GET':
+        form.name.data = product.name
+        form.description.data = product.description
+        form.amount.data = product.amount
+        form.category.data = product.category
+        form.shelf.data = product.shelf
+
+    return render_template('edit_product.html', form=form, image_file=image_file, shop_theme='white', product_image=product.image)
 
 

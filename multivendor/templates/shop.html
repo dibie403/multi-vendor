@@ -140,7 +140,7 @@
             </div>
         </div>
 
-        <!-- Product Modal -->
+       <!-- Product Modal -->
         <div class="modal fade" id="productModal{{ product.id }}" tabindex="-1" role="dialog" aria-labelledby="productModalLabel{{ product.id }}" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered" role="document">
                 <div class="modal-content">
@@ -154,12 +154,15 @@
                         <img src="{{ url_for('static', filename='product_images/' + product.image) }}" class="img-fluid mb-3" alt="{{ product.name }}">
                         <p>{{ product.description }}</p>
                         <p class="price">${{ product.amount }}</p>
-                        <button class="btn btn-add-cart" href="{{ url_for('register') }}">Add to cart 🛒</button>
-                        <button class="btn btn-warning" href="{{ url_for('register') }}">View product 🛒</button>
+                        
+                        <!-- Correcting the navigation links -->
+                        <a class="btn btn-add-cart" href="{{ url_for('register') }}">Add to cart 🛒</a>
+                        <a class="btn btn-warning" href="{{ url_for('product_page', product_id=product.id,username=product.seller.slug) }}">View product 🛒</a>
                     </div>
                 </div>
             </div>
         </div>
+
 
     {% endfor %}
      

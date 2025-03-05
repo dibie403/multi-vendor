@@ -468,3 +468,50 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 
+
+
+
+
+
+/* Dots */
+.dots {
+    text-align: center;
+    margin-top: 8px;
+}
+
+.dot {
+    height: 8px;
+    width: 8px;
+    margin: 0 4px;
+    background-color: #ccc;
+    border-radius: 50%;
+    display: inline-block;
+    cursor: pointer;
+}
+
+.dot.active {
+    background-color: #333;
+}
+
+/* Product Details */
+.sku {
+    color: gray;
+    font-size: 14px;
+}
+/* Quantity */
+.quantity-container {
+    margin-top: 10px;
+}
+
+.quantity-container input {
+    width: 50px;
+    padding: 5px;
+    font-size: 16px;
+    text-align: center;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.selected {
+    box-shadow: 0 0 4px rgba(0, 0, 0, 0.5);
+}

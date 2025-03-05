@@ -153,32 +153,103 @@ class AddProductForm(FlaskForm):
     # Product Image Upload
     picture = FileField(
         'Add Product Image', 
+        validators=[DataRequired(),FileAllowed(['jpg', 'png'])]
+    )
+
+    # Submit Button
+    submit = SubmitField('Add product')
+
+
+class UpdateshopForm(FlaskForm):
+		# Shop Fields (optional for buyers)
+		shop_name = StringField('Shop Name', validators=[DataRequired(), Length(max=30)])
+		shop_motto = TextAreaField('Shop Motto', validators=[DataRequired()])
+		shop_about=TextAreaField('About Your Store', validators=[DataRequired()])
+		picture=FileField('Update Profile Picture',validators=[FileAllowed(['jpg','png'])])
+		submit = SubmitField('Update')
+
+		#function to handle wether the user alredy exist in the database
+
+		def validate_shop_name(self,shop_name):
+			if shop_name.data != current_user.shop_name:
+				user=User.query.filter_by(shop_name=shop_name.data).first()
+
+				if user:
+					raise ValidationError('Shop name already taken,Please pick a unique shop name')
+
+		def validate_shop_motto(self,shop_motto):
+			if shop_motto.data != current_user.shop_motto:
+				user=User.query.filter_by(shop_motto=shop_motto.data).first()
+
+				if user:
+					raise ValidationError('Brand slogan already taken,Please pick a unique slogan')
+
+class EditProductForm(FlaskForm):
+    # Product Name
+    name = StringField(
+        'Product Name', 
+        validators=[DataRequired(), Length(min=3, max=20)]
+    )
+
+    # Description
+    description = TextAreaField(
+        'Description', 
+        validators=[DataRequired()]
+    )
+
+    # Amount
+    amount = StringField(
+        'Amount', 
+        validators=[DataRequired(), Length(min=3, max=20)]
+    )
+
+    # Category Dropdown
+    category = SelectField(
+        'Category', 
+        choices=[
+            ('shoes', 'Shoes'), 
+            ('clothes', 'Clothes'), 
+            ('perfume', 'Perfume'), 
+            ('electronics', 'Electronics'), 
+            ('books', 'Books'), 
+            ('phones', 'Phones'),
+            ('laptops', 'Laptops'),
+            ('home_appliances', 'Home Appliances'),
+            ('beauty', 'Beauty & Personal Care'),
+            ('health', 'Health & Wellness'),
+            ('sports', 'Sports & Outdoors'),
+            ('toys', 'Toys & Games'),
+            ('automotive', 'Automotive'),
+            ('furniture', 'Furniture'),
+            ('groceries', 'Groceries'),
+            ('watches', 'Watches & Accessories'),
+            ('jewelry', 'Jewelry'),
+            ('handbags', 'Handbags & Accessories'),
+            ('gaming', 'Gaming & Consoles'),
+            ('office_supplies', 'Office Supplies'),
+            ('others', 'Others')
+        ],
+        validators=[DataRequired()]
+    )
+
+    # Shelf Dropdown
+    shelf = SelectField(
+        'Shelf', 
+        choices=[
+            ('featured', 'Featured'), 
+            ('top_sales', 'Top Sales'), 
+            ('best_selling', 'Best Selling')
+        ],
+        validators=[DataRequired()]
+    )
+
+    # Product Image Upload
+    picture = FileField(
+        'Add Product Image', 
         validators=[FileAllowed(['jpg', 'png'])]
     )
 
     # Submit Button
     submit = SubmitField('Update')
 
-
-class UpdateshopForm(FlaskForm):
-		# Shop Fields (optional for buyers)
-		shop_name = StringField('Shop Name', validators=[DataRequired(), Length(max=20)])
-		shop_motto = TextAreaField('Shop Motto', validators=[DataRequired()])
-		shop_about=TextAreaField('About Your Store', validators=[DataRequired()])
-		picture=FileField('Update Profile Picture',validators=[FileAllowed(['jpg','png'])])
-		submit = SubmitField('Sign Up')
-
-		#function to handle wether the user alredy exist in the database
-
-		def validate_shop(self,shop_name):
-			user=User.query.filter_by(username=show_name.data).first()
-
-			if user:
-				raise ValidationError('Shop name already taken,Please pick a unique shop name')
-
-		def validate_shopMotor(self,shop_motto):
-			user=User.query.filter_by(username=shop_motto.data).first()
-
-			if user:
-				raise ValidationError('Brand slogan already taken,Please pick a unique slogan')
-
+    

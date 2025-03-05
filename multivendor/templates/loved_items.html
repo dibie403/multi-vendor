@@ -1,9 +1,8 @@
 {% extends "layout.html" %}
 
 {% block content3 %}
+<h1 class="my-4 section-title">Loved Items🛍️ </h1>
 <div class="content-section">
-
-    <h1 class="my-4 section-title">Loved Items🛍️ </h1>
 
       <div>
         <div class="row product-grid">
@@ -42,7 +41,23 @@
                     </div>
                 </div>
             </div>
+        {% else %}
+         <h3 class="text-primary text-center" style="color: #428bca;">No Loved Items Yet!</h3>
     {% endfor %}
 </div>
+
+{% for page_num in loves.iter_pages() %}
+          {% if page_num %}
+            {% if loves.page == page_num %}
+              <a class="btn btn-info mb-4" href="{{url_for('Loved_items',page=page_num)}}">{{page_num}}</a>
+            {% else %}
+             <a class="btn btn-outline-info mb-4" href="{{url_for('Loved_items',page=page_num)}}">{{page_num}}</a>
+            {% endif %}
+          {% else %}
+           ...
+          {% endif %}
+          
+          
+        {% endfor %}
 
 {% endblock %}

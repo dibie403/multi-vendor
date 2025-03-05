@@ -51,6 +51,15 @@ h1, h2, h3, h4, h5, h6 {
   color: #ffffff;
   font-weight: bold;
 }
+.content-section11 {
+    max-width: 450px;
+    margin: auto;
+    background: #fff;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.1);
+    animation: fadeIn 1s ease-in-out;
+  }
 
 /* Shop Search & Icon Section */
 .container11 {

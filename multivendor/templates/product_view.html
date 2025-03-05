@@ -1,0 +1,104 @@
+{% extends "layout.html" %}
+
+{% block content3 %}
+  <div class="content-section11 mb-4">
+    <!-- Top Section: Go Back Link & Icons -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <!-- Go Back Link -->
+        <a href="javascript:history.back()" class="btn btn-outline-secondary btn-sm">Go Back</a>
+        
+        {% if current_user.username == product.seller.username %}
+        <!-- Icon Buttons -->
+            <div class="d-flex justify-content-end">
+               
+
+                <a class="btn btn-outline-danger btn-sm mx-1" data-toggle="modal" data-target="#deleteModal">
+                    <img src="{{ url_for('static', filename='images/trash.png') }}" alt="delete Product" style="width: 12px;">
+                </a>
+
+                <a href="{{ url_for('edit_product',product_id=product.id) }}" class="btn btn-outline-success btn-sm mx-1">
+                    <img src="{{ url_for('static', filename='images/edit.png') }}" alt="Settings" style="width: 12px;">
+                </a>
+            </div>
+        {% else %}
+         <a class="btn btn-outline-danger btn-sm mx-1" data-toggle="modal" data-target="#deleteModal">
+                    <img src="{{ url_for('static', filename='images/trash.png') }}" alt="delete Product" style="width: 12px;">
+                </a>
+
+        {% endif %}
+
+    </div>
+
+    <div class="product-container">
+        <!-- Image Slider -->
+        <div class="d-flex justify-content-center mb-3">
+            <img src="{{ url_for('static', filename='product_images/' + product.image) }}" class="product-image img-fluid" alt="Product Image">
+        </div>
+
+        <!-- Product Details -->
+        <div class="product-details">
+            <p class="sku">SKU: 00{{product.id}}</p>
+            <h1 class="card-title">{{product.name}}</h1>
+            <p class="price">$15.00</p>
+
+            <!-- Color Selection -->
+            <div class="card-title">
+                <p>Description: <span style="color:grey;">{{product.description}}</span></p>
+                <div class="color-option selected"></div>
+            </div>
+
+            <!-- Quantity Selector -->
+            <div class="quantity-container">
+                <label for="quantity">Quantity</label>
+                <input type="number" id="quantity" min="1" value="1">
+            </div>
+        </div>
+    </div>
+
+    <!-- Buttons -->
+            <div class="d-flex  gap-3 mt-3">
+                <button class="btn btn-warning mr-4">Add to Cart</button>
+                <button class="btn-add-cart ">Place Order</button>
+            </div>
+  </div>
+
+ </div>
+<div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="deleteModalLabel">Are you Sure You Want To Delete This Product</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        clicking on the delete button will completely remove this item fromyour store!
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <a href="{{ url_for('delete_product',product_id=product.id) }}" class="btn btn-primary btn btn-sm-2">Delete</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<script>
+let currentIndex = 0;
+const images = document.querySelectorAll('.slides img');
+const dots = document.querySelectorAll('.dot');
+
+function changeSlide(index) {
+    images[currentIndex].classList.remove('active');
+    dots[currentIndex].classList.remove('active');
+
+    images[index].classList.add('active');
+    dots[index].classList.add('active');
+
+    currentIndex = index;
+}
+</script>
+
+{% endblock %}

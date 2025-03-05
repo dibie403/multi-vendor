@@ -1,0 +1,156 @@
+{% extends "layout.html" %}
+
+{% block content1 %}
+
+  
+<div class="content-section mb-4">
+  <div class="header-title11">🚀Add New Product</div>
+  <div class="sub-header11">Add New Product To Your Store</div>
+
+  <form method="POST"  action="" enctype="multipart/form-data">
+    {{ form.hidden_tag() }}
+    <fieldset class="form-group">
+
+       <!-- Productname Field -->
+          <div class="form-group11">
+            {{ form.name.label(class="form-control-label", for="name") }}
+            {% if form.name.errors %}
+              {{ form.name(class="form-control is-invalid", id="name") }}
+              <div class="invalid-feedback">
+                {% for error in form.name.errors %}
+                  <span>{{ error }}</span>
+                {% endfor %}
+              </div>
+            {% else %}
+              {{ form.name(class="form-control", id="name") }}
+            {% endif %}
+          </div>
+
+          <!-- description Field -->
+         <!-- Description Field -->
+          <div class="form-group11">
+              {{ form.description.label(class="form-control-label", for="description") }}
+              {% if form.description.errors %}
+                  {{ form.name(class="form-control is-invalid", id="description") }}  <!-- BUG: form.name instead of form.description -->
+                  <div class="invalid-feedback">
+                      {% for error in form.description.errors %}
+                          <span>{{ error }}</span>
+                      {% endfor %}
+                  </div>
+              {% else %}
+                  {{ form.description(class="form-control", id="description") }}
+              {% endif %}
+          </div>
+
+
+          <!-- Email Field -->
+          <div class="form-group11">
+            {{ form.amount.label(class="form-control-label", for="amount") }}
+            {% if form.amount.errors %}
+              {{ form.amount(class="form-control is-invalid", id="amount") }}
+              <div class="invalid-feedback">
+                {% for error in form.amount.errors %}
+                  <span>{{ error }}</span>
+                {% endfor %}
+              </div>
+            {% else %}
+              {{ form.amount(class="form-control", id="amount") }}
+            {% endif %}
+          </div>
+         <!-- Category Dropdown -->
+          <div class="form-group11">
+            {{ form.category.label(class="form-control-label") }}
+            {% if form.category.errors %}
+              {{ form.category(class="form-control is-invalid") }}
+              <div class="invalid-feedback">
+                {% for error in form.category.errors %}
+                  <span>{{ error }}</span>
+                {% endfor %}
+              </div>
+            {% else %}
+              {{ form.category(class="form-control") }}
+            {% endif %}
+          </div>
+            <!-- Shelf Dropdown -->
+          <div class="form-group11">
+            {{ form.shelf.label(class="form-control-label") }}
+            {% if form.shelf.errors %}
+              {{ form.shelf(class="form-control is-invalid") }}
+              <div class="invalid-feedback">
+                {% for error in form.shelf.errors %}
+                  <span>{{ error }}</span>
+                {% endfor %}
+              </div>
+            {% else %}
+              {{ form.shelf(class="form-control") }}
+            {% endif %}
+          </div>
+       <!-- Display Old Product Image -->
+      {% if product_image %}
+        <div class="mb-3">
+          <label>Current Product Image:</label>
+          <br>
+          <img src="{{ url_for('static', filename='product_images/' + product_image) }}" 
+               alt="Old Product Image" width="70" height="70" 
+               style="border-radius: 8px; object-fit: cover;">
+        </div>
+      {% endif %}
+
+      <div class="form-group11">
+          <label for="picture" class="d-block">Upload Product Images</label>
+
+          <!-- Hidden File Input with Multiple Selection Enabled -->
+          {{ form.picture(class="form-control-file d-none", id="picture") }}
+
+          <!-- Custom Upload Button (Using an Image) -->
+          <label for="picture" class="custom-file-upload">
+              <img src="{{ url_for('static', filename='images/cloud-upload-alt (1).png') }}" 
+                   alt="Upload" width="50" height="50" style="cursor: pointer;">
+          </label>
+
+          <!-- Image Preview Container -->
+          <div id="image-preview-container" class="mt-3"></div>
+
+          <!-- Error Handling -->
+          {% if form.picture.errors %}
+              {% for error in form.picture.errors %}
+                  <span class='text-danger'>{{ error }}</span><br>
+              {% endfor %}
+          {% endif %}
+      </div>
+
+
+
+
+
+    </fieldset>
+
+    <!-- Submit Button -->
+    <div class="form-group11">
+      {{ form.submit(class="btn-custom") }}
+    </div>
+  </form>
+<!-- JavaScript for Image Preview -->
+<script>
+document.getElementById('picture').addEventListener('change', function(event) {
+    let previewContainer = document.getElementById('image-preview-container');
+    previewContainer.innerHTML = ''; // Clear previous previews
+
+    for (let file of event.target.files) {
+        let reader = new FileReader();
+        reader.onload = function(e) {
+            let img = document.createElement('img');
+            img.src = e.target.result;
+            img.width = 60;  // Adjust preview size
+            img.height = 60;
+            img.style.margin = '5px';
+            img.style.borderRadius = '8px';
+            img.style.objectFit = 'cover';
+            previewContainer.appendChild(img);
+        };
+        reader.readAsDataURL(file);
+    }
+});
+</script>
+</div>
+{% endblock %}

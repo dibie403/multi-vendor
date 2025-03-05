@@ -20,13 +20,13 @@ class User(db.Model,UserMixin):
     phone_number = db.Column(db.String(20), unique=True, nullable=False)
     status = db.Column(db.Boolean, nullable=False,default=False)
     slug = db.Column(db.String(100), unique=True, nullable=False)
-    slug1=db.Column(db.String(100), unique=True, nullable=False)
+    slug1=db.Column(db.String(100), unique=True, nullable=True)
     products = db.relationship('Product', backref='seller', lazy=True)
     
     
     
     def __repr__(self):
-        return f"User('{self.username}', '{self.slug1}','{self.image_file}', '{self.shop_about}')"
+        return f"User('{self.slug}', '{self.slug1}','{self.image_file}', '{self.shop_about}')"
 
 class Product(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -43,7 +43,7 @@ class Product(db.Model):
     
 
     def __repr__(self):
-        return f"Product('{self.name}', '{self.image}')"
+        return f"Product('{self.name}', '{self.slug}')"
 
 
 class Image(db.Model):
@@ -58,6 +58,7 @@ class Love(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     product_id = db.Column(db.Integer, db.ForeignKey('product.id'), nullable=False)
+    date = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
 
     # Define relationships
     user = db.relationship('User', backref=db.backref('loves', lazy=True))
