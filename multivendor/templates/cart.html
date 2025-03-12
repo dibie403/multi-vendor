@@ -1,0 +1,60 @@
+
+{% extends "layout.html" %}
+
+{% block content3 %}
+<h1 class="my-4 section-title">Cart🛍️ </h1>
+<div class="content-section">
+    <h5>Only Items you cart From This Seller Store Is Displayed Here</h5>
+      <div>
+        <div class="row product-grid">
+          {% for cart_item in cart_items %}
+         <!-- Product Item -->
+            <div class="col-6 col-sm-4 col-md-2 product-item" data-toggle="modal" data-target="#productModal{{ cart_item.product.id }}">
+                <div class="product-card">
+                    <div class="image-container">
+                        <img src="{{ url_for('static', filename='product_images/' + cart_item.product.image) }}" class="card-img-top" alt="{{cart_item.product.name }}">
+                        
+                    </div>
+                    <div class="card-body text-center">
+                        <small class="card-title">{{ cart_item.product.name }}</small>
+                        <p class="card-text price">${{cart_item.product.amount }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Product Modal -->
+            <div class="modal fade" id="productModal{{cart_item.product.id }}" tabindex="-1" role="dialog" aria-labelledby="productModalLabel{{ cart_item.product.id }}" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">{{ cart_item.product.name }}</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body text-center">
+                            <img src="{{ url_for('static', filename='product_images/' + cart_item.product.image) }}" class="img-fluid mb-3" alt="{{ cart_item.product.name }}">
+                            <p>{{ cart_item.product.description }}</p>
+                            <p class="price">${{ cart_item.product.amount }}</p>
+                            
+                            <button class="btn btn-warning" href="{{ url_for('register') }}">View product 🛒</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% else %}
+         <h3 class="text-primary text-center" style="color: #428bca;">No cart Items Yet!</h3>
+    {% endfor %}
+</div>
+{% for page_num in range(1, total_pages + 1) %}
+    {% if page == page_num %}
+        <a class="btn btn-info mb-4" href="{{ url_for('cart', seller_id=seller.id, page=page_num) }}">{{ page_num }}</a>
+    {% else %}
+        <a class="btn btn-outline-info mb-4" href="{{ url_for('cart', seller_id=seller.id, page=page_num) }}">{{ page_num }}</a>
+    {% endif %}
+{% endfor %}
+
+
+
+
+{% endblock %}

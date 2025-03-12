@@ -39,7 +39,7 @@
         <div class="product-details">
             <p class="sku">SKU: 00{{product.id}}</p>
             <h1 class="card-title">{{product.name}}</h1>
-            <p class="price">$15.00</p>
+            <p class="price">${{product.amount}}</p>
 
             <!-- Color Selection -->
             <div class="card-title">
@@ -47,18 +47,32 @@
                 <div class="color-option selected"></div>
             </div>
 
-            <!-- Quantity Selector -->
-            <div class="quantity-container">
-                <label for="quantity">Quantity</label>
-                <input type="number" id="quantity" min="1" value="1">
-            </div>
+           <form action="{{ url_for('Cart_product', product_id=product.id) }}" method="POST">
+                <!-- Quantity Selector -->
+                <div class="d-flex align-items-center gap-3 mt-3">
+                    <label for="quantity">Quantity:</label>
+
+                    <div class="quantity-container d-flex align-items-center">
+                        <button type="button" class="btn-quantity" onclick="decreaseQuantity()">−</button>
+                        <input type="number" id="quantity" name="quantity" min="1" value="1">
+                        <button type="button" class="btn-quantity" onclick="increaseQuantity()">+</button>
+                    </div>
+                </div>
+
+                <!-- Submit Button -->
+                <button type="submit" class="btn-add-cart">Add to cart 🛒</button>
+            </form>
+
+
+
         </div>
     </div>
 
     <!-- Buttons -->
             <div class="d-flex  gap-3 mt-3">
-                <button class="btn btn-warning mr-4">Add to Cart</button>
-                <button class="btn-add-cart ">Place Order</button>
+                
+                <a class="btn btn-warning" href="{{ url_for('checkout', seller_id=product.user_id) }}">Place Order {{cart_count}}🛒</a>
+                    </div>
             </div>
   </div>
 
@@ -99,6 +113,19 @@ function changeSlide(index) {
 
     currentIndex = index;
 }
+
+function increaseQuantity() {
+    let quantityInput = document.getElementById("quantity");
+    quantityInput.value = parseInt(quantityInput.value) + 1;
+}
+
+function decreaseQuantity() {
+    let quantityInput = document.getElementById("quantity");
+    if (parseInt(quantityInput.value) > 1) {
+        quantityInput.value = parseInt(quantityInput.value) - 1;
+    }
+}
+
 </script>
 
 {% endblock %}

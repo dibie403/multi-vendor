@@ -134,7 +134,7 @@ h1, h2, h3, h4, h5, h6 {
  .icon-group {
     display: flex;
     align-items: center;
-    gap: 20px; /* Reduces space between icons */
+    gap: 10px; /* Reduces space between icons */
     margin-left: auto; /* Pushes group to the right */
     background-color: #fafafa;
     border-radius: 15px;
@@ -473,25 +473,7 @@ h1, h2, h3, h4, h5, h6 {
 
 
 
-/* Dots */
-.dots {
-    text-align: center;
-    margin-top: 8px;
-}
 
-.dot {
-    height: 8px;
-    width: 8px;
-    margin: 0 4px;
-    background-color: #ccc;
-    border-radius: 50%;
-    display: inline-block;
-    cursor: pointer;
-}
-
-.dot.active {
-    background-color: #333;
-}
 
 /* Product Details */
 .sku {
@@ -499,19 +481,46 @@ h1, h2, h3, h4, h5, h6 {
     font-size: 14px;
 }
 /* Quantity */
-.quantity-container {
-    margin-top: 10px;
-}
 
-.quantity-container input {
-    width: 50px;
-    padding: 5px;
-    font-size: 16px;
-    text-align: center;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-}
 
 .selected {
     box-shadow: 0 0 4px rgba(0, 0, 0, 0.5);
+}
+
+.cart-count {
+    top: 55%; /* Move it slightly downward */
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 14px;
+    font-weight: bold;
+    color: black;
+}
+
+.quantity-container {
+    display: flex;
+    align-items: center;
+    border: px solid #ccc;
+    border-radius: 5px;
+    overflow: hidden;
+    width: 100px;
+}
+
+.quantity-container input {
+    width: 40px;
+    text-align: center;
+    border: none;
+    font-size: 13px;
+    font-weight: bold;
+}
+
+.btn-quantity {
+    background: #f8f9fa;
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.btn-quantity:hover {
+    background: #ddd;
 }

@@ -60,10 +60,13 @@
     </form>
   </div>
 
-
+  {% if current_user.username == product.seller.username %}
    <!-- Wrapper to group icons and push them to the right -->
   <div class="icon-group" style="font-size: 0.8rem; ">
   <!-- Copy Link Button -->
+   <a href="{{ url_for('copy_link') }}" class="btn btn-outline-primary btn-sm">
+    <img class="article-img" src="{{ url_for('static', filename='images/overview.png') }}" alt="Copy Link" style="width: 10px; height: auto;">
+  </a>
   <a href="{{ url_for('copy_link') }}" class="btn btn-outline-primary btn-sm">
     <img class="article-img" src="{{ url_for('static', filename='images/copy.png') }}" alt="Copy Link" style="width: 10px; height: auto;">
   </a>
@@ -78,6 +81,15 @@
     <img class="article-img" src="{{ url_for('static', filename='images/settings.png') }}" alt="Settings" style="width: 10px; height: auto;">
   </a>
 </div>
+{% else %}
+  <a href="{{ url_for('cart',seller_id=user.id) }}" class="btn btn-outline-success btn-sm position-relative">
+    <img class="article-img" src="{{ url_for('static', filename='images/shopping-bag.png') }}" alt="Settings" style="width: 30px; height: auto;">
+    <span class="position-absolute cart-count ">
+        {{ cart_count }}
+    </span>
+</a>
+
+{% endif %}
 
 </div>
 
@@ -104,6 +116,10 @@
     <li class="list-group-item">
       <a>Business Hour: 9am-12am</a>
     </li>
+
+    <a href="{{ url_for('cart',seller_id=user.id) }}" class="btn btn-outline-success btn-sm">
+    <img class="article-img" src="{{ url_for('static', filename='images/plus.png') }}" alt="New Product" style="width: 10px; height: auto;">
+  </a>
    
   </ul>
 {% endblock %}
@@ -156,8 +172,8 @@
                         <p class="price">${{ product.amount }}</p>
                         
                         <!-- Correcting the navigation links -->
-                        <a class="btn btn-add-cart" href="{{ url_for('register') }}">Add to cart 🛒</a>
-                        <a class="btn btn-warning" href="{{ url_for('product_page', product_id=product.id,username=product.seller.slug) }}">View product 🛒</a>
+                        <a class="btn btn-warning" href="{{ url_for('Cart_product', product_id=product.id) }}">Add to cart 🛒</a>
+                        <a class="btn btn-add-cart" href="{{ url_for('product_page', product_id=product.id,username=product.seller.slug) }}">View product 🛒</a>
                     </div>
                 </div>
             </div>

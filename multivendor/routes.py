@@ -6,9 +6,10 @@ from flask import render_template, url_for, flash, redirect, request, jsonify
 from multivendor import app,db,bcrypt
 from flask_login import login_user,current_user,logout_user,login_required
 from multivendor.forms import RegistrationForm,LoginForm,UpdateProfileForm,AddProductForm,UpdateshopForm,EditProductForm
-from multivendor.models import User,Product,Love
+from multivendor.models import User,Product,Love,CartItem,OrderItem,Order
 import re
 from datetime import datetime
+import random
 
 
 
@@ -112,12 +113,16 @@ def shop2(username):
     page = request.args.get('page', 1, type=int)
 
     user= User.query.filter_by(slug=username).first_or_404()
+    product=Product.query.filter_by(user_id=user.id).first()
     products=Product.query.filter_by(user_id=user.id).order_by(Product.date.desc()).paginate(page=page, per_page=2)
+    seller_id=product.user_id if product else None
+    cart_items = get_cart_items_for_seller(current_user.id, seller_id)
+    cart_count = len(cart_items) if cart_items else 0
     loved_products = {love.product_id for love in Love.query.filter_by(user_id=current_user.id).all()}
     
     print(user.shop_image_file)
 
-    return render_template('shop.html',title='shop',image_file=image_file,products=products,user=user,loved_products=loved_products)
+    return render_template('shop.html',title='shop',image_file=image_file,products=products,user=user,loved_products=loved_products,product=product,cart_count=cart_count)
 
 
 def save_picture(form_picture):
@@ -350,27 +355,37 @@ def Loved_items():
 @login_required
 def product_page(product_id,username):
     product=Product.query.filter_by(id=product_id).first_or_404()
-
+    seller_id=product.user_id if product else None
+    cart_items = get_cart_items_for_seller(current_user.id, seller_id)
+    # Count the number of items in the cart for this user and seller
+    cart_count = len(cart_items) if cart_items else 0
     
-    return render_template('product_view.html',product=product)
+    return render_template('product_view.html',product=product,cart_count=cart_count)
 
 @app.route('/Product-page/delete/<int:product_id>', methods=['POST', 'GET'])
 @login_required
 def delete_product(product_id):
-
-    # Get the post or raise 404 if it doesn't exist
+    # Get the product or raise 404 if it doesn't exist
     product = Product.query.get_or_404(product_id)
 
+    # Delete all related cart items first
+    CartItem.query.filter_by(product_id=product.id).delete()
+
+    # Delete related "loves" if applicable
     for love in product.loves:
         db.session.delete(love)
 
+    # Delete related order items
+    for order in product.order_items:
+        db.session.delete(order)
 
-    # Delete the post itself
+    # Delete the product itself
     db.session.delete(product)
     db.session.commit()
 
-    flash("Product has been successfully.", "success")
-    return redirect(url_for('shop2',username=current_user.slug))
+    flash("Product has been successfully deleted.", "success")
+    return redirect(url_for('shop2', username=current_user.slug))
+
 
 import re
 from datetime import datetime
@@ -438,4 +453,119 @@ def edit_product(product_id):
 
     return render_template('edit_product.html', form=form, image_file=image_file, shop_theme='white', product_image=product.image)
 
+@app.route("/cart/<seller_id>")
+def cart(seller_id):
+    """Show cart items only for the current store's seller"""
+    page = request.args.get('page', 1, type=int)
+    per_page = 1  # Number of items per page
+
+    seller = User.query.filter_by(id=seller_id).first_or_404()
+    cart_items1 = get_cart_items_for_seller(current_user.id, seller.id)  # This returns a list
+
+    # Sort by date in descending order
+    cart_items1.sort(key=lambda item: item.date, reverse=True)  
+
+    # Manual pagination logic
+    total_items = len(cart_items1)
+    start = (page - 1) * per_page
+    end = start + per_page
+    cart_items = cart_items1[start:end]
+
+    # Calculate total pages
+    total_pages = (total_items // per_page) + (1 if total_items % per_page else 0)
+
+    return render_template("cart.html", 
+                           cart_items=cart_items, 
+                           seller=seller, 
+                           page=page, 
+                           total_pages=total_pages)
+
+
+
+def get_cart_items_for_seller(user_id, seller_id):
+    """Retrieve only cart items belonging to the current seller's store"""
+    return CartItem.query.filter_by(user_id=user_id, seller_id=seller_id).all()
+
+
+
+
+@app.route("/Cart_Item/<int:product_id>", methods=['GET', 'POST'])
+@login_required
+def Cart_product(product_id):
+    product = Product.query.get_or_404(product_id)
+    
+    # Get the quantity safely (default to 1 if missing)
+    quantity = request.form.get('quantity', type=int)
+    if not quantity or quantity < 1:
+        quantity = 1  # Ensure quantity is always at least 1
+
+    existing_product = CartItem.query.filter_by(user_id=current_user.id, product_id=product.id).first()
+
+    if existing_product:
+        flash("Product already exists in the cart, please add a new product.", "success")
+    else:
+        cart_product = CartItem(
+            user_id=current_user.id,
+            product_id=product.id,
+            seller_id=product.seller.id,
+            quantity=quantity,
+            amount=product.amount
+        )
+        db.session.add(cart_product)
+        db.session.commit()
+        print("Added to cart")
+
+    return redirect(url_for('product_page', product_id=product.id, username=product.seller.slug))
+
+
+
+def generate_track_code():
+    """Generate a unique 6-digit track code"""
+    while True:
+        track_code = random.randint(100000, 999999)  # Generate a 6-digit number
+        existing_order = Order.query.filter_by(track_code=track_code).first()
+
+        if not existing_order:
+            return track_code  # Ensure uniqueness
+
+
+@app.route("/checkout/<int:seller_id>", methods=['GET', 'POST'])
+@login_required
+def checkout(seller_id):
+    """Process checkout for a specific seller"""
+    seller = User.query.filter_by(id=seller_id).first_or_404()
+    
+    cart_items = get_cart_items_for_seller(current_user.id, seller_id)
+
+    if not cart_items:
+        flash("Your cart is empty for this seller.", "danger")
+        return redirect(url_for('cart', seller_id=seller_id))
+
+    # Calculate total amount
+    total_amount = sum(item.product.amount * item.quantity for item in cart_items)
+    print(total_amount)
+    # Create an order
+    order = Order(user_id=current_user.id, seller_id=seller_id,total_amount=total_amount,track_code=generate_track_code())
+    db.session.add(order)
+    db.session.commit()
+    print(order)
+
+    # Move cart items to the order
+    for item in cart_items:
+        order_item = OrderItem(
+            order_id=order.id,
+            product_id=item.product_id,
+            quantity=item.quantity,
+            amount=item.amount
+        )
+        db.session.add(order_item)
+        print(order_item)
+        db.session.delete(item)  # Remove item from cart
+    
+    db.session.commit()
+
+    
+    
+    flash("Your order has been placed successfully!", "success")
+    return redirect(url_for('shop2', username=seller.slug))
 
