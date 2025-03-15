@@ -362,6 +362,14 @@ def product_page(product_id,username):
     
     return render_template('product_view.html',product=product,cart_count=cart_count)
 
+@app.route("/Product-View/<product_id>", methods=['GET', 'POST'])
+@login_required
+def product_page_neutral(product_id):
+    product=Product.query.filter_by(id=product_id).first_or_404()
+    seller_id=product.user_id if product else None
+    
+    return render_template('product_view.html',product=product)
+
 @app.route('/Product-page/delete/<int:product_id>', methods=['POST', 'GET'])
 @login_required
 def delete_product(product_id):
@@ -517,6 +525,13 @@ def Cart_product(product_id):
 
     return redirect(url_for('product_page', product_id=product.id, username=product.seller.slug))
 
+@app.route("/delete_cart/<int:product_id>,<int:seller_id>", methods=['GET', 'POST'])
+@login_required
+def delete_cart_item(product_id,seller_id):
+    cart_item=CartItem.query.filter_by(user_id=current_user.id, product_id=product_id).first()
+    db.session.delete(cart_item) 
+    db.session.commit()
+    return redirect(url_for('cart', seller_id=seller_id))
 
 
 def generate_track_code():
@@ -527,6 +542,7 @@ def generate_track_code():
 
         if not existing_order:
             return track_code  # Ensure uniqueness
+
 
 
 @app.route("/checkout/<int:seller_id>", methods=['GET', 'POST'])
@@ -568,4 +584,63 @@ def checkout(seller_id):
     
     flash("Your order has been placed successfully!", "success")
     return redirect(url_for('shop2', username=seller.slug))
+
+
+
+
+
+
+@app.route("/seller/orders")
+@login_required
+def seller_orders():
+    """Display all orders for the logged-in seller"""
+    orders = Order.query.filter_by(seller_id=current_user.id).order_by(Order.created_at.desc()).all()
+    return render_template("seller_orders.html", orders=orders)
+
+@app.route("/seller/order_items/<int:order_id>")
+@login_required
+def get_order_items(order_id):
+    """Retrieve items for a specific order (AJAX request)"""
+    order = Order.query.filter_by(id=order_id, seller_id=current_user.id).first()
+    if not order:
+        return jsonify({"error": "Order not found"}), 404
+
+    total_cost = sum(item.amount for item in order.order_items)  # ✅ Calculate total cost
+
+    return jsonify({
+        "track_code": order.track_code,
+        "total_cost": f"${total_cost:.2f}",  # ✅ Format total cost
+        "items": [
+            {
+                "product_name": item.product.name,
+                "quantity": item.quantity,
+                "amount": f"${item.amount:.2f}",
+                "product_image": url_for('static', filename=f'product_images/{item.product.image}')
+            }
+            for item in order.order_items
+        ]
+    })
+@app.route("/update_order_status/<int:order_id>", methods=["POST"])
+@login_required
+def update_order_status(order_id):
+    """Update the status of an order"""
+    order = Order.query.filter_by(id=order_id, seller_id=current_user.id).first()
+    
+    if not order:
+        return jsonify({"error": "Order not found"}), 404
+
+    data = request.get_json()
+    new_status = data.get("status")
+
+    if new_status not in ["Pending", "Shipped", "Delivered"]:
+        return jsonify({"error": "Invalid status"}), 400
+
+    order.status = new_status
+    db.session.commit()
+    
+    return jsonify({"success": True, "message": "Order status updated successfully!"})
+
+
+
+
 

@@ -27,7 +27,11 @@
                 <div class="modal-dialog modal-dialog-centered" role="document">
                     <div class="modal-content">
                         <div class="modal-header">
+                        	<a class="btn btn-outline-danger btn-sm mx-1 " data-toggle="modal" data-target="#deleteModal">
+					                    <img src="{{ url_for('static', filename='images/trash.png') }}" alt="delete Product" style="width: 12px;">
+					                </a>
                             <h5 class="modal-title">{{ cart_item.product.name }}</h5>
+
                             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                 <span aria-hidden="true">&times;</span>
                             </button>
@@ -37,15 +41,37 @@
                             <p>{{ cart_item.product.description }}</p>
                             <p class="price">${{ cart_item.product.amount }}</p>
                             
-                            <button class="btn btn-warning" href="{{ url_for('register') }}">View product 🛒</button>
+                            
                         </div>
                     </div>
                 </div>
             </div>
+            <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
+			  <div class="modal-dialog" role="document">
+			    <div class="modal-content">
+			      <div class="modal-header">
+			        <h5 class="modal-title" id="deleteModalLabel">Are you Sure You Want To Delete This Product</h5>
+			        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+			          <span aria-hidden="true">&times;</span>
+			        </button>
+			      </div>
+			      <div class="modal-body">
+			        clicking on the delete button will completely remove this item from your cart!
+			      </div>
+			      <div class="modal-footer">
+			        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+			        <a href="{{ url_for('delete_cart_item',product_id=cart_item.product_id,seller_id=cart_item.seller_id) }}" class="btn btn-primary btn btn-sm-2">Delete</a>
+			      </div>
+			    </div>
+			  </div>
+			</div>
         {% else %}
          <h3 class="text-primary text-center" style="color: #428bca;">No cart Items Yet!</h3>
     {% endfor %}
 </div>
+
+
+
 {% for page_num in range(1, total_pages + 1) %}
     {% if page == page_num %}
         <a class="btn btn-info mb-4" href="{{ url_for('cart', seller_id=seller.id, page=page_num) }}">{{ page_num }}</a>
