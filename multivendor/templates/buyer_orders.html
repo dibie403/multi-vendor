@@ -1,0 +1,118 @@
+{% extends "layout.html" %}
+
+{% block content3 %}
+<div class="container">
+    <h2 class="mb-4">Purchase History</h2>
+    <div class="table-responsive">
+        <table class="table table-bordered">
+            <thead class="thead-dark">
+                <tr>
+                    <th>#</th>
+                    <th>Track</th>
+                    <th>Seller</th>
+                    <th>Total Amount</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for order in orders %}
+                <tr>
+                    <td>{{ loop.index }}</td>
+                    <td>{{ order.track_code }}</td>
+                    <td>{{ order.seller.shop_name }}</td>
+                    <td>${{ order.total_amount }}</td>
+                    <td>
+                        <span class=" {% if order.status == 'Pending' %}badge-warning{% elif order.status == 'Shipped' %}badge-info{% elif order.status == 'Delivered' %}badge-success{% else %}badge-secondary{% endif %}">
+                            {{ order.status }}
+                        </span>
+                    </td>
+                    <td>
+                        <button type="button" class="btn btn-primary view-items" data-order-id="{{ order.id }}" data-toggle="modal" data-target="#orderModal">
+                            View Items
+                        </button>
+                    </td>
+                </tr>
+                
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+ 
+
+<!-- Order Items Modal -->
+<div class="modal fade" id="orderModal" tabindex="-1" role="dialog" aria-labelledby="orderModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="orderModalLabel">Order Details</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Image</th>
+                            <th>Product Name</th>
+                            <th>Quantity</th>
+                            <th>Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody id="modalOrderItems"></tbody>
+                </table>
+            </div>
+            <div class="modal-footer d-flex justify-content-end">
+                <h5 id="modalTotalCost" class="text-right"></h5>  <!-- ✅ Displays Total Cost -->
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    document.querySelectorAll(".view-items").forEach(button => {
+        button.addEventListener("click", function() {
+            const orderId = this.getAttribute("data-order-id");
+            fetch(`/buyer/order_items/${orderId}`)
+                .then(response => response.json())
+                .then(data => {
+                    // ✅ Set track code in modal title
+                    document.getElementById("orderModalLabel").textContent = `Order track code: ${data.track_code}`;
+
+                    let tableRows = "";
+                    data.items.forEach(item => {
+                        tableRows += `
+                            <tr>
+                                <td>
+                                    <img src="${item.product_image}" class="img-thumbnail" style="width: 50px; height: 50px;">
+                                </td>
+                                <td>${item.product_name}</td>
+                                <td>${item.quantity}</td>
+                                <td>${item.amount}</td>
+                            </tr>
+                        `;
+                    });
+
+                    document.getElementById("modalOrderItems").innerHTML = tableRows;
+
+                    // ✅ Insert total cost in the modal footer
+                    document.getElementById("modalTotalCost").textContent = `Total Cost: ${data.total_cost}`;
+                })
+                .catch(error => console.error("Error fetching order items:", error));
+        });
+    });
+});
+
+
+
+
+</script>
+
+{% endblock %}

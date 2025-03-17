@@ -1,43 +1,182 @@
 {% extends "layout.html" %}
 
 {% block content3 %}
-<div class="container mt-4">
-    <h2 class="mb-4">Your Orders</h2>
-    <div class="table-responsive">
-        <table class="table table-bordered">
-            <thead class="thead-dark">
-                <tr>
-                    <th>#</th>
-                    <th>Track</th>
-                    <th>Buyer</th>
-                    <th>Total Amount</th>
-                    <th>Status</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for order in orders %}
-                <tr>
-                    <td>{{ loop.index }}</td>
-                    <td>{{ order.track_code }}</td>
-                    <td>{{ order.user.username }}</td>
-                    <td>${{ order.total_amount }}</td>
-                    <td>
-                        <span class="badge {% if order.status == 'Pending' %}badge-warning{% elif order.status == 'Shipped' %}badge-info{% elif order.status == 'Delivered' %}badge-success{% else %}badge-secondary{% endif %}">
-                            {{ order.status }}
-                        </span>
-                    </td>
-                    <td>
-                        <button type="button" class="btn btn-primary view-items" data-order-id="{{ order.id }}" data-toggle="modal" data-target="#orderModal">
-                            View Items
-                        </button>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+<div class="container">
+    <h3>Customers Order</h3>
+    <sub> Only The Most Recent Orders Are Displayed Here</sub>
+   <!-- ✅ Orders Table -->
+<div class="table-responsive mt-4">
+    <table class="table table-striped table-hover table-bordered rounded">
+        <thead class="thead-dark text-center">
+            <tr>
+                <th>#</th>
+                <th>Track</th>
+                <th>Buyer</th>
+                <th>Total Amount</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody class="text-center">
+            {% for order in orders %}
+            <tr>
+                <td>{{ loop.index }}</td>
+                <td><strong>{{ order.track_code }}</strong></td>
+                <td>{{ order.user.username }}</td>
+                <td><b style="color: #28a745;">${{ order.total_amount }}</b></td>
+                <td>
+                    <span class="
+                        {% if order.status == 'Pending' %} badge-warning 
+                        {% elif order.status == 'Shipped' %} badge-info 
+                        {% elif order.status == 'Delivered' %} badge-success 
+                        {% else %} badge-secondary 
+                        {% endif %}">
+                        {{ order.status }}
+                    </span>
+                </td>
+                <td>
+                    <button type="button" class="btn btn-sm btn-primary view-items" 
+                        data-order-id="{{ order.id }}" data-toggle="modal" data-target="#orderModal">
+                         <i class="bi bi-eye"></i> View
+                    </button>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<style>
+/* ✅ Shrink Cards on Mobile */
+@media (max-width: 768px) {
+    .summary-card {
+        transform: scale(0.95);  /* Shrinks the card */
+        margin: auto;  /* Centers the cards */
+    }
+    .summary-card h5 {
+        font-size: 11px; /* Reduce heading size */
+    }
+    .summary-card h3 {
+        font-size: 12px; /* Reduce number size */
+    }
+}
+/* ✅ Default: Charts are stacked on small screens */
+.chart-container {
+    width: 100%;  /* Make charts responsive */
+    max-width: 600px;  /* Prevent too large charts */
+    margin: auto;  /* Center charts */
+}
+
+/* ✅ Tablet: Show charts side by side */
+@media (min-width: 768px) {
+    .chart-wrapper {
+        display: flex;
+        justify-content: center;
+        gap: 20px; /* Add space between charts */
+    }
+    .chart-container {
+        width: 48%; /* Make charts share the row */
+    }
+}
+/* ✅ Style Enhancements */
+.table thead {
+    background-color: #004d00; /* Dark Green Header */
+    color: white;
+}
+
+.table tbody tr:hover {
+    background-color: #f8f9fa; /* Light hover effect */
+}
+
+.badge-warning {
+    background-color: #ffc107;
+    color: #000;
+}
+
+.badge-info {
+    background-color: #17a2b8;
+    color: white;
+}
+
+.badge-success {
+    background-color: #28a745;
+    color: white;
+}
+
+.badge-secondary {
+    background-color: #6c757d;
+    color: white;
+}
+
+/* ✅ Responsive Design */
+@media (max-width: 768px) {
+    .table-responsive {
+        overflow-x: auto;
+    }
+    .btn {
+        font-size: 12px; /* Smaller buttons on mobile */
+        padding: 4px 8px;
+    }
+}
+</style>
+
+    <h3 class="mb-4 mt-4">Summary Table</h3>
+    <!-- ✅ Summary Table -->
+    <div class="row d-flex justify-content-center">
+        
+        <div class="col-md-4 col-4">
+            <div class="card text-center summary-card">
+                <div class="card-body">
+                    <h5>Total Orders</h5>
+                    <h3>{{ total_orders }}</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 col-4">
+            <div class="card text-center summary-card">
+                <div class="card-body">
+                    <h5>Total Customers</h5>
+                    <h3>{{ total_customers }}</h3>
+                    <button type="button" class="btn btn-sm btn-primary" 
+                        data-toggle="modal" data-target="#customerModal">
+                        <i class="bi bi-eye"></i> View
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4 col-4">
+            <div class="card text-center summary-card">
+                <div class="card-body">
+                    <h5>Total Revenue</h5>
+                    <h3>₦{{ total_revenue }}</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+ <h3 class="mb-4 mt-4 text-center">Line Chart (Monthly Sales)</h3>
+
+<!-- ✅ Charts Section -->
+<div class="chart-wrapper">
+    <!-- ✅ Line Chart (Monthly Sales) -->
+    <div class="chart-container">
+        <canvas id="salesChart"></canvas>
+    </div>
+
+    <!-- ✅ Pie Chart (Order Status) -->
+    <h3 class="mb-4 mt-4">Order Status</h3>
+    <div class="chart-container">
+        <canvas id="statusChart"></canvas>
     </div>
 </div>
+
+
+<!-- ✅ Include Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+
 
 <!-- Order Items Modal -->
 <div class="modal fade" id="orderModal" tabindex="-1" role="dialog" aria-labelledby="orderModalLabel" aria-hidden="true">
@@ -69,10 +208,51 @@
     </div>
 </div>
 
+<!-- Customer List Modal -->
+<div class="modal fade" id="customerModal" tabindex="-1" aria-labelledby="customerModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="customerModalLabel">Customer List</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Customer Name</th>
+                            <th>Phone Number</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for customer in unique_customers.values() %}
+                        <tr>
+                            <td>{{ customer.name }}</td>
+                            <td>{{ customer.phone_number }}</td>
+                            <td>
+                               <button class="btn btn-sm btn-success">
+                                    <a href="{{ url_for('send_whatsapp', phone_number=customer.phone_number) }}" 
+                                       class="text-white text-decoration-none" target="_blank">
+                                        <i class="bi bi-chat-dots"></i> Message
+                                    </a>
+                                </button>
 
-<!-- jQuery and Bootstrap Scripts -->
-<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/js/bootstrap.min.js"></script>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
 
 <script>
 document.addEventListener("DOMContentLoaded", function() {
@@ -108,10 +288,67 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     });
 });
+// 📌 Line Chart (Total Revenue Per Month)
+const salesChartCtx = document.getElementById("salesChart").getContext("2d");
+new Chart(salesChartCtx, {
+    type: "line",
+    data: {
+        labels: {{ sales_data["months"] | tojson }}, // Month names
+        datasets: [
+            {
+                label: "Total Revenue (₦)",
+                data: {{ sales_data["revenue"] | tojson }},
+                borderColor: "green",
+                backgroundColor: "rgba(0, 255, 0, 0.2)",
+                fill: true,
+                tension: 0.4,
+                pointBackgroundColor: "green",
+                pointRadius: 5,  // Make points visible
+                pointHoverRadius: 7,
+            }
+        ]
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            legend: { display: true,
+            labels: {
+                padding: 1,  // ✅ Adds space below the legend
+            }
+        },
+            datalabels: {
+                align: "top",   // Position label on top of the point
+                anchor: "end",  // Ensure label is at the right spot
+                color: "black",
+                font: { weight: "bold", size: 10 },
+                formatter: (value) => `₦${value}`,  // Format as currency
+            }
+        },
+        layout: {
+        padding: { bottom:1 }  // ✅ Adds extra space below the chart area
+    },
+        scales: {
+            y: {
+                beginAtZero: true,
+                ticks: { callback: (value) => "₦" + value }
+            }
+        }
+    },
+    plugins: [ChartDataLabels]  // Enable Data Labels Plugin
+});
 
-
-
-
+// 📌 Pie Chart (Order Status)
+const statusChartCtx = document.getElementById("statusChart").getContext("2d");
+new Chart(statusChartCtx, {
+    type: "pie",
+    data: {
+        labels: ["Pending", "Shipped", "Delivered"],
+        datasets: [{
+            data: [{{ status_data["Pending"] }}, {{ status_data["Shipped"] }}, {{ status_data["Delivered"] }}],
+            backgroundColor: ["orange", "blue", "green"]
+        }]
+    }
+});
 </script>
 
 {% endblock %}

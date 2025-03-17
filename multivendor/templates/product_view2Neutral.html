@@ -44,7 +44,7 @@
                 <div class="color-option selected"></div>
             </div>
 
-           <form action="{{ url_for('Cart_product', product_id=product.id) }}" method="POST">
+           <form action="{{ url_for('checkout2', seller_id=product.user_id,product_id=product.id) }}" method="POST">
                 <!-- Quantity Selector -->
                 <div class="d-flex align-items-center gap-3 mt-3">
                     <label for="quantity">Quantity:</label>
@@ -57,7 +57,7 @@
                 </div>
 
                 <!-- Submit Button -->
-                <button type="submit" class="btn-add-cart">Add to cart 🛒</button>
+                <button type="submit" class="btn-add-cart">Place Order 🛒</button>
             </form>
 
 
@@ -66,11 +66,7 @@
     </div>
 
     <!-- Buttons -->
-            <div class="d-flex  gap-3 mt-3">
-                
-                <a class="btn btn-warning" href="{{ url_for('checkout', seller_id=product.user_id) }}">Place Order🛒</a>
-                    </div>
-            </div>
+           
   </div>
 
  </div>

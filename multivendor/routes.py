@@ -368,7 +368,7 @@ def product_page_neutral(product_id):
     product=Product.query.filter_by(id=product_id).first_or_404()
     seller_id=product.user_id if product else None
     
-    return render_template('product_view.html',product=product)
+    return render_template('product_view2Neutral.html',product=product)
 
 @app.route('/Product-page/delete/<int:product_id>', methods=['POST', 'GET'])
 @login_required
@@ -585,17 +585,114 @@ def checkout(seller_id):
     flash("Your order has been placed successfully!", "success")
     return redirect(url_for('shop2', username=seller.slug))
 
+@app.route("/Loved_items/place/order<int:seller_id>,<int:product_id>", methods=['GET', 'POST'])
+@login_required
+def checkout2(seller_id,product_id):
+    """Process checkout for a specific seller"""
+    product=Product.query.filter_by(id=product_id).first()
+    """Get quantity"""
+    quantity = request.form.get('quantity', type=int)
+    if not quantity or quantity < 1:
+        quantity = 1  # Ensure quantity is always at least 1
+
+    print(quantity)
+
+    total_amount = (product.amount * quantity)
+    # Create an order
+    order = Order(user_id=current_user.id, seller_id=seller_id,total_amount=total_amount,track_code=generate_track_code())
+    db.session.add(order)
+    db.session.commit()
+    print(order)
+
+    order_item = OrderItem(
+        order_id=order.id,
+        product_id=product_id,
+        quantity=quantity,
+        amount=product.amount
+    )
+    db.session.add(order_item)
+    print(order_item)
+    
+    db.session.commit()
+
+    
+    
+    flash("Your order has been placed successfully!", "success")
+    return redirect(url_for('Loved_items'))
 
 
 
 
+
+
+from flask import jsonify
+from datetime import datetime
+import calendar
+from collections import defaultdict
+import calendar
 
 @app.route("/seller/orders")
 @login_required
 def seller_orders():
-    """Display all orders for the logged-in seller"""
-    orders = Order.query.filter_by(seller_id=current_user.id).order_by(Order.created_at.desc()).all()
-    return render_template("seller_orders.html", orders=orders)
+    """Display only the last 10 orders but calculate analytics from all orders"""
+
+    # 📌 Fetch the last 10 orders for display
+    orders = (
+        Order.query.filter_by(seller_id=current_user.id)
+        .order_by(Order.created_at.desc())
+        .limit(10)  # ✅ Only get the latest 10 orders
+        .all()
+    )
+
+    # 📌 Fetch **all** orders for accurate analytics
+    all_orders = Order.query.filter_by(seller_id=current_user.id).all()
+
+    # ✅ Get total orders count
+    total_orders = len(all_orders)
+
+    # ✅ Calculate total revenue from **all orders**
+    total_revenue = sum(order.total_amount for order in all_orders)
+
+    # ✅ Extract unique customers from all orders
+    unique_customers = {}
+    for order in all_orders:
+        if order.user_id not in unique_customers:
+            unique_customers[order.user_id] = {
+                "name": order.user.username,  # Assuming a `name` field in the User model
+                "phone_number": order.user.phone_number,  # Assuming phone number exists
+            }
+
+    total_customers = len(unique_customers)  # ✅ Get count of unique customers
+
+    # ✅ Initialize monthly revenue dictionary
+    monthly_revenue = defaultdict(float)
+    for order in all_orders:  # ✅ Loop through all orders
+        order_month = order.created_at.month
+        monthly_revenue[order_month] += order.total_amount
+
+    # ✅ Prepare data for Chart.js
+    sales_data = {
+        "months": [calendar.month_abbr[m] for m in range(1, 13)],  # ['Jan', 'Feb', ..., 'Dec']
+        "revenue": [monthly_revenue[m] for m in range(1, 13)],  # ✅ Correct revenue for each month
+    }
+
+    # 📌 Order Status Data for Pie Chart
+    status_count = {"Pending": 0, "Shipped": 0, "Delivered": 0}
+    for order in all_orders:
+        if order.status in status_count:
+            status_count[order.status] += 1
+
+    return render_template(
+        "seller_orders.html",
+        orders=orders,
+        total_orders=total_orders,
+        total_revenue=total_revenue,
+        total_customers=total_customers,
+        unique_customers=unique_customers,  # ✅ Pass unique customers to the template
+        sales_data=sales_data,
+        status_data=status_count,
+    )
+
 
 @app.route("/seller/order_items/<int:order_id>")
 @login_required
@@ -605,7 +702,8 @@ def get_order_items(order_id):
     if not order:
         return jsonify({"error": "Order not found"}), 404
 
-    total_cost = sum(item.amount for item in order.order_items)  # ✅ Calculate total cost
+    #total_cost = sum(item.amount for item in order.order_items)  # ✅ Calculate total cost
+    total_cost = order.total_amount
 
     return jsonify({
         "track_code": order.track_code,
@@ -620,6 +718,39 @@ def get_order_items(order_id):
             for item in order.order_items
         ]
     })
+
+@app.route("/buyer/orders")
+@login_required
+def buyer_orders():
+    """Display all orders for the logged-in seller"""
+    orders = Order.query.filter_by(user_id=current_user.id).order_by(Order.created_at.desc()).all()
+
+    return render_template("buyer_orders.html", orders=orders)
+
+@app.route("/buyer/order_items/<int:order_id>")
+@login_required
+def get_order_itemss(order_id):
+    """Retrieve items for a specific order (AJAX request)"""
+    order = Order.query.filter_by(id=order_id, user_id=current_user.id).first()
+    if not order:
+        return jsonify({"error": "Order not found"}), 404
+
+    total_cost = order.total_amount  # ✅ Calculate total cost
+
+    return jsonify({
+        "track_code": order.track_code,
+        "total_cost": f"${total_cost:.2f}",  # ✅ Format total cost
+        "items": [
+            {
+                "product_name": item.product.name,
+                "quantity": item.quantity,
+                "amount": f"${item.amount:.2f}",
+                "product_image": url_for('static', filename=f'product_images/{item.product.image}')
+            }
+            for item in order.order_items
+        ]
+    })
+
 @app.route("/update_order_status/<int:order_id>", methods=["POST"])
 @login_required
 def update_order_status(order_id):
@@ -640,6 +771,34 @@ def update_order_status(order_id):
     
     return jsonify({"success": True, "message": "Order status updated successfully!"})
 
+
+
+
+from urllib.parse import quote
+
+@app.route("/send_whatsapp/<string:phone_number>")
+@login_required
+def send_whatsapp(phone_number):
+    """Generate WhatsApp link with a predefined message"""
+
+    country_code = "234"  # Nigeria (+234) → Change if needed
+
+    # Ensure the number is in international format
+    if not phone_number.startswith("+") and not phone_number.startswith(country_code):
+        phone_number = country_code + phone_number.lstrip("0")  # Remove leading '0'
+
+    # ✅ Properly encode the message and URL
+    store_url = f"http://127.0.0.1:5000/store/{current_user.username}"
+    message = (
+        f"Hello, this is {current_user.shop_name} Store From Vendera. "
+        f"Wanted To Let You Know we have new stock for you to check out. "
+        f"Visit our store today at {store_url}"
+    )
+
+    # ✅ Generate WhatsApp URL with proper encoding
+    whatsapp_url = f"https://api.whatsapp.com/send?phone={phone_number}&text={quote(message)}"
+
+    return redirect(whatsapp_url)
 
 
 
