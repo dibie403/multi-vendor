@@ -64,6 +64,7 @@ class UpdateProfileForm(FlaskForm):
 		email = StringField('Email', validators=[DataRequired(), Email()])
 		phone = StringField('Phone Number', validators=[DataRequired()])
 		status = SelectField('Register As', choices=[('True', 'Seller'), ('False', 'Buyer')], validators=[DataRequired()])
+		shop_name = StringField('Shop Name', validators=[Optional(), Length(max=20)])
 		picture=FileField('Update Profile Picture',validators=[FileAllowed(['jpg','png'])])
 		submit=SubmitField('Update')
 
@@ -88,6 +89,12 @@ class UpdateProfileForm(FlaskForm):
 
 				if user:
 				   raise ValidationError('phone number already Exist,Please use a unique Email')
+		def validate_shop(self,shop_name):
+			user=User.query.filter_by(username=show_name.data).first()
+
+			if user:
+				raise ValidationError('Shop name already taken,Please pick a unique shop name')
+
 
 		
 

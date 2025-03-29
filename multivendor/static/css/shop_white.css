@@ -88,12 +88,14 @@ h1, h2, h3, h4, h5, h6 {
   padding: 10px;
 }
 
-.search-box11 button {
-  background-color: #3498db;
-  color: #ffffff;
-  border-radius: 10px;
-  padding: 10px 15px;
-  transition: background 0.3s;
+.search-box button {
+  background-color: #a61c3c;
+  color: #fff;
+  padding: 10px 18px;
+  border-radius: 20px;
+  border: none;
+  margin-left: 10px;
+  transition: 0.3s;
 }
 
 .search-box11 button:hover {
@@ -127,7 +129,7 @@ h1, h2, h3, h4, h5, h6 {
     animation: fadeIn 1s ease-in-out;
   }
 
-  
+
 
 /* Section Title */
 .section-title {
@@ -324,19 +326,55 @@ h1, h2, h3, h4, h5, h6 {
     font-size: 14px;
 }
 /* Quantity */
-.quantity-container {
-    margin-top: 10px;
-}
 
-.quantity-container input {
-    width: 50px;
-    padding: 5px;
-    font-size: 16px;
-    text-align: center;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-}
 
 .selected {
     box-shadow: 0 0 4px rgba(0, 0, 0, 0.5);
+}
+
+.cart-count {
+    top: 55%; /* Move it slightly downward */
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 14px;
+    font-weight: bold;
+    color: black;
+}
+
+.quantity-container {
+    display: flex;
+    align-items: center;
+    border: px solid #ccc;
+    border-radius: 5px;
+    overflow: hidden;
+    width: 100px;
+}
+
+.quantity-container input {
+    width: 40px;
+    text-align: center;
+    border: none;
+    font-size: 13px;
+    font-weight: bold;
+}
+
+.btn-quantity {
+    background: #f8f9fa;
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.btn-quantity:hover {
+    background: #ddd;
+}
+
+
+
+.icon-label {
+    font-size: 10px;
+    color: gray;
+    margin-top: 2px; /* Adds space between the icon and text */
+    text-align: center;
 }

@@ -49,47 +49,70 @@
 <div class="container11">
   
 
-  <div class="search-box11 mr-4">
-    <form method="POST" action="#">
-      <div class="input-group">
-        <input type="text" name="content" class="form-control" placeholder="Search...">
-        <div class="input-group-append">
-          <button type="submit" class="btn btn-primary">Search</button>
-        </div>
-      </div>
-    </form>
+  <div class="search-box11 mr-4" data-user-id="{{ user.id }}">
+      <form id="searchForm">
+          <div class="input-group">
+              <input type="text" name="content" id="searchInput" class="form-control" placeholder="Search...">
+              <div class="input-group-append">
+                  <button type="submit" class="btn btn-primary">Search</button>
+              </div>
+          </div>
+      </form>
   </div>
+  <!-- Search Results -->
+  <ul id="searchResults"></ul>
+
 
   {% if current_user.username == product.seller.username %}
    <!-- Wrapper to group icons and push them to the right -->
-  <div class="icon-group" style="font-size: 0.8rem; ">
-  <!-- Copy Link Button -->
-   <a href="{{ url_for('seller_orders') }}" class="btn btn-outline-primary btn-sm">
-    <img class="article-img" src="{{ url_for('static', filename='images/overview.png') }}" alt="Copy Link" style="width: 10px; height: auto;">
-  </a>
-  <a href="{{ url_for('copy_link') }}" class="btn btn-outline-primary btn-sm">
-    <img class="article-img" src="{{ url_for('static', filename='images/copy.png') }}" alt="Copy Link" style="width: 10px; height: auto;">
-  </a>
+    <div class="icon-group" style="font-size: 0.8rem; text-align: center; display: flex; gap: 10px; align-items: center;">
 
-  <!-- New Product Button -->
-  <a href="{{ url_for('New_product') }}" class="btn btn-outline-success btn-sm">
-    <img class="article-img" src="{{ url_for('static', filename='images/plus.png') }}" alt="New Product" style="width: 10px; height: auto;">
-  </a>
+      <!-- Overview Button -->
+      <div class="icon-container">
+        <a href="{{ url_for('seller_orders') }}" class="btn btn-sm">
+          <img class="article-img" src="{{ url_for('static', filename='images/overview.png') }}" alt="Overview" style="width: 10px; height: auto;">
+        </a>
+        <div class="icon-label">Overview</div>
+      </div>
 
-  <!-- Settings Button -->
-   <a href="{{ url_for('shop_edit') }}" class="btn btn-outline-success btn-sm">
-    <img class="article-img" src="{{ url_for('static', filename='images/settings.png') }}" alt="Settings" style="width: 10px; height: auto;">
-  </a>
-</div>
-{% else %}
-  <a href="{{ url_for('cart',seller_id=user.id) }}" class="btn btn-outline-success btn-sm position-relative">
-    <img class="article-img" src="{{ url_for('static', filename='images/shopping-bag.png') }}" alt="Settings" style="width: 30px; height: auto;">
-    <span class="position-absolute cart-count ">
-        {{ cart_count }}
-    </span>
-</a>
+      <!-- Copy Link Button -->
+      <div class="icon-container">
+        <a href="{{ url_for('copy_link') }}" class="btn btn-sm ml-2">
+          <img class="article-img" src="{{ url_for('static', filename='images/copy.png') }}" alt="Copy Link" style="width: 10px; height: auto;">
+        </a>
+        <div class="icon-label">Copy store link</div>
+      </div>
+
+      <!-- New Product Button -->
+      <div class="icon-container">
+        <a href="{{ url_for('New_product') }}" class="btn btn-sm mr-4 ml-2">
+          <img class="article-img" src="{{ url_for('static', filename='images/plus.png') }}" alt="New Product" style="width: 10px; height: auto;">
+        </a>
+        <div class="icon-label">Add product</div>
+      </div>
+
+      <!-- Settings Button -->
+      <div class="icon-container">
+        <a href="{{ url_for('shop_edit') }}" class="btn btn-sm">
+          <img class="article-img" src="{{ url_for('static', filename='images/settings.png') }}" alt="Settings" style="width: 10px; height: auto;">
+        </a>
+        <div class="icon-label">Settings</div>
+      </div>
+   </div>
+
+  {% else %}
+    <!-- Shopping Cart Button -->
+    <div class="icon-container">
+      <a href="{{ url_for('cart', seller_id=user.id) }}" class="btn btn-outline-primary btn-sm position-relative">
+        <img class="article-img" src="{{ url_for('static', filename='images/shopping-bag.png') }}" alt="Cart" style="width: 30px; height: auto;">
+        <span class="position-absolute cart-count">{{ cart_count }}</span>
+      </a>
+      <div class="icon-label">Cart</div>
+    </div>
 
 {% endif %}
+
+
 
 </div>
 
@@ -99,6 +122,7 @@
 
 
 {% block content2 %}
+ <div id="content2">
   <h3 style="font-family: 'Montserrat', sans-serif;"> 🛍️{{user.shop_name}}🛒</h3>
   <div class="text muted">
   <p>{{user.shop_motto}}</p>
@@ -122,6 +146,7 @@
   </a>
    
   </ul>
+ </div>
 {% endblock %}
 
 {% block content3 %}
@@ -228,6 +253,99 @@ function toggleLove(button) {
         // Flash message or alert to notify the user
         alert('Store website link copied successfully!');
     }
+
+
+
+
+ document.getElementById("searchForm").addEventListener("submit", function (event) {
+    event.preventDefault();
+    
+    let searchQuery = document.getElementById("searchInput").value.trim();
+    let userId = document.querySelector(".search-box11").getAttribute("data-user-id");
+
+    fetch("/search_products", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: `content=${encodeURIComponent(searchQuery)}&user_id=${encodeURIComponent(userId)}`
+    })
+    .then(response => response.json())
+    .then(data => {
+        let productGrid = document.querySelector(".product-grid");
+        let contentBlock = document.querySelector("#content2");  // ✅ Select the block to hide
+        productGrid.innerHTML = "";  // Clear existing products
+
+        // **Hide content2 when searching**
+        if (contentBlock) {
+            contentBlock.style.display = "none";
+        }
+
+        if (data.length === 0) {
+            productGrid.innerHTML = "<p>No products found.</p>";
+        } else {
+            data.forEach(product => {
+                productGrid.innerHTML += `
+                    <div class="col-6 col-sm-4 col-md-2 product-item">
+                        <div class="product-card" data-toggle="modal" data-target="#productModal${product.id}">
+                            <div class="image-container">
+                                <img src="/static/product_images/${product.image}" class="card-img-top" alt="${product.name}">
+                            </div>
+                            <div class="card-body text-center">
+                                <small class="card-title">${product.name}</small>
+                                <p class="card-text price">$${product.amount}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Modal -->
+                    <div class="modal fade" id="productModal${product.id}" tabindex="-1" role="dialog" aria-labelledby="productModalLabel${product.id}" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="productModalLabel${product.id}">${product.name}</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body text-center">
+                                    <img src="/static/product_images/${product.image}" class="img-fluid mb-3" alt="${product.name}">
+                                    <p class="product-description">${product.description}</p>
+                                    <p class="price"><strong>Price: </strong>$${product.amount}</p>
+                                    
+                                    <!-- Buttons -->
+                                    <button class="btn btn-warning add-to-cart" data-product-id="${product.id}">Add to cart 🛒</button>
+                                    <button class="btn btn-primary view-product" data-product-id="${product.id}" data-seller-username="${product.seller_slug}">View product 🛒</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            // **Reinitialize Bootstrap Modals**
+            $('.modal').on('shown.bs.modal', function () {
+                $(this).modal('show');
+            });
+        }
+    })
+    .catch(error => console.error("Error:", error));
+});
+
+// ✅ Handle "Add to Cart" and "View Product" Clicks
+document.addEventListener("click", function (event) {
+    if (event.target.classList.contains("add-to-cart")) {
+        let productId = event.target.getAttribute("data-product-id");
+        window.location.href = `/Cart_Item/${productId}`;
+    }
+
+    if (event.target.classList.contains("view-product")) {
+        let productId = event.target.getAttribute("data-product-id");
+        let username = event.target.getAttribute("data-seller-username");
+        window.location.href = `/store/${username}/Product-page/${productId}`;
+    }
+});
+
+
+
 </script>
 
 {% for page_num in products.iter_pages() %}

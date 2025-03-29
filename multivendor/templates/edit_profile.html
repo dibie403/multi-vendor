@@ -68,6 +68,22 @@
           {{ form.status(class="form-control", id="status") }}
         {% endif %}
       </div>
+      <div id="shopFields" class="hidden">
+            <!-- Shop Name -->
+            <div class="form-group">
+              {{ form.shop_name.label(class="form-control-label", for="shop_name") }}
+              {% if form.shop_name.errors %}
+                {{ form.shop_name(class="form-control is-invalid", id="shop_name") }}
+                <div class="invalid-feedback">
+                  {% for error in form.shop_name.errors %}
+                    <span>{{ error }}</span>
+                  {% endfor %}
+                </div>
+              {% else %}
+                {{ form.shop_name(class="form-control", id="shop_name") }}
+              {% endif %}
+            </div>
+        </div>
 
       <div class="form-group">
           {{ form.picture.label() }}  <!-- Label should use form-control-label --> 
@@ -88,4 +104,25 @@
   </form>
 
 </div>
+<!-- JavaScript to Show/Hide Shop Fields -->
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    var statusSelect = document.getElementById("status");
+    var shopFields = document.getElementById("shopFields");
+
+    function toggleShopFields() {
+      if (statusSelect.value === "seller") {
+        shopFields.style.display = "block"; // Show fields
+      } else {
+        shopFields.style.display = "none"; // Hide fields
+      }
+    }
+
+    // Run the function on page load (in case of form re-submission)
+    toggleShopFields();
+
+    // Listen for changes in the dropdown
+    statusSelect.addEventListener("change", toggleShopFields);
+  });
+</script>
 {% endblock %}

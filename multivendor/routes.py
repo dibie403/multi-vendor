@@ -10,6 +10,7 @@ from multivendor.models import User,Product,Love,CartItem,OrderItem,Order
 import re
 from datetime import datetime
 import random
+from urllib.parse import quote
 
 
 
@@ -122,7 +123,7 @@ def shop2(username):
     
     print(user.shop_image_file)
 
-    return render_template('shop.html',title='shop',image_file=image_file,products=products,user=user,loved_products=loved_products,product=product,cart_count=cart_count)
+    return render_template('shop.html',title='shop',image_file=image_file,products=products,user=user,loved_products=loved_products,product=product,cart_count=cart_count,shop_theme="white")
 
 
 def save_picture(form_picture):
@@ -353,22 +354,38 @@ def Loved_items():
 
 @app.route("/store/<string:username>/Product-page/<product_id>", methods=['GET', 'POST'])
 @login_required
-def product_page(product_id,username):
-    product=Product.query.filter_by(id=product_id).first_or_404()
-    seller_id=product.user_id if product else None
-    cart_items = get_cart_items_for_seller(current_user.id, seller_id)
-    # Count the number of items in the cart for this user and seller
-    cart_count = len(cart_items) if cart_items else 0
-    
-    return render_template('product_view.html',product=product,cart_count=cart_count)
+def product_page(product_id, username):
+    """Display product details and retrieve the last track code from session"""
 
-@app.route("/Product-View/<product_id>", methods=['GET', 'POST'])
+    product = Product.query.filter_by(id=product_id).first_or_404()
+    seller_id = product.user_id if product else None
+    cart_items = get_cart_items_for_seller(current_user.id, seller_id)
+    
+    # ✅ Count the number of items in the cart
+    cart_count = len(cart_items) if cart_items else 0
+
+    track_code = generate_track_code()
+
+    return render_template(
+        'product_view.html', 
+        product=product, 
+        cart_count=cart_count, 
+        track_code=track_code, 
+        seller_id=seller_id, 
+        shop_theme='white'
+    )
+
+
+
+@app.route("/Product-View/<username>/<int:product_id>", methods=['GET', 'POST'])
 @login_required
-def product_page_neutral(product_id):
+def product_page_neutral(product_id,username):
     product=Product.query.filter_by(id=product_id).first_or_404()
     seller_id=product.user_id if product else None
+
+    track_code = generate_track_code()
     
-    return render_template('product_view2Neutral.html',product=product)
+    return render_template('product_view2Neutral.html',product=product,shop_theme='white',track_code=track_code,seller_id=seller_id)
 
 @app.route('/Product-page/delete/<int:product_id>', methods=['POST', 'GET'])
 @login_required
@@ -393,6 +410,20 @@ def delete_product(product_id):
 
     flash("Product has been successfully deleted.", "success")
     return redirect(url_for('shop2', username=current_user.slug))
+
+@app.route('/Product-page/delete/product/<int:product_id>', methods=['POST', 'GET'])
+@login_required
+def delete_product22(product_id):
+    # Get the product or raise 404 if it doesn't exist
+    #product = Product.query.get_or_404(product_id)
+
+    # Delete all related cart items first
+    love=Love.query.filter_by(product_id=product_id,user_id=current_user.id).first()
+    db.session.delete(love) 
+    db.session.commit()
+
+    flash("Product has been successfully deleted.", "success")
+    return redirect(url_for('Loved_items'))
 
 
 import re
@@ -544,10 +575,9 @@ def generate_track_code():
             return track_code  # Ensure uniqueness
 
 
-
-@app.route("/checkout/<int:seller_id>", methods=['GET', 'POST'])
+@app.route("/checkout/<int:seller_id>/<string:track_code>", methods=['GET', 'POST'])
 @login_required
-def checkout(seller_id):
+def checkout(seller_id,track_code):
     """Process checkout for a specific seller"""
     seller = User.query.filter_by(id=seller_id).first_or_404()
     
@@ -556,12 +586,13 @@ def checkout(seller_id):
     if not cart_items:
         flash("Your cart is empty for this seller.", "danger")
         return redirect(url_for('cart', seller_id=seller_id))
-
+    
+    #track_code = generate_track_code()
     # Calculate total amount
     total_amount = sum(item.product.amount * item.quantity for item in cart_items)
     print(total_amount)
     # Create an order
-    order = Order(user_id=current_user.id, seller_id=seller_id,total_amount=total_amount,track_code=generate_track_code())
+    order = Order(user_id=current_user.id, seller_id=seller_id,total_amount=total_amount,track_code=track_code)
     db.session.add(order)
     db.session.commit()
     print(order)
@@ -579,15 +610,40 @@ def checkout(seller_id):
         db.session.delete(item)  # Remove item from cart
     
     db.session.commit()
-
-    
     
     flash("Your order has been placed successfully!", "success")
-    return redirect(url_for('shop2', username=seller.slug))
+    
 
-@app.route("/Loved_items/place/order<int:seller_id>,<int:product_id>", methods=['GET', 'POST'])
+    return redirect(url_for('shop2', username=seller.slug,track_code=track_code))
+
+from urllib.parse import quote
+
+@app.route("/send_order_whatsapp/<int:seller_id>/<string:track_code>")
 @login_required
-def checkout2(seller_id,product_id):
+def send_order_whatsapp(seller_id, track_code):
+    """Send a WhatsApp message to the seller with the order track code"""
+
+    seller = User.query.filter_by(id=seller_id).first_or_404()
+    phone_number = seller.phone_number  # Ensure this is in international format (e.g., +234XXXXXXXXXX)
+
+    country_code = "234"  # Nigeria (+234), update if needed
+    if not phone_number.startswith("+") and not phone_number.startswith(country_code):
+        phone_number = country_code + phone_number.lstrip("0")
+
+    # 📌 Predefined message
+    message = f"Hello {seller.shop_name}, I just placed an order with Track Code: {track_code}. Please confirm and process my order. Thank you!"
+
+    # ✅ Generate WhatsApp URL
+    whatsapp_url = f"https://api.whatsapp.com/send?phone={phone_number}&text={quote(message)}"
+
+    print("Redirecting to WhatsApp:", whatsapp_url)  # ✅ Debugging output
+
+    return redirect(whatsapp_url)
+
+
+@app.route("/Loved_items/place/order<int:seller_id>,<int:product_id>,<string:track_code>", methods=['GET', 'POST'])
+@login_required
+def checkout2(seller_id,product_id,track_code):
     """Process checkout for a specific seller"""
     product=Product.query.filter_by(id=product_id).first()
     """Get quantity"""
@@ -599,7 +655,7 @@ def checkout2(seller_id,product_id):
 
     total_amount = (product.amount * quantity)
     # Create an order
-    order = Order(user_id=current_user.id, seller_id=seller_id,total_amount=total_amount,track_code=generate_track_code())
+    order = Order(user_id=current_user.id, seller_id=seller_id,total_amount=total_amount,track_code=track_code)
     db.session.add(order)
     db.session.commit()
     print(order)
@@ -612,13 +668,14 @@ def checkout2(seller_id,product_id):
     )
     db.session.add(order_item)
     print(order_item)
-    
     db.session.commit()
 
     
     
     flash("Your order has been placed successfully!", "success")
     return redirect(url_for('Loved_items'))
+
+
 
 
 
@@ -650,8 +707,19 @@ def seller_orders():
     # ✅ Get total orders count
     total_orders = len(all_orders)
 
-    # ✅ Calculate total revenue from **all orders**
+    # ✅ Calculate total revenue from all orders
     total_revenue = sum(order.total_amount for order in all_orders)
+
+    # ✅ Format the total revenue in 'K' (thousands) or 'M' (millions) format
+    def format_number(value):
+        if value >= 1_000_000:
+            return f"{value / 1_000_000:.1f}M"  # Example: 2,500,000 → 2.5M
+        elif value >= 1_000:
+            return f"{value / 1_000:.0f}k"  # Example: 215,000 → 215k
+        return str(value)  # No formatting for small numbers
+
+    # ✅ Apply formatting
+    formatted_total_revenue = format_number(total_revenue)
 
     # ✅ Extract unique customers from all orders
     unique_customers = {}
@@ -677,7 +745,7 @@ def seller_orders():
     }
 
     # 📌 Order Status Data for Pie Chart
-    status_count = {"Pending": 0, "Shipped": 0, "Delivered": 0}
+    status_count = {"Pending": 0, "Shipped": 0, "Delivered": 0,"Cancelled":0}
     for order in all_orders:
         if order.status in status_count:
             status_count[order.status] += 1
@@ -691,6 +759,7 @@ def seller_orders():
         unique_customers=unique_customers,  # ✅ Pass unique customers to the template
         sales_data=sales_data,
         status_data=status_count,
+        shop_theme='white'
     )
 
 
@@ -722,7 +791,8 @@ def get_order_items(order_id):
 @app.route("/buyer/orders")
 @login_required
 def buyer_orders():
-    """Display all orders for the logged-in seller"""
+    
+    """Display all orders for the logged-in buyer"""
     orders = Order.query.filter_by(user_id=current_user.id).order_by(Order.created_at.desc()).all()
 
     return render_template("buyer_orders.html", orders=orders)
@@ -751,30 +821,11 @@ def get_order_itemss(order_id):
         ]
     })
 
-@app.route("/update_order_status/<int:order_id>", methods=["POST"])
-@login_required
-def update_order_status(order_id):
-    """Update the status of an order"""
-    order = Order.query.filter_by(id=order_id, seller_id=current_user.id).first()
-    
-    if not order:
-        return jsonify({"error": "Order not found"}), 404
-
-    data = request.get_json()
-    new_status = data.get("status")
-
-    if new_status not in ["Pending", "Shipped", "Delivered"]:
-        return jsonify({"error": "Invalid status"}), 400
-
-    order.status = new_status
-    db.session.commit()
-    
-    return jsonify({"success": True, "message": "Order status updated successfully!"})
 
 
 
 
-from urllib.parse import quote
+
 
 @app.route("/send_whatsapp/<string:phone_number>")
 @login_required
@@ -800,6 +851,86 @@ def send_whatsapp(phone_number):
 
     return redirect(whatsapp_url)
 
+@app.route("/update_order_status", methods=["POST"])
+@login_required
+def update_order_status():
+    order_id = request.form.get("order_id")
+    new_status = request.form.get("status")
 
+    order = Order.query.get(order_id)
+    if not order:
+        return jsonify({"success": False, "message": "Order not found"}), 404
+
+    # Ensure only the seller/admin can update status
+    if order.seller_id != current_user.id:
+        return jsonify({"success": False, "message": "Unauthorized"}), 403
+
+    order.status = new_status
+    db.session.commit()
+
+    # Return the updated status and badge color
+    status_classes = {
+        "Pending": "badge-warning",
+        "Shipped": "badge-info",
+        "Delivered": "badge-success",
+        "Cancelled": "badge-danger"
+    }
+    return jsonify({
+        "success": True,
+        "message": "Order status updated successfully!",
+        "new_status": new_status,
+        "badge_class": status_classes.get(new_status, "badge-secondary")
+    })
+
+from sqlalchemy import and_
+
+@app.route('/search_orders', methods=['GET'])
+def search_orders():
+    search_query = request.args.get('query', '').strip().lower()
+    seller_id = current_user.id  # Get the logged-in seller's ID
+
+    filtered_orders = Order.query.filter(
+        and_(
+            Order.seller_id == seller_id,  # Ensure seller_id matches
+            Order.track_code.ilike(f"%{search_query}%")  # Search by track_code
+        )
+    ).order_by(Order.created_at.desc()).limit(10).all()
+
+    # Convert orders to JSON
+    orders_data = [
+        {
+            "id": order.id,
+            "track_code": order.track_code,
+            "buyer": order.user.username,
+            "total_amount": order.total_amount,
+            "status": order.status
+        }
+        for order in filtered_orders
+    ]
+
+    return jsonify(orders_data)
+
+@app.route("/search_products", methods=["POST"])
+def search_products():
+    search_query = request.form.get("content")
+    user_id = request.form.get("user_id")  # Ensure you get the correct user ID
+
+    products = Product.query.filter(
+        Product.name.ilike(f"%{search_query}%"),
+        Product.user_id == user_id
+    ).all()
+
+    product_list = [
+        {
+            "id": product.id,
+            "name": product.name,
+            "amount": product.amount,
+            "image": product.image,
+            "description":product.description
+        }
+        for product in products
+    ]
+
+    return jsonify(product_list)
 
 

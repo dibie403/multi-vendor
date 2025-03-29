@@ -82,15 +82,12 @@ h1, h2, h3, h4, h5, h6 {
   color: white; /* Make sure link text also changes color on hover */
 }
 
-/* sytling for shop search and icon*/
-  .container11 {
-    display: flex;
-    align-items: center;
-    flex-wrap: nowrap;  /* Prevents wrapping */
-    justify-content: space-between; /* Ensures spacing */
-    padding: 10px;
-    overflow-x: auto; /* Allows horizontal scrolling on small screens if necessary */
-  }
+/* Shop Search & Icon Section */
+.container11 {
+  background: #f8f9fa; /* Light Gray */
+  padding: 20px;
+  border-radius: 10px;
+}
 
   .article-img {
     width: 30px;
@@ -467,7 +464,35 @@ h1, h2, h3, h4, h5, h6 {
   transform: scale(1.05);
 }
 
+.icon-group {
+  background-color: #f8f9fa;
+  padding: 10px;
+  border-radius: 10px;
+}
 
+.icon-group .btn {
+  border-color: green;
+  color: #ffffff;
+  padding: 8px 12px;
+  border-radius: 10px;
+  transition: background 0.3s;
+}
+
+.icon-group .btn:hover {
+  background: #4caf50;
+}
+.icon-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.icon-label {
+    font-size: 9px; /* Tiny text */
+    color: black; /* Black text */
+    margin-top: 2px; /* Small gap between icon and text */
+    text-align: center;
+}
 
 
 
@@ -524,3 +549,38 @@ h1, h2, h3, h4, h5, h6 {
 .btn-quantity:hover {
     background: #ddd;
 }
+
+.checkmark-wrapper {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin: 10px auto;
+    }
+    
+    .checkmark {
+        width: 60px;
+        height: 60px;
+        stroke: #28a745;
+        stroke-width: 4;
+        stroke-dasharray: 50;
+        stroke-dashoffset: 50;
+        animation: checkmark 1s ease-in-out forwards;
+    }
+
+    .checkmark-circle {
+        stroke-dasharray: 150;
+        stroke-dashoffset: 150;
+        stroke: #28a745;
+        stroke-width: 4;
+        animation: circle 0.8s ease-in-out forwards;
+    }
+
+    @keyframes circle {
+        from { stroke-dashoffset: 150; }
+        to { stroke-dashoffset: 0; }
+    }
+
+    @keyframes checkmark {
+        from { stroke-dashoffset: 50; }
+        to { stroke-dashoffset: 0; }
+    }

@@ -9,7 +9,7 @@ body {
 
 h1, h2, h3, h4, h5, h6 {
   color: #d63384; /* Bright pink headings */
-  font-weight: 700;
+  font-weight: 600;
 }
 
 .bg-steel {

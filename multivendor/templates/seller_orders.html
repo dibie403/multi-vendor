@@ -2,8 +2,21 @@
 
 {% block content3 %}
 <div class="container">
-    <h3>Customers Order</h3>
-    <sub> Only The Most Recent Orders Are Displayed Here</sub>
+   <div class="d-flex justify-content-between align-items-center">
+    <div>
+        <h3>Customers Order</h3>
+        <sub>Only The Most Recent Orders Are Displayed Here</sub>
+    </div>
+    <!-- ✅ Search Bar -->
+    <div class="input-group" style="width: 300px;">
+        <input type="text" id="searchInput" class="form-control" placeholder="e.g 562517">
+        <div class="input-group-append">
+            <button class="btn btn-outline-secondary" type="button">
+                <i class="bi bi-search"></i>
+            </button>
+        </div>
+    </div>
+</div>
    <!-- ✅ Orders Table -->
 <div class="table-responsive mt-4">
     <table class="table table-striped table-hover table-bordered rounded">
@@ -14,6 +27,7 @@
                 <th>Buyer</th>
                 <th>Total Amount</th>
                 <th>Status</th>
+                <th>Modify status</th>
                 <th>Actions</th>
             </tr>
         </thead>
@@ -23,17 +37,24 @@
                 <td>{{ loop.index }}</td>
                 <td><strong>{{ order.track_code }}</strong></td>
                 <td>{{ order.user.username }}</td>
-                <td><b style="color: #28a745;">${{ order.total_amount }}</b></td>
+                <td><b style="color: #28a745;">₦{{ order.total_amount }}</b></td>
                 <td>
-                    <span class="
-                        {% if order.status == 'Pending' %} badge-warning 
-                        {% elif order.status == 'Shipped' %} badge-info 
-                        {% elif order.status == 'Delivered' %} badge-success 
-                        {% else %} badge-secondary 
-                        {% endif %}">
+                    <span class="{% if order.status == 'Pending' %} badge-warning 
+                                 {% elif order.status == 'Shipped' %} badge-info 
+                                 {% elif order.status == 'Delivered' %} badge-success 
+                                 {% else %} badge-danger {% endif %}">
                         {{ order.status }}
                     </span>
                 </td>
+                <td>
+                    <select class="form-control status-dropdown" data-order-id="{{ order.id }}">
+                        <option value="Pending" {% if order.status == 'Pending' %}selected{% endif %}>Pending</option>
+                        <option value="Shipped" {% if order.status == 'Shipped' %}selected{% endif %}>Shipped</option>
+                        <option value="Delivered" {% if order.status == 'Delivered' %}selected{% endif %}>Delivered</option>
+                        <option value="Cancelled" {% if order.status == 'Cancelled' %}selected{% endif %}>Cancelled</option>
+                    </select>
+                </td>
+
                 <td>
                     <button type="button" class="btn btn-sm btn-primary view-items" 
                         data-order-id="{{ order.id }}" data-toggle="modal" data-target="#orderModal">
@@ -46,6 +67,136 @@
     </table>
 </div>
 
+
+    <h3 class="mb-4 mt-4">Summary Table</h3>
+    <!-- ✅ Summary Table -->
+    <div class="row d-flex justify-content-center">
+        
+        <div class="col-md-4 col-4">
+            <div class="card text-center summary-card">
+                <div class="card-body">
+                    <h5>Total Orders</h5>
+                    <h3>{{ total_orders }}</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 col-4">
+            <div class="card text-center summary-card">
+                <div class="card-body">
+                    <h5>Total Customers</h5>
+                    <h3>{{ total_customers }}</h3>
+                    <button type="button" class="btn btn-sm btn-primary" 
+                        data-toggle="modal" data-target="#customerModal">
+                        <i class="bi bi-eye"></i> View
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4 col-4">
+            <div class="card text-center summary-card">
+                <div class="card-body">
+                    <h5>Total Revenue</h5>
+                    <h3>₦{{ total_revenue }}</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+ <h3 class="mb-4 mt-4">Line Chart (Monthly Sales)</h3>
+
+<!-- ✅ Charts Section -->
+<div class="chart-wrapper">
+    <!-- ✅ Line Chart (Monthly Sales) -->
+    <div class="chart-container">
+        <canvas id="salesChart"></canvas>
+    </div>
+
+    <!-- ✅ Pie Chart (Order Status) -->
+    <h3 class="mb-4 mt-4 text-center">Order Status</h3>
+    <div class="chart-container">
+        <canvas id="statusChart"></canvas>
+    </div>
+</div>
+
+
+<!-- ✅ Include Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+
+
+<!-- Order Items Modal -->
+<div class="modal fade" id="orderModal" tabindex="-1" role="dialog" aria-labelledby="orderModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title " id="orderModalLabel">Order Details</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <table class="table ">
+                    <thead>
+                        <tr>
+                            <th>Image</th>
+                            <th>Product Name</th>
+                            <th>Quantity</th>
+                            <th>Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody id="modalOrderItems"></tbody>
+                </table>
+            </div>
+            <div class="modal-footer d-flex justify-content-end">
+                <h5 id="modalTotalCost" class="text-right"></h5>  <!-- ✅ Displays Total Cost -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Customer List Modal -->
+<div class="modal fade" id="customerModal" tabindex="-1" aria-labelledby="customerModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="customerModalLabel">Customer List</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Customer Name</th>
+                            <th>Phone Number</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for customer in unique_customers.values() %}
+                        <tr>
+                            <td>{{ customer.name }}</td>
+                            <td>{{ customer.phone_number }}</td>
+                            <td>
+                               <button class="btn btn-sm btn-success">
+                                <a href="{{ url_for('send_whatsapp', phone_number=customer.phone_number) }}" 
+                                   class="text-white text-decoration-none" target="_blank">
+                                    <i class="bi bi-chat-dots"></i> Message
+                                </a>
+                            </button>
+
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
 <style>
 /* ✅ Shrink Cards on Mobile */
 @media (max-width: 768px) {
@@ -119,136 +270,6 @@
     }
 }
 </style>
-
-    <h3 class="mb-4 mt-4">Summary Table</h3>
-    <!-- ✅ Summary Table -->
-    <div class="row d-flex justify-content-center">
-        
-        <div class="col-md-4 col-4">
-            <div class="card text-center summary-card">
-                <div class="card-body">
-                    <h5>Total Orders</h5>
-                    <h3>{{ total_orders }}</h3>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-4 col-4">
-            <div class="card text-center summary-card">
-                <div class="card-body">
-                    <h5>Total Customers</h5>
-                    <h3>{{ total_customers }}</h3>
-                    <button type="button" class="btn btn-sm btn-primary" 
-                        data-toggle="modal" data-target="#customerModal">
-                        <i class="bi bi-eye"></i> View
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-4 col-4">
-            <div class="card text-center summary-card">
-                <div class="card-body">
-                    <h5>Total Revenue</h5>
-                    <h3>₦{{ total_revenue }}</h3>
-                </div>
-            </div>
-        </div>
-    </div>
-
-
- <h3 class="mb-4 mt-4 text-center">Line Chart (Monthly Sales)</h3>
-
-<!-- ✅ Charts Section -->
-<div class="chart-wrapper">
-    <!-- ✅ Line Chart (Monthly Sales) -->
-    <div class="chart-container">
-        <canvas id="salesChart"></canvas>
-    </div>
-
-    <!-- ✅ Pie Chart (Order Status) -->
-    <h3 class="mb-4 mt-4">Order Status</h3>
-    <div class="chart-container">
-        <canvas id="statusChart"></canvas>
-    </div>
-</div>
-
-
-<!-- ✅ Include Chart.js -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
-
-
-<!-- Order Items Modal -->
-<div class="modal fade" id="orderModal" tabindex="-1" role="dialog" aria-labelledby="orderModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="orderModalLabel">Order Details</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <table class="table">
-                    <thead>
-                        <tr>
-                            <th>Image</th>
-                            <th>Product Name</th>
-                            <th>Quantity</th>
-                            <th>Amount</th>
-                        </tr>
-                    </thead>
-                    <tbody id="modalOrderItems"></tbody>
-                </table>
-            </div>
-            <div class="modal-footer d-flex justify-content-end">
-                <h5 id="modalTotalCost" class="text-right"></h5>  <!-- ✅ Displays Total Cost -->
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Customer List Modal -->
-<div class="modal fade" id="customerModal" tabindex="-1" aria-labelledby="customerModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="customerModalLabel">Customer List</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <table class="table table-striped">
-                    <thead>
-                        <tr>
-                            <th>Customer Name</th>
-                            <th>Phone Number</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for customer in unique_customers.values() %}
-                        <tr>
-                            <td>{{ customer.name }}</td>
-                            <td>{{ customer.phone_number }}</td>
-                            <td>
-                               <button class="btn btn-sm btn-success">
-                                    <a href="{{ url_for('send_whatsapp', phone_number=customer.phone_number) }}" 
-                                       class="text-white text-decoration-none" target="_blank">
-                                        <i class="bi bi-chat-dots"></i> Message
-                                    </a>
-                                </button>
-
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-</div>
 
 
 
@@ -342,13 +363,148 @@ const statusChartCtx = document.getElementById("statusChart").getContext("2d");
 new Chart(statusChartCtx, {
     type: "pie",
     data: {
-        labels: ["Pending", "Shipped", "Delivered"],
+        labels: ["Pending", "Shipped", "Delivered","Cancelled"],
         datasets: [{
-            data: [{{ status_data["Pending"] }}, {{ status_data["Shipped"] }}, {{ status_data["Delivered"] }}],
-            backgroundColor: ["orange", "blue", "green"]
+            data: [{{ status_data["Pending"] }}, {{ status_data["Shipped"] }}, {{ status_data["Delivered"] }},{{ status_data["Cancelled"] }}],
+            backgroundColor: ["orange", "blue", "green", "red"]
         }]
     }
 });
+
+document.addEventListener("DOMContentLoaded", function () {
+    document.querySelectorAll(".status-dropdown").forEach(function (dropdown) {
+        dropdown.addEventListener("change", function () {
+            let orderId = this.getAttribute("data-order-id");
+            let newStatus = this.value;
+            let statusBadge = this.closest("tr").querySelector("td span");
+
+            fetch("/update_order_status", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded"
+                },
+                body: `order_id=${orderId}&status=${newStatus}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Update status badge dynamically
+                    statusBadge.textContent = data.new_status;
+                    statusBadge.className = `badge ${data.badge_class}`;
+                } else {
+                    alert("Failed to update order status: " + data.message);
+                }
+            })
+            .catch(error => console.error("Error:", error));
+        });
+    });
+});
+
+document.getElementById("searchInput").addEventListener("keyup", function () {
+    let searchQuery = this.value.trim();
+
+    fetch(`/search_orders?query=${searchQuery}`)
+        .then(response => response.json())
+        .then(data => {
+            let tableBody = document.querySelector("tbody");
+            tableBody.innerHTML = "";  // Clear existing rows
+
+            data.forEach((order, index) => {
+                let statusClass = order.status === "Pending" ? "badge-warning" :
+                                  order.status === "Shipped" ? "badge-info" :
+                                  order.status === "Delivered" ? "badge-success" : "badge-danger";
+
+                let newRow = `
+                    <tr>
+                        <td>${index + 1}</td>
+                        <td><strong>${order.track_code}</strong></td>
+                        <td>${order.buyer}</td>
+                        <td><b style="color: #28a745;">$${order.total_amount}</b></td>
+                        <td><span class="badge ${statusClass}">${order.status}</span></td>
+                        <td>
+                            <select class="form-control status-dropdown" data-order-id="${order.id}">
+                                <option value="Pending" ${order.status === 'Pending' ? 'selected' : ''}>Pending</option>
+                                <option value="Shipped" ${order.status === 'Shipped' ? 'selected' : ''}>Shipped</option>
+                                <option value="Delivered" ${order.status === 'Delivered' ? 'selected' : ''}>Delivered</option>
+                                <option value="Cancelled" ${order.status === 'Cancelled' ? 'selected' : ''}>Cancelled</option>
+                            </select>
+                        </td>
+                        <td>
+                            <button type="button" class="btn btn-sm btn-primary view-items" data-order-id="${order.id}" data-toggle="modal" data-target="#orderModal">
+                                <i class="bi bi-eye"></i> View
+                            </button>
+                        </td>
+                    </tr>
+                `;
+
+                tableBody.innerHTML += newRow;
+            });
+
+            // ✅ Reattach event listeners to the new elements
+            attachEventListeners();
+        })
+        .catch(error => console.error("Error fetching orders:", error));
+});
+function attachEventListeners() {
+    // ✅ Attach event listener for "View" button
+    document.querySelectorAll(".view-items").forEach(button => {
+        button.addEventListener("click", function() {
+            const orderId = this.getAttribute("data-order-id");
+            fetch(`/seller/order_items/${orderId}`)
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById("orderModalLabel").textContent = `Order track code: ${data.track_code}`;
+
+                    let tableRows = "";
+                    data.items.forEach(item => {
+                        tableRows += `
+                            <tr>
+                                <td><img src="${item.product_image}" class="img-thumbnail" style="width: 50px; height: 50px;"></td>
+                                <td>${item.product_name}</td>
+                                <td>${item.quantity}</td>
+                                <td>${item.amount}</td>
+                            </tr>
+                        `;
+                    });
+
+                    document.getElementById("modalOrderItems").innerHTML = tableRows;
+                    document.getElementById("modalTotalCost").textContent = `Total Cost: ${data.total_cost}`;
+                })
+                .catch(error => console.error("Error fetching order items:", error));
+        });
+    });
+
+    // ✅ Attach event listener for "Status Update" dropdowns
+    document.querySelectorAll(".status-dropdown").forEach(dropdown => {
+        dropdown.addEventListener("change", function () {
+            let orderId = this.getAttribute("data-order-id");
+            let newStatus = this.value;
+            let statusBadge = this.closest("tr").querySelector("td span");
+
+            fetch("/update_order_status", {
+                method: "POST",
+                headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                body: `order_id=${orderId}&status=${newStatus}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    statusBadge.textContent = data.new_status;
+                    statusBadge.className = `badge ${data.badge_class}`;
+                } else {
+                    alert("Failed to update order status: " + data.message);
+                }
+            })
+            .catch(error => console.error("Error updating status:", error));
+        });
+    });
+}
+
+// ✅ Call the function initially to attach events on page load
+document.addEventListener("DOMContentLoaded", attachEventListeners);
+
+
+
 </script>
 
 {% endblock %}

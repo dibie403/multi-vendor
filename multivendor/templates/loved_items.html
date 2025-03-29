@@ -35,7 +35,7 @@
                             <img src="{{ url_for('static', filename='product_images/' + love.product.image) }}" class="img-fluid mb-3" alt="{{ love.product.name }}">
                             <p>{{ love.product.description }}</p>
                             <p class="price">${{ love.product.amount }}</p>
-                            <a class="btn btn-warning" class="btn btn-warning" href="{{ url_for('product_page_neutral', product_id=love.product.id)}}">View product 🛒</a>
+                            <a class="btn btn-warning" class="btn btn-warning" href="{{ url_for('product_page_neutral', product_id=love.product.id,username=love.product.seller.slug)}}">View product 🛒</a>
                         </div>
                     </div>
                 </div>
