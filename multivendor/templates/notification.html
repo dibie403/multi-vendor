@@ -1,0 +1,40 @@
+{% extends "layout.html" %}
+{% block content4 %}
+  <div class="header-title11">Notifications</div>
+
+        {% for enriched_notification in notifications %}
+            {% set notification = enriched_notification.notification %}
+            {% set initiator = enriched_notification.initiator %}
+
+            <div class="comments mb-3 p-3 rounded border shadow-sm">
+                
+                    <!-- Left Side: Image and Content -->
+                    <div class="d-flex align-items-center">
+                        <img class="rounded-circle article-img2 me-2" 
+                             src="{{url_for('static', filename='profile_pics/' + initiator.image_file)}}" alt="Profile Picture">
+                        <div>
+                           
+                    </div>
+                     <h6 class="mb-0 text-primary">
+                            
+                        <a href="{{ url_for('seller_orders') }}">
+                            {{ notification.content }}
+                        </a>
+                     </h6>
+                    </div>
+                    <!-- Right Side: Date -->
+                    <div class="text-muted d-flex ">
+                        <small>
+                            {{ notification.date.strftime('%Y-%m-%d %H:%M:%S') }}
+                        </small>
+                    </div>
+                
+            </div>
+        {% else %}
+            <sub>No notification yet!</sub>
+        {% endfor %}
+    </div>
+
+
+{% endblock %}
+

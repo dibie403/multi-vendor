@@ -1,7 +1,7 @@
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField,FileAllowed
-from wtforms import StringField,PasswordField,SubmitField,BooleanField,TextAreaField,SelectField
-from wtforms.validators import DataRequired,Length,Email,EqualTo,ValidationError,Optional
+from wtforms import StringField,PasswordField,SubmitField,BooleanField,TextAreaField,SelectField,IntegerField,HiddenField,RadioField
+from wtforms.validators import DataRequired,Length,Email,EqualTo,ValidationError,Optional,NumberRange
 from multivendor.models import User
 from flask_login import current_user
 
@@ -172,6 +172,13 @@ class UpdateshopForm(FlaskForm):
 		shop_name = StringField('Shop Name', validators=[DataRequired(), Length(max=30)])
 		shop_motto = TextAreaField('Shop Motto', validators=[DataRequired()])
 		shop_about=TextAreaField('About Your Store', validators=[DataRequired()])
+		shop_theme = RadioField('Shop Theme', choices=[
+		    ('none', 'None'),
+		    ('white', 'white'),
+		    ('pastel', 'pastel')
+		])
+		
+
 		picture=FileField('Update Profile Picture',validators=[FileAllowed(['jpg','png'])])
 		submit = SubmitField('Update')
 
@@ -258,5 +265,66 @@ class EditProductForm(FlaskForm):
 
     # Submit Button
     submit = SubmitField('Update')
+
+    
+class RequestResetTokenForm(FlaskForm):
+	email=StringField('Email',validators=[DataRequired(),Email()])
+	submit=SubmitField('Request Reset')
+
+class ResetPasswordForm(FlaskForm):
+	password=PasswordField('Password', validators=[DataRequired()])
+	confirm_password=PasswordField('Comfirm Password',validators=[DataRequired(),EqualTo('password')])
+	submit=SubmitField('Reset')
+
+
+
+class PersonalInfoForm(FlaskForm):
+    first_name = StringField("First Name", validators=[DataRequired(), Length(max=100)])
+    last_name = StringField("Last Name", validators=[DataRequired(), Length(max=100)])
+    country = SelectField(
+        "Country",
+        choices=[
+            ('', 'Select Country'),
+            ('Nigeria', 'Nigeria'),
+            ('Ghana', 'Ghana'),
+            ('Benin', 'Benin'),
+            ('Togo', 'Togo'),
+            ('Ivory Coast', 'Ivory Coast'),
+            ('Senegal', 'Senegal'),
+            ('Gambia', 'Gambia'),
+            ('Mali', 'Mali'),
+            ('Niger', 'Niger'),
+            ('Burkina Faso', 'Burkina Faso'),
+            ('Sierra Leone', 'Sierra Leone'),
+            ('Liberia', 'Liberia'),
+            ('Guinea', 'Guinea'),
+            ('Guinea-Bissau', 'Guinea-Bissau'),
+            ('Cape Verde', 'Cape Verde')
+        ],
+        validators=[DataRequired()],
+        render_kw={"class": "form-control"}
+    )
+    state = StringField("State", validators=[Optional(), Length(max=100)])
+    address = StringField("Address", validators=[Optional(), Length(max=255)])
+
+    day_of_birth = IntegerField(
+        "Day",
+        validators=[DataRequired(), NumberRange(min=1, max=31)],
+        render_kw={"placeholder": "e.g:01", "maxlength": 2}
+    )
+    month_of_birth = IntegerField(
+        "Month",
+        validators=[DataRequired(), NumberRange(min=1, max=12)],
+        render_kw={"placeholder": "e.g-07", "maxlength": 2}
+    )
+    year_of_birth = IntegerField(
+        "Year",
+        validators=[DataRequired(), NumberRange(min=1900, max=2100)],
+        render_kw={"placeholder": "e.g-2000", "maxlength": 4}
+    )
+
+    email_code = StringField('Enter 6-digit Code')  # Initially hidden
+    verify_email = SubmitField('Verify Email')
+    submit = SubmitField("Save")
 
     

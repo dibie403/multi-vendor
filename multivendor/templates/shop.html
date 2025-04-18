@@ -2,6 +2,28 @@
 
 
 {% block content1 %}
+<style>
+
+.cart-count {
+    top: -5px;
+    right: -5px;
+    background-color: red;
+    color: white;
+    font-size: 12px;
+    border-radius: 50%;
+    padding: 2px 6px;
+}
+
+
+
+
+
+
+</style>
+
+
+ 
+
  <div id="carouselExampleIndicators" class="carousel" data-ride="carousel">
   <ol class="carousel-indicators">
     <li data-target="#carouselExampleIndicators" data-slide-to="0" class="active"></li>
@@ -12,15 +34,15 @@
 
   <div class="carousel-inner">
     <div class="carousel-item active">
-      <img src="{{ url_for('static', filename='corasel/' + user.shop_image_file) }}" class="d-block w-100" alt="Slide 1">
+      <img src="{{ url_for('static', filename='corasel/20250414_160300.jpg') }}" class="d-block w-100" alt="Slide 1">
       <div class="carousel-caption custom-caption">
-        <h4>🔥 Big Sale Today!</h4>
-        <p>Up to 50% OFF on selected items.</p>
+        <h4>--</h4>
+        <p>--</p>
       </div>
     </div>
 
     <div class="carousel-item">
-      <img src="{{ url_for('static', filename='corasel/' + user.shop_image_file) }}" class="d-block w-100" alt="Slide 2">
+      <img src="{{ url_for('static', filename='corasel/image2coro.png') }}" class="d-block w-100" alt="Slide 2">
       <div class="carousel-caption custom-caption">
         <h4>🛍️ Shop the Trend</h4>
         <p>New arrivals, great deals!</p>
@@ -28,7 +50,7 @@
     </div>
 
     <div class="carousel-item">
-      <img src="{{ url_for('static', filename='corasel/' + user.shop_image_file) }}" class="d-block w-100" alt="Slide 3">
+      <img src="{{ url_for('static', filename='corasel/imagee1coro.png') }}" class="d-block w-100" alt="Slide 3">
       <div class="carousel-caption custom-caption">
         <h4>🚚 Free Shipping!</h4>
         <p>Orders above $99 only.</p>
@@ -49,68 +71,77 @@
 <div class="container11">
   
 
-  <div class="search-box11 mr-4" data-user-id="{{ user.id }}">
-      <form id="searchForm">
-          <div class="input-group">
-              <input type="text" name="content" id="searchInput" class="form-control" placeholder="Search...">
-              <div class="input-group-append">
-                  <button type="submit" class="btn btn-primary">Search</button>
-              </div>
+ 
+
+
+  {% if current_user.username == user.username %}
+     {% if is_valid %}
+         {% if not user.is_super and not user.is_subscribed %}
+            <h6 class="text-center">
+              You are Currently on the Free 30 days Trial, please subscribe to continue using our service after 30 days.
+            </h6>
+          {% endif %}
+
+
+
+           <marquee behavior="scroll" direction="left" class="text-muted" scrollamount="4">
+            {{ user.shop_motto }}
+        </marquee>  
+
+         <!-- Wrapper to group icons and push them to the right -->
+          <div class="icon-group" style="font-size: 0.8rem; text-align: center; display: flex; gap: 5px; align-items: center;">
+
+            <!-- Copy Link Button -->
+            <div class="icon-container">
+              <a href="{{ url_for('copy_link') }}" class="btn btn-sm ml-2">
+                <img class="article-img" src="{{ url_for('static', filename='images/copy.png') }}" alt="Copy Link" style="width: 15px; height: auto;">
+              </a>
+              <div class="icon-label">Copylink</div>
+            </div>
+
+            <!-- Overview Button -->
+            <div class="icon-container">
+              <a href="{{ url_for('seller_orders') }}" class="btn btn-sm ml-2">
+                <img class="article-img" src="{{ url_for('static', filename='images/overview.png') }}" alt="Overview" style="width: 15px; height: auto;">
+              </a>
+              <div class="icon-label">Overview</div>
+            </div>
+
+
+
+           
+            <!-- Settings Button -->
+            <div class="icon-container">
+              <a href="{{ url_for('shop_edit') }}" class="btn btn-sm ml-2">
+                <img class="article-img" src="{{ url_for('static', filename='images/settings.png') }}" alt="Settings" style="width: 15px; height: auto;">
+              </a>
+              <div class="icon-label">Settings</div>
+            </div>
+            <div class="icon-container">
+              <a href="{{ url_for('notification') }}" class="btn btn-sm ml-2">
+                <img class="article-img" src="{{ url_for('static', filename='images/cowbell-more.png') }}" alt="Settings" style="width: 15px; height: auto;">
+              </a>
+              <div class="icon-label">Notification</div>
+            </div>
+
+              <!-- New Product Button -->
+            <div class="icon-container">
+              <a href="{{ url_for('New_product') }}" class="btn btn-sm ml-2 ">
+                <img class="article-img" src="{{ url_for('static', filename='images/plus.png') }}" alt="New Product" style="width: 15px; height: auto;">
+              </a>
+              <div class="icon-label">product</div>
+            </div>
           </div>
-      </form>
-  </div>
-  <!-- Search Results -->
-  <ul id="searchResults"></ul>
 
+        {% endif %}
+    {% else %} 
+    <marquee behavior="scroll" direction="left" class="text-muted" scrollamount="4">
+            {{ user.shop_motto }}
+        </marquee>     
+        
 
-  {% if current_user.username == product.seller.username %}
-   <!-- Wrapper to group icons and push them to the right -->
-    <div class="icon-group" style="font-size: 0.8rem; text-align: center; display: flex; gap: 10px; align-items: center;">
-
-      <!-- Overview Button -->
-      <div class="icon-container">
-        <a href="{{ url_for('seller_orders') }}" class="btn btn-sm">
-          <img class="article-img" src="{{ url_for('static', filename='images/overview.png') }}" alt="Overview" style="width: 10px; height: auto;">
-        </a>
-        <div class="icon-label">Overview</div>
-      </div>
-
-      <!-- Copy Link Button -->
-      <div class="icon-container">
-        <a href="{{ url_for('copy_link') }}" class="btn btn-sm ml-2">
-          <img class="article-img" src="{{ url_for('static', filename='images/copy.png') }}" alt="Copy Link" style="width: 10px; height: auto;">
-        </a>
-        <div class="icon-label">Copy store link</div>
-      </div>
-
-      <!-- New Product Button -->
-      <div class="icon-container">
-        <a href="{{ url_for('New_product') }}" class="btn btn-sm mr-4 ml-2">
-          <img class="article-img" src="{{ url_for('static', filename='images/plus.png') }}" alt="New Product" style="width: 10px; height: auto;">
-        </a>
-        <div class="icon-label">Add product</div>
-      </div>
-
-      <!-- Settings Button -->
-      <div class="icon-container">
-        <a href="{{ url_for('shop_edit') }}" class="btn btn-sm">
-          <img class="article-img" src="{{ url_for('static', filename='images/settings.png') }}" alt="Settings" style="width: 10px; height: auto;">
-        </a>
-        <div class="icon-label">Settings</div>
-      </div>
-   </div>
-
-  {% else %}
-    <!-- Shopping Cart Button -->
-    <div class="icon-container">
-      <a href="{{ url_for('cart', seller_id=user.id) }}" class="btn btn-outline-primary btn-sm position-relative">
-        <img class="article-img" src="{{ url_for('static', filename='images/shopping-bag.png') }}" alt="Cart" style="width: 30px; height: auto;">
-        <span class="position-absolute cart-count">{{ cart_count }}</span>
-      </a>
-      <div class="icon-label">Cart</div>
-    </div>
-
-{% endif %}
+  {% endif %}
+        
 
 
 
@@ -120,92 +151,169 @@
 
 {% endblock %}
 
-
 {% block content2 %}
- <div id="content2">
-  <h3 style="font-family: 'Montserrat', sans-serif;"> 🛍️{{user.shop_name}}🛒</h3>
-  <div class="text muted">
-  <p>{{user.shop_motto}}</p>
-  </div>
-  <ul class="list-group">
-    <li class="list-group-item">
-      <a>Rating: ⭐⭐⭐⭐⭐</a>
-    </li>
-    <li class="list-group-item">
-      <a>Location: NIGERIA</a>
-    </li>
-    <li class="list-group-item">
-      <a>Contact: {{user.phone_number}}</a>
-    </li>
-    <li class="list-group-item">
-      <a>Business Hour: 9am-12am</a>
-    </li>
+<div id="content2">
+  <div class="d-flex justify-content-between align-items-center mt-2">
+    {% if user.is_verified %}
+      <!-- Verified Vendor text with rounded corners and icon to update -->
+      <div class="d-flex align-items-center">
+        <span class="badge bg-success text-white ml-2" style="font-size: 1rem; padding: 5px 10px;">
+          <i class="bi bi-patch-check-fill" style="margin-right: 5px;"></i> Verified Vendor
+        </span>
+      </div>
+       {%if user.username == current_user.username %}
+        <!-- Circular "!" icon for updating the info, placed at the right side -->
+        <a href="{{ url_for('personal_info') }}" class="text-decoration-none ms-3" title="Click to update your info">
+          <i class="bi bi-exclamation-circle-fill" style="color: #28a745; font-size: 1.5rem; padding: 5px; border-radius: 50%;"></i>
+        </a>
+       {% endif %}
 
-    <a href="{{ url_for('cart',seller_id=user.id) }}" class="btn btn-outline-success btn-sm">
-    <img class="article-img" src="{{ url_for('static', filename='images/plus.png') }}" alt="New Product" style="width: 10px; height: auto;">
-  </a>
-   
-  </ul>
- </div>
+    {% else %}
+      <!-- Unverified text with yellow background and rounded corners -->
+      <div class="d-flex align-items-center">
+        <span class="badge bg-warning text-dark ml-2" style="font-size: 0.90rem; padding: 5px 10px;">
+          <i class="bi bi-exclamation-triangle-fill" style="margin-right: 5px;"></i> Unverified
+        </span>
+      </div>
+      {%if user.username == current_user.username %}
+      <!-- Verification icon (clickable) placed at the right side -->
+      <a href="{{ url_for('personal_info') }}" class="text-decoration-none ms-3" title="Click to verify">
+        <i class="bi bi-shield-exclamation" style="color: #ffc107; font-size: 1.5rem; padding-left: 10px;"></i>
+      </a>
+      {% endif %}
+    {% endif %}
+  </div>
+
+  <div class="store-guide mt-4">
+    <p>🚀 <strong>Welcome to {{ user.shop_name }}!</strong></p>
+    <p>📢 <em>"{{ user.shop_motto }}"</em></p>
+    <p>📍 Located in: <strong>Nigeria</strong></p>
+    <p>📞 Contact us: <strong>{{ user.phone_number }}</strong></p>
+    <p>⏰ Open: <strong>9 AM - 12 AM</strong></p>
+    {%if user.username != current_user.username %}
+      <p>📧 Notify vendor? 
+        <a href="{{ url_for('notify_vendor', phone_number=user.phone_number) }}" class="btn btn-sm btn-success">
+          Send a message
+        </a>
+      </p>
+    {% endif %}
+  </div>
+
+</div>
 {% endblock %}
 
+
+
+
+
+
+
+
+
 {% block content3 %}
-<div class="content-section">
-
-
-
-  <h1 class="my-4 section-title">Featured Products 🛍️ </h1>
-
-  <div>
-    <div class="row product-grid">
-      {% for product in products %}
-     <!-- Product Item -->
-        <div class="col-6 col-sm-4 col-md-2 product-item" data-toggle="modal" data-target="#productModal{{ product.id }}">
-            <div class="product-card">
-                <div class="image-container">
-                    <img src="{{ url_for('static', filename='product_images/' + product.image) }}" class="card-img-top" alt="{{ product.name }}">
-                    {% if current_user.is_authenticated %}
-                        <button class="love-icon {% if product.id in loved_products %}active{% endif %}" 
-                                data-product-id="{{ product.id }}" 
-                                onclick="event.stopPropagation(); toggleLove(this)">
-                            {% if product.id in loved_products %}💚{% else %}🤍{% endif %}
-                        </button>
-                    {% else %}
-                        <button class="love-icon" onclick="event.stopPropagation(); toggleLove(this)">⭐</button>
-                    {% endif %}
-                </div>
-                <div class="card-body text-center">
-                    <small class="card-title">{{ product.name }}</small>
-                    <p class="card-text price">${{ product.amount }}</p>
+<!-- Container for Cart and Search (Side by Side) -->
+<div class="d-flex align-items-center justify-content-between">
+    <!-- Search Box -->
+    <div class="search-box11 search-box11 form mt-2" data-user-id="{{ user.id }}" style="flex-grow: 1; max-width: 70%;">
+        <form id="searchForm">
+            <div class="input-group">
+                <input type="text" name="content" id="searchInput" class="form-control" placeholder="Search...">
+                <div class="input-group-append">
+                    <button type="submit" class="btn btn-primary">Search</button>
                 </div>
             </div>
-        </div>
+        </form>
+    </div>
+    
+    <!-- Cart Button (Right-Aligned) -->
+    <div class="icon-container ml-3">
+        <a href="{{ url_for('cart', seller_id=user.id) }}" class="btn btn-outline-primary btn-sm position-relative">
+            <img class="article-img" src="{{ url_for('static', filename='images/shopping-cart-notification.png') }}" alt="Cart" style="width: 30px; height: auto;">
+            <span class="position-absolute cart-count">{{ cart_count }}</span>
+        </a>
+        <div class="icon-label text-center">Cart</div>
+    </div>
+</div>
 
-       <!-- Product Modal -->
-        <div class="modal fade" id="productModal{{ product.id }}" tabindex="-1" role="dialog" aria-labelledby="productModalLabel{{ product.id }}" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">{{ product.name }}</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
+<!-- Search Results -->
+<ul id="searchResults"></ul>
+
+
+
+{% if is_valid %}
+
+      <h1 class="my-4 section-title">Collections 🛍️ </h1>
+
+      <div>
+        <div class="row product-grid">
+          {% for product in products %}
+         <!-- Product Item -->
+            <div class="col-6 col-sm-4 col-md-2 product-item" data-toggle="modal" data-target="#productModal{{ product.id }}">
+                <div class="product-card">
+                    <div class="image-container">
+                        <img src="{{ url_for('static', filename='product_images/' + product.image) }}" class="card-img-top" alt="{{ product.name }}">
+                        {% if current_user.is_authenticated %}
+                            <button class="love-icon {% if product.id in loved_products %}active{% endif %}" 
+                                    data-product-id="{{ product.id }}" 
+                                    onclick="event.stopPropagation(); toggleLove(this)">
+                                {% if product.id in loved_products %}💚{% else %}🤍{% endif %}
+                            </button>
+                        {% else %}
+                           <button class="love-icon" onclick="event.stopPropagation(); toggleLove(this)">🤍</button>
+                        {% endif %}
                     </div>
-                    <div class="modal-body text-center">
-                        <img src="{{ url_for('static', filename='product_images/' + product.image) }}" class="img-fluid mb-3" alt="{{ product.name }}">
-                        <p>{{ product.description }}</p>
-                        <p class="price">${{ product.amount }}</p>
-                        
-                        <!-- Correcting the navigation links -->
-                        <a class="btn btn-warning" href="{{ url_for('Cart_product', product_id=product.id) }}">Add to cart 🛒</a>
-                        <a class="btn btn-add-cart" href="{{ url_for('product_page', product_id=product.id,username=product.seller.slug) }}">View product 🛒</a>
+                    <div class="card-body text-center">
+                        <small class="card-title">{{ product.name }}</small>
+                        <p class="card-text price">${{ product.amount }}</p>
                     </div>
                 </div>
             </div>
-        </div>
+
+           <!-- Product Modal -->
+            <div class="modal fade" id="productModal{{ product.id }}" tabindex="-1" role="dialog" aria-labelledby="productModalLabel{{ product.id }}" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">{{ product.name }}</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body text-center">
+                            <img src="{{ url_for('static', filename='product_images/' + product.image) }}" class="img-fluid mb-3" alt="{{ product.name }}">
+                            <p>{{ product.description }}</p>
+                            <p class="price">${{ product.amount }}</p>
+                            
+                            <!-- Correcting the navigation links -->
+                            <a class="btn btn-warning" href="{{ url_for('Cart_product', product_id=product.id) }}">Add to cart 🛒</a>
+                            <a class="btn btn-add-cart" href="{{ url_for('product_page', product_id=product.id,shop_name=product.seller.slug1) }}">View product 🛒</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+           {% else %}
+         <h6 class="text-center">No Item in your store yet,pls add product by clicking on the plus icon button!</h6>
+
+        {% endfor %}
+  {% else %}
+<h1 class="my-4 section-title">Collections 🛍️</h1>
+<div style="text-align: center;">
+    <img class="article-img" src="{{ url_for('static', filename='images/shop_lock.png') }}" alt="shop_lock" style="width: 300px; height: auto; display: inline;">
+    {% if user.username == current_user.username %}
+    <h6>Buyers are no longer seeing your products when they visit your store..</h5>
+    <sub>You have no Active Subcription,Pls click on the  Button to check our subcription package</sub><br>
+     <a class="btn btn-add-cart" href="{{ url_for('pricing') }}">See Pricing</a>
+    {% endif %}
+</div>
 
 
-    {% endfor %}
+</div>
+
+
+
+
+{% endif %}
+
      
 
        
@@ -313,7 +421,7 @@ function toggleLove(button) {
                                     
                                     <!-- Buttons -->
                                     <button class="btn btn-warning add-to-cart" data-product-id="${product.id}">Add to cart 🛒</button>
-                                    <button class="btn btn-primary view-product" data-product-id="${product.id}" data-seller-username="${product.seller_slug}">View product 🛒</button>
+                                    <button class="btn btn-primary view-product" data-product-id="${product.id}" data-seller-shop_name="${product.shop_slug}">View product 🛒</button>
                                 </div>
                             </div>
                         </div>
@@ -339,8 +447,8 @@ document.addEventListener("click", function (event) {
 
     if (event.target.classList.contains("view-product")) {
         let productId = event.target.getAttribute("data-product-id");
-        let username = event.target.getAttribute("data-seller-username");
-        window.location.href = `/store/${username}/Product-page/${productId}`;
+        let shop_name = event.target.getAttribute("data-seller-shop_name");
+        window.location.href = `/store/${shop_name}/Product-page/${productId}`;
     }
 });
 
@@ -351,9 +459,9 @@ document.addEventListener("click", function (event) {
 {% for page_num in products.iter_pages() %}
           {% if page_num %}
             {% if products.page == page_num %}
-              <a class="btn btn-info mb-4" href="{{url_for('shop2',page=page_num,username=current_user.slug)}}">{{page_num}}</a>
+              <a class="btn btn-info mb-4" href="{{url_for('shop2',page=page_num,shop_name=current_user.slug1)}}">{{page_num}}</a>
             {% else %}
-             <a class="btn btn-outline-info mb-4" href="{{url_for('shop2',page=page_num,username=current_user.slug)}}">{{page_num}}</a>
+             <a class="btn btn-outline-info mb-4" href="{{url_for('shop2',page=page_num,shop_name=current_user.slug1)}}">{{page_num}}</a>
             {% endif %}
           {% else %}
            ...

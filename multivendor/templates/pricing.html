@@ -1,0 +1,171 @@
+{% extends "layout.html" %}
+
+{% block content3 %}
+
+<style>
+.card-pricing {
+  border-radius: 15px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.card-pricing:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+.price {
+  font-size: 2.5rem;
+  font-weight: bold;
+}
+.features li {
+  padding: 5px 0;
+}
+</style>
+
+<div style="text-align: center; margin-top: 20px;">
+    <h4>Are You A Seller?</h4>
+    <small>Check out our competitive price range for our service</small>
+    
+   {% if current_user.is_authenticated %}
+    {% if current_user.is_super %}
+        <h5>Who do we have here 😊 A super user!! Your Subscription is Unlimited!</h5>
+    {% elif current_user.status and current_user.is_subscribed %}
+        {% if current_user.subscription_end and current_user.subscription_end > datetime.utcnow() %}
+            <h6>
+                Hi {{ current_user.username }}, your
+                {{ current_user.subscription.plan }} plan is still valid and active until 
+                {{ current_user.subscription_end.strftime('%B %d, %Y at %I:%M %p') }}.
+            </h6>
+        {% else %}
+            <h5>You have no active subscription plan.</h5>
+        {% endif %}
+    {% else %}
+        <h5>Please subscribe to access premium features. You have no active plan.</h5>
+    {% endif %}
+{% endif %}
+
+
+</div>
+
+<div class="container py-5"> 
+  <div class="row g-4">
+ 
+    <!-- Free Trial -->
+    <div class="col-md-3">
+      <div class="card card-pricing text-center">
+        <div class="card-body">
+          <h5 class="card-title">Free Trial</h5>
+          <p class="text-muted">30 Days Access</p>
+          <div class="price text-success mb-3">₦0</div>
+          <ul class="list-unstyled features">
+            <li>✓ Full Store Customization</li>
+            <li>✓ Access for 30 Days</li>
+            <li>✓ Analysis Page Access</li>
+            <li>✓ Order Tracking</li>
+          </ul>
+          <a href="{{ url_for('home') }}" class="btn btn-primary">Get Free Trial</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- 1 Month Plan -->
+    <div class="col-md-3">
+      <div class="card card-pricing text-center">
+        <div class="card-body">
+          <h5 class="card-title">1 Month Plan</h5>
+          <p class="text-muted">30 Days Access</p>
+          <div class="price text-primary mb-3">₦1,500</div>
+          <ul class="list-unstyled features">
+            <li>✓ Full Store Customization</li>
+            <li>✓ Access for 1 Month</li>
+            <li>✓ Analysis Page Access</li>
+            <li>✓ Order Tracking</li>
+          </ul>
+          {% if current_user.is_super %}
+             <a href="#" class="btn btn-primary disabled" style="pointer-events: none; opacity: 0.5;">Paid</a>
+
+          {% elif current_user.status %}
+             {% if current_user.subscription_end and current_user.subscription_end > datetime.utcnow() %}
+                  {% if current_user.subscription.plan == '1month' %}
+                      <a href="#" class="btn btn-primary disabled" style="pointer-events: none; opacity: 0.5;">Active Subscription - ₦1500</a>
+                  {% else %}
+                      <a href="#" class="btn btn-primary disabled" style="pointer-events: none; opacity: 0.5;">Subscription Active</a>
+                  {% endif %}
+              {% else %}
+                  <a href="{{ url_for('pay', plan='1month') }}" class="btn btn-primary">Subscribe ₦1500</a>
+              {% endif %}
+          {% else %}
+          <a href="{{ url_for('home') }}" class="btn btn-primary">Subscribe ₦1500</a>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- 3 Months Plan -->
+    <div class="col-md-3">
+      <div class="card card-pricing text-center">
+        <div class="card-body">
+          <h5 class="card-title">3 Months Plan</h5>
+          <p class="text-muted">90 Days Access</p>
+          <div class="price text-warning mb-3">₦4,000</div>
+          <ul class="list-unstyled features">
+            <li>✓ Full Store Customization</li>
+            <li>✓ Access for 3 Months</li>
+            <li>✓ Analysis Page Access</li>
+            <li>✓ Order Tracking</li>
+          </ul>
+          {% if current_user.is_super %}
+             <a href="#" class="btn btn-primary disabled" style="pointer-events: none; opacity: 0.5;">Paid</a>
+
+          {% elif current_user.status %}
+            {% if current_user.subscription_end and current_user.subscription_end > datetime.utcnow() %}
+                    {% if current_user.subscription.plan == '3months' %}
+                        <a href="#" class="btn btn-primary disabled" style="pointer-events: none; opacity: 0.5;">Active Subscription - ₦4000</a>
+                    {% else %}
+                        <a href="#" class="btn btn-primary disabled" style="pointer-events: none; opacity: 0.5;">Subscription Active</a>
+                    {% endif %}
+                {% else %}
+                     <a href="{{ url_for('pay', plan='3months') }}" class="btn btn-primary">Subscribe ₦4000</a>
+                {% endif %}
+          {% else %}
+          <a href="{{ url_for('home') }}" class="btn btn-primary">Subscribe ₦4000</a>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- 6 Months Plan -->
+    <div class="col-md-3">
+      <div class="card card-pricing text-center">
+        <div class="card-body">
+          <h5 class="card-title">6 Months Plan</h5>
+          <p class="text-muted">180 Days Access</p>
+          <div class="price text-danger mb-3">₦8,000</div>
+          <ul class="list-unstyled features">
+            <li>✓ Full Store Customization</li>
+            <li>✓ Access for 6 Months</li>
+            <li>✓ Analysis Page Access</li>
+            <li>✓ Order Tracking</li>
+          </ul>
+          {% if current_user.is_super %}
+             <a href="#" class="btn btn-primary disabled" style="pointer-events: none; opacity: 0.5;">Paid</a>
+
+          {% elif current_user.status %}
+             {% if current_user.subscription_end and current_user.subscription_end > datetime.utcnow() %}
+                      {% if current_user.subscription.plan == '6months' %}
+                          <a href="#" class="btn btn-primary disabled" style="pointer-events: none; opacity: 0.5;">Active Subscription - ₦8000</a>
+                      {% else %}
+                          <a href="#" class="btn btn-primary disabled" style="pointer-events: none; opacity: 0.5;">Subscription Active</a>
+                      {% endif %}
+                  {% else %}
+                       <a href="{{ url_for('pay', plan='6months') }}" class="btn btn-primary">Subscribe ₦8000</a>
+                  {% endif %}
+          {% else %}
+          <a href="{{ url_for('pay', plan='6months') }}" class="btn btn-primary">Subscribe ₦8000</a>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+{% endblock %}

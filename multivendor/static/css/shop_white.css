@@ -74,13 +74,64 @@ h1, h2, h3, h4, h5, h6 {
   color: #ffffff;
   font-weight: bold;
 }
+/* Adjustments for Tablets */
+@media (max-width: 768px) {
+  .carousel-item img {
+    height: 250px;
+  }
 
+  .custom-caption {
+    top: 10px;
+    right: 10px;
+    padding: 8px 12px;
+    font-size: 14px;
+    max-width: 150px;
+  }
+}
+
+/* Adjustments for Small Phones */
+@media (max-width: 576px) {
+  .carousel-item img {
+    height: 200px;
+  }
+
+  .custom-caption {
+    top: 8px;
+    right: 8px;
+    padding: 6px 6px;
+    font-size: 12px;
+    max-width: 180px;
+    line-height: 1.0;
+  }
+}
+
+/* Smooth Fade-in Animation */
+@keyframes fadeInRight {
+  from {
+    opacity: 0;
+    transform: translateX(40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
 /* Shop Search & Icon Section */
 .container11 {
-  background: #f8f9fa; /* Light Gray */
+  background: #ffffff; /* Light Gray */
   padding: 20px;
   border-radius: 10px;
 }
+
+.search-box11 {
+    flex-grow: 1; /* Allows search bar to expand */
+    max-width: 350px;
+  }
+
+  .search-box11 form {
+    display: flex;
+    align-items: center;
+  }
 
 .search-box11 input {
   border: 2px solid #1a73e8;
@@ -377,4 +428,38 @@ h1, h2, h3, h4, h5, h6 {
     color: gray;
     margin-top: 2px; /* Adds space between the icon and text */
     text-align: center;
+}
+
+ .store-header {
+  margin-top: 0rem;
+    background: #f8f9fa; /* Light Gray */
+        color: white;
+        border-radius: 10px;
+        text-align: center;
+        margin-bottom: 15px;
+    }
+    
+    .store-name {
+        font-size: 20px;
+    }
+    
+    .store-motto {
+        font-size: 12px;
+        font-style: italic;
+        opacity: 0.9;
+    }
+
+    .header-buttons .btn {
+        font-size: 18px;
+        padding: 6px 10px;
+    }
+
+    .cart-btn i, .search-btn i {
+        font-size: 20px;
+    }
+
+   .article-img2 {
+  height: 30px;
+  width: 30px;
+  margin-right: 10px;
 }

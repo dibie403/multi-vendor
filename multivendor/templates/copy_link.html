@@ -10,11 +10,11 @@
         if (navigator.clipboard && window.isSecureContext) {
             navigator.clipboard.writeText(text).then(function() {
                 // Successfully copied; redirect now.
-                window.location.href = "{{ url_for('shop2', username=current_user.username) }}";
+                window.location.href = "{{ url_for('shop2',shop_name=current_user.slug1) }}";
             }, function(err) {
                 // If there's an error, you might want to handle it.
                 console.error('Could not copy text: ', err);
-                window.location.href = "{{ url_for('shop2', username=current_user.username) }}";
+                window.location.href = "{{ url_for('shop2',shop_name=current_user.slug1) }}";
             });
         } else {
             // Fallback for older browsers
@@ -28,7 +28,7 @@
                 console.error('Fallback: Oops, unable to copy', err);
             }
             document.body.removeChild(tempInput);
-            window.location.href = "{{ url_for('shop2', username=current_user.username) }}";
+            window.location.href = "{{ url_for('shop2',shop_name=current_user.slug1) }}";
         }
       }
       

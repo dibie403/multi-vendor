@@ -1,8 +1,8 @@
-"""initial migration
+"""create db
 
-Revision ID: 3adfad188999
+Revision ID: 25519be6ac2e
 Revises: 
-Create Date: 2025-03-15 12:37:23.730206
+Create Date: 2025-04-12 07:56:27.449450
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '3adfad188999'
+revision = '25519be6ac2e'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -33,6 +33,9 @@ def upgrade():
     sa.Column('status', sa.Boolean(), nullable=False),
     sa.Column('slug', sa.String(length=100), nullable=False),
     sa.Column('slug1', sa.String(length=100), nullable=True),
+    sa.Column('is_subscribed', sa.Boolean(), nullable=True),
+    sa.Column('subscription_end', sa.DateTime(), nullable=True),
+    sa.Column('date', sa.DateTime(), nullable=False),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('email'),
     sa.UniqueConstraint('phone_number'),
@@ -41,6 +44,15 @@ def upgrade():
     sa.UniqueConstraint('slug'),
     sa.UniqueConstraint('slug1'),
     sa.UniqueConstraint('username')
+    )
+    op.create_table('notification',
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('user_id', sa.Integer(), nullable=False),
+    sa.Column('content', sa.Text(), nullable=False),
+    sa.Column('date', sa.DateTime(), nullable=False),
+    sa.Column('initiator', sa.Integer(), nullable=False),
+    sa.ForeignKeyConstraint(['user_id'], ['user.id'], ),
+    sa.PrimaryKeyConstraint('id')
     )
     op.create_table('order',
     sa.Column('id', sa.Integer(), nullable=False),
@@ -68,6 +80,18 @@ def upgrade():
     sa.ForeignKeyConstraint(['user_id'], ['user.id'], ),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('slug')
+    )
+    op.create_table('subscription',
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('user_id', sa.Integer(), nullable=False),
+    sa.Column('plan', sa.String(length=50), nullable=True),
+    sa.Column('amount', sa.Integer(), nullable=True),
+    sa.Column('reference', sa.String(length=100), nullable=True),
+    sa.Column('start_date', sa.DateTime(), nullable=True),
+    sa.Column('end_date', sa.DateTime(), nullable=True),
+    sa.ForeignKeyConstraint(['user_id'], ['user.id'], ),
+    sa.PrimaryKeyConstraint('id'),
+    sa.UniqueConstraint('user_id')
     )
     op.create_table('cart_item',
     sa.Column('id', sa.Integer(), nullable=False),
@@ -119,7 +143,9 @@ def downgrade():
     op.drop_table('love')
     op.drop_table('image')
     op.drop_table('cart_item')
+    op.drop_table('subscription')
     op.drop_table('product')
     op.drop_table('order')
+    op.drop_table('notification')
     op.drop_table('user')
     # ### end Alembic commands ###

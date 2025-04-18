@@ -1,6 +1,39 @@
 {% extends "layout.html" %}
 
 {% block content1 %}
+<style>
+  .theme-selection {
+    gap: 20px;
+  }
+  .theme-option {
+    cursor: pointer;
+    border: 2px solid transparent;
+    padding: 10px;
+    border-radius: 10px;
+    transition: all 0.3s ease-in-out;
+    width: 120px;
+  }
+  .theme-option input[type="radio"] {
+    display: none;
+  }
+  .theme-option .theme-img {
+    width: 100%;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 8px;
+  }
+  .theme-option .theme-label {
+    margin-top: 8px;
+    font-weight: 500;
+  }
+  .theme-option input[type="radio"]:checked + .theme-img {
+    border: 3px solid #28a745;
+  }
+  .theme-option input[type="radio"]:checked ~ .theme-label {
+    color: #28a745;
+  }
+</style>
+
 
   
 <div class="content-section mb-4">
@@ -80,6 +113,36 @@
               {% endfor %}
           {% endif %}
       </div>
+      <!-- Shop Theme Selection -->
+    <div class="form-group11 mt-4">
+      <label class="form-control-label">Choose a Theme</label>
+      <div class="d-flex justify-content-between flex-wrap mt-2 theme-selection">
+
+        <!-- Theme Option 1: None -->
+        <label class="theme-option text-center">
+          <input type="radio" name="shop_theme" value="none" {% if form.shop_theme.data == 'none' %}checked{% endif %}>
+
+          <img src="{{ url_for('static', filename='images/theme1.png') }}" alt="None Theme" class="theme-img">
+          <div class="theme-label">None</div>
+        </label>
+
+        <!-- Theme Option 2: White -->
+        <label class="theme-option text-center">
+          <input type="radio" name="shop_theme" value="white" {% if form.shop_theme.data == 'white' %}checked{% endif %}>
+          <img src="{{ url_for('static', filename='images/theme2.png') }}" alt="White Theme" class="theme-img">
+          <div class="theme-label">White</div>
+        </label>
+
+        <!-- Theme Option 3: Pastel -->
+        <label class="theme-option text-center">
+          <input type="radio" name="shop_theme" value="pastel" {% if form.shop_theme.data == 'pastel' %}checked{% endif %}>
+          <img src="{{ url_for('static', filename='images/theme3.png') }}" alt="Pastel Theme" class="theme-img">
+          <div class="theme-label">Pastel</div>
+        </label>
+
+      </div>
+    </div>
+
 
 
 

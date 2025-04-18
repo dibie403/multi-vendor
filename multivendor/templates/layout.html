@@ -68,11 +68,11 @@
         <!-- Navbar Right Side -->
         <div class="navbar-nav">
             {% if current_user.is_authenticated %}
-                <a class="nav-item nav-link" href="#">Cart</a>
-                <a class="nav-item nav-link" href="#">Notification</a>
+                <a class="nav-item nav-link" href="{{url_for('pricing')}}">Pricing</a>
+                <a class="nav-item nav-link" href="{{url_for('notification')}}">Notification</a>
 
                 {% if current_user.status %}
-                    <a class="nav-item nav-link" href="{{ url_for('shop2',username=current_user.slug)}}">Shop</a>
+                    <a class="nav-item nav-link" href="{{ url_for('shop2',shop_name=current_user.slug1)}}">Shop</a>
                 {% endif %}
 
                 <!-- User Dropdown -->

@@ -1,0 +1,26 @@
+<!-- templates/email/welcome_email.html -->
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Welcome to Vendera</title>
+</head>
+<body style="font-family: Arial, sans-serif; background-color: #f8f8f8; padding: 20px;">
+  <div style="max-width: 600px; margin: auto; background-color: #ffffff; padding: 20px; border-radius: 8px; border: 1px solid #ddd;">
+    
+   
+
+    <!-- Header -->
+    <h2 style="color: darkgreen; text-align: center;">Welcome to Vendera, {{ user.username }}! 🎉</h2>
+
+    <!-- Body Text -->
+    <p style="font-size: 16px; color: #333;">Thank you for joining our platform. We’re thrilled to have you on board!</p>
+    <p style="font-size: 16px; color: #333;">Start exploring our <a href="{{ url_for('home', _external=True) }}" style="color: darkgreen; text-decoration: none;">amazing marketplace</a> now.</p>
+    <p style="font-size: 16px; color: #333;">If you need any help, just reply to this email or contact our support team.</p>
+
+    <!-- Footer -->
+    <p style="font-size: 16px; color: #333;">Cheers,<br><strong>The Vendera Team</strong></p>
+  </div>
+</body>
+</html>
+

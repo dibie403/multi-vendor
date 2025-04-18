@@ -1,6 +1,11 @@
 {% extends "layout.html" %}
 
 {% block content1 %}
+<style>
+  .hidden {
+    display: none;
+  }
+</style>
 
   
 <div class="content-section mb-4">
@@ -104,25 +109,27 @@
   </form>
 
 </div>
-<!-- JavaScript to Show/Hide Shop Fields -->
 <script>
-  document.addEventListener("DOMContentLoaded", function() {
-    var statusSelect = document.getElementById("status");
-    var shopFields = document.getElementById("shopFields");
+  document.addEventListener("DOMContentLoaded", function () {
+    const statusSelect = document.getElementById("status");
+    const shopFields = document.getElementById("shopFields");
 
     function toggleShopFields() {
-      if (statusSelect.value === "seller") {
-        shopFields.style.display = "block"; // Show fields
+      if (statusSelect.value === "True") {  // This matches the value in form.py
+        shopFields.style.display = "block";
       } else {
-        shopFields.style.display = "none"; // Hide fields
+        shopFields.style.display = "none";
       }
     }
 
-    // Run the function on page load (in case of form re-submission)
+    // Initial check on page load
     toggleShopFields();
 
-    // Listen for changes in the dropdown
+    // Update visibility on change
     statusSelect.addEventListener("change", toggleShopFields);
   });
 </script>
+
+</script>
+
 {% endblock %}

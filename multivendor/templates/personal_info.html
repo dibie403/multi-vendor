@@ -1,0 +1,83 @@
+{% extends "layout.html" %}
+{% block content1 %}
+
+<!-- Show flash messages -->
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    {% for category, message in messages %}
+      <div class="alert alert-{{ category }}">{{ message }}</div>
+    {% endfor %}
+  {% endif %}
+{% endwith %}
+<div class="header-title11">Verify Your Identity</div>
+  <div class="sub-header">Fill In Your Personal Information.</div>
+
+<form method="POST">
+    {{ form.hidden_tag() }}
+
+    <div class="form-group">
+        {{ form.first_name.label }} {{ form.first_name(class="form-control") }}
+    </div>
+    <div class="form-group">
+        {{ form.last_name.label }} {{ form.last_name(class="form-control") }}
+    </div>
+    <div class="form-group">
+        {{ form.country.label }} {{ form.country(class="form-control") }}
+    </div>
+    <div class="form-group">
+        {{ form.state.label }} {{ form.state(class="form-control") }}
+    </div>
+    <div class="form-group">
+        {{ form.address.label }} {{ form.address(class="form-control") }}
+    </div>
+
+    <div class="form-row">
+        <div class="form-group col">
+            {{ form.day_of_birth.label }}
+            {{ form.day_of_birth(class="form-control", placeholder="e.g. 01", maxlength="2") }}
+        </div>
+        <div class="form-group col">
+            {{ form.month_of_birth.label }}
+            {{ form.month_of_birth(class="form-control", placeholder="e.g. 07", maxlength="2") }}
+        </div>
+        <div class="form-group col">
+            {{ form.year_of_birth.label }}
+            {{ form.year_of_birth(class="form-control", placeholder="e.g. 2000", maxlength="4") }}
+        </div>
+    </div>
+
+    {% if show_verification %}
+    <div class="form-group mt-3">
+        {{ form.email_code.label }}
+        {{ form.email_code(class="form-control", maxlength="6", placeholder="Enter the 6-digit code") }}
+    </div>
+    {% endif %}
+
+    <button type="submit" name="verify_email" id="send-code-btn" class="btn btn-info" {% if cooldown and cooldown > 0 %}disabled{% endif %}>
+    Send Verification Code
+    </button>
+    {{ form.submit(class="btn btn-success") }}
+</form>
+{% if cooldown and cooldown > 0 %}
+    <p class="text-warning mt-2">Wait <span id="cooldown">{{ cooldown }}</span> seconds to resend code.</p>
+{% endif %}
+
+<script>
+    let cooldown = parseInt(document.getElementById("cooldown")?.innerText || 0);
+    if (cooldown > 0) {
+        const interval = setInterval(() => {
+            cooldown--;
+            document.getElementById("cooldown").innerText = cooldown;
+
+            if (cooldown <= 0) {
+                clearInterval(interval);
+                const btn = document.getElementById("send-code-btn");
+                if (btn) {
+                    btn.disabled = false;
+                }
+                document.getElementById("cooldown").parentElement.style.display = "none";
+            }
+        }, 1000);
+    }
+</script>
+{% endblock content1 %}

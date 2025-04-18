@@ -85,7 +85,7 @@ h1, h2, h3, h4, h5, h6 {
 /* Shop Search & Icon Section */
 .container11 {
   background: #f8f9fa; /* Light Gray */
-  padding: 20px;
+  padding: 5px;
   border-radius: 10px;
 }
 
@@ -93,6 +93,12 @@ h1, h2, h3, h4, h5, h6 {
     width: 30px;
     height: auto;
   }
+
+  .article-img2 {
+  height: 30px;
+  width: 30px;
+  margin-right: 10px;
+}
 
   .search-box11 {
     flex-grow: 1; /* Allows search bar to expand */
@@ -584,3 +590,34 @@ h1, h2, h3, h4, h5, h6 {
         from { stroke-dashoffset: 50; }
         to { stroke-dashoffset: 0; }
     }
+
+
+.store-header {
+  margin-top: 0rem;
+    background: #f8f9fa; /* Light Gray */
+        color: white;
+        border-radius: 10px;
+        text-align: center;
+        margin-bottom: 15px;
+    }
+    
+    .store-name {
+        font-size: 20px;
+    }
+    
+    .store-motto {
+        font-size: 12px;
+        font-style: italic;
+        opacity: 0.9;
+    }
+
+    .header-buttons .btn {
+        font-size: 18px;
+        padding: 6px 10px;
+    }
+
+    .cart-btn i, .search-btn i {
+        font-size: 20px;
+    }
+
+    

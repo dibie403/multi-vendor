@@ -125,8 +125,8 @@
             <div class="modal-body text-center">
               <img src="{{ url_for('static', filename='images/download2.jpeg') }}" class="img-fluid mb-3" alt="Wireless Headphones">
               <p>High-quality wireless headphones with noise cancellation and long battery life.</p>
-              <p class="price">$59.99</p>
-              <button class="btn btn-add-cart" href="{{url_for('register')}}">Add to cart 🛒</button>
+              <p class="price" href="{{ url_for('notification') }}">$59.99</p>
+              <button class="btn btn-add-cart" href="{{ url_for('notification') }}">Add to cart 🛒</button>
               <button class="btn btn-warning" href="{{url_for('register')}}">View product 🛒</button>
             </div>
           </div>

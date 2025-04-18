@@ -1,6 +1,7 @@
 from datetime import datetime
 from multivendor import db,login_manager,app
 from flask_login import UserMixin
+from itsdangerous import URLSafeTimedSerializer, BadSignature, SignatureExpired
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -17,16 +18,48 @@ class User(db.Model,UserMixin):
     shop_name= db.Column(db.String(20), nullable=True, unique=True)
     shop_motto= db.Column(db.Text, nullable=True,unique=True)
     shop_about= db.Column(db.Text, nullable=True,unique=False)
+    shop_theme = db.Column(db.Text, nullable=True, default=None)
     phone_number = db.Column(db.String(20), unique=True, nullable=False)
     status = db.Column(db.Boolean, nullable=False,default=False)
     slug = db.Column(db.String(100), unique=True, nullable=False)
     slug1=db.Column(db.String(100), unique=True, nullable=True)
+    
+    is_subscribed = db.Column(db.Boolean, default=False)
+    subscription_end = db.Column(db.DateTime, nullable=True)
+    date = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    is_super = db.Column(db.Boolean, default=False,nullable=True)
+    is_verified = db.Column(db.Boolean, default=False,nullable=True)
+
+    subscription = db.relationship('Subscription', backref='user', uselist=False)
     products = db.relationship('Product', backref='seller', lazy=True)
+    personal_info = db.relationship('PersonalInfo', backref='user', uselist=False, cascade="all, delete-orphan")
+
+    
+    def get_reset_token(self, expires_sec=1800):
+        s = URLSafeTimedSerializer(app.config['SECRET_KEY'])
+        return s.dumps({'user_id': self.id})
+
+    @staticmethod
+    def verify_reset_token(token):
+        s = URLSafeTimedSerializer(app.config['SECRET_KEY'])
+        try:
+            # Pass the expiration time in seconds (e.g., 1800 for 30 minutes)
+            data = s.loads(token, max_age=1800)
+            user_id = data['user_id']
+        except SignatureExpired:
+            # Handle expired token
+            return None
+        except BadSignature:
+            # Handle invalid token
+            return None
+
+        # Assuming User.query.get retrieves a user by their ID
+        return User.query.get(user_id)
     
     
     
     def __repr__(self):
-        return f"User('{self.slug}', '{self.slug1}','{self.email}', '{self.shop_about}')"
+        return f"User('{self.slug}', '{self.is_verified}','{self.is_subscribed}', '{self.subscription_end}')"
 
 class Product(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -39,6 +72,8 @@ class Product(db.Model):
     image = db.Column(db.String(255), nullable=False)
     shelf = db.Column(db.String(100), nullable=False)
     slug = db.Column(db.String(100), unique=True, nullable=False)
+
+
     
     
 
@@ -108,3 +143,46 @@ class OrderItem(db.Model):
 
     def __repr__(self):
         return f"OrderItem('{self.id}', Order: '{self.order_id}', Product: '{self.product_id}', Qty: '{self.quantity}')"
+
+class Notification(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    content = db.Column(db.Text, nullable=False)
+    date = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    initiator= db.Column(db.Integer, nullable=False,default=None)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    
+    
+
+
+    # Define relationships
+    user = db.relationship('User', backref=db.backref('notifications', lazy=True))
+   
+
+    def __repr__(self):
+         return f"Notification('{self.content}','{self.user_id}')"
+
+class Subscription(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = user_id = db.Column(db.Integer, db.ForeignKey('user.id'), unique=True,nullable=False)
+    plan = db.Column(db.String(50))
+    amount = db.Column(db.Integer)
+    reference = db.Column(db.String(100))
+    start_date = db.Column(db.DateTime, default=datetime.utcnow)
+    end_date = db.Column(db.DateTime)
+
+    def __repr__(self):
+        return f"Subscription('{self.user_id}', '{self.end_date}','{self.start_date}','{self.amount}','{self.reference}','{self.plan}')"
+
+
+class PersonalInfo(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), unique=True, nullable=False)
+    first_name = db.Column(db.String(100), nullable=False)
+    last_name = db.Column(db.String(100), nullable=False)
+    country = db.Column(db.String(100), nullable=False)
+    state = db.Column(db.String(100), nullable=True)
+    address = db.Column(db.String(255), nullable=True)
+    day_of_birth = db.Column(db.Integer, nullable=False)
+    month_of_birth = db.Column(db.Integer, nullable=False)
+    year_of_birth = db.Column(db.Integer, nullable=False)

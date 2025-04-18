@@ -1,0 +1,106 @@
+{% extends "layout.html" %}
+
+{% block content3 %}
+
+<div class="container py-5">
+  <h3 class="mb-4 text-center">Make Payment</h3>
+
+  <!-- In payment.html -->
+
+<form id="paymentForm">
+  <div class="mb-3">
+    <label for="name" class="form-label">Full Name</label>
+    <input type="text" class="form-control" id="name" placeholder="Enter your full name" required>
+  </div>
+
+  <div class="mb-3">
+    <label for="email" class="form-label">Email Address</label>
+    <input type="email" class="form-control" id="email" placeholder="Enter your email" required>
+  </div>
+
+  <div class="mb-3">
+    <label class="form-label">Selected Plan</label>
+    <input type="text" class="form-control" value="{{ plan | capitalize }} Plan - ₦{{ amount }}" readonly>
+  </div>
+
+  <input type="hidden" id="amount" value="{{ amount }}">
+  <input type="hidden" id="plan" value="{{ plan }}"> <!-- Store selected plan here -->
+
+  <button type="submit" class="btn btn-primary w-100">Pay Now</button>
+</form>
+
+<!-- PAYSTACK JAVASCRIPT SDK -->
+<script src="https://js.paystack.co/v1/inline.js"></script>
+
+<script>
+  const paymentForm = document.getElementById('paymentForm');
+  paymentForm.addEventListener("submit", payWithPaystack, false);
+
+  function payWithPaystack(e) {
+    e.preventDefault();
+
+    const plan = document.getElementById("plan").value;
+    let handler = PaystackPop.setup({
+      key:"{{PK_test_key}}", 
+      email: document.getElementById("email").value,
+      amount: document.getElementById("amount").value * 100,
+      currency: "NGN",
+      ref: 'sub_' + Math.floor((Math.random() * 1000000000) + 1),
+      metadata: {
+        custom_fields: [
+          {
+            display_name: "Customer Name",
+            variable_name: "customer_name",
+            value: document.getElementById("name").value
+          },
+          {
+            display_name: "Plan Selected",
+            variable_name: "plan",
+            value: plan
+          }
+        ]
+      },
+      callback: function(response) {
+        alert('Payment successful. Transaction Ref: ' + response.reference);
+
+        fetch('/verify-payment', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: new URLSearchParams({
+            'reference': response.reference
+          })
+        })
+        .then(response => {
+          if(response.redirected) {
+            // If backend redirects (Flask redirect), follow it
+            window.location.href = response.url;
+          } else {
+            return response.text();
+          }
+        })
+        .then(data => {
+          if(data) {
+            console.log(data);
+            alert(data);
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          alert('There was an error processing the payment verification.');
+        });
+      },
+
+      onClose: function() {
+        alert('Transaction was not completed, window closed.');
+      }
+    });
+
+    handler.openIframe();
+  }
+</script>
+
+
+
+{% endblock %}
