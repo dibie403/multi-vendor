@@ -41,20 +41,20 @@
             {% endif %}
           </div>
 
-          <!-- Email Field -->
-          <div class="form-group11">
+         <div class="form-group11">
             {{ form.amount.label(class="form-control-label", for="amount") }}
             {% if form.amount.errors %}
-              {{ form.amount(class="form-control is-invalid", id="amount") }}
-              <div class="invalid-feedback">
-                {% for error in form.amount.errors %}
-                  <span>{{ error }}</span>
-                {% endfor %}
-              </div>
+                {{ form.amount(class="form-control is-invalid", id="amount", type="number", step="0.01", min="0") }}
+                <div class="invalid-feedback">
+                    {% for error in form.amount.errors %}
+                        <span>{{ error }}</span>
+                    {% endfor %}
+                </div>
             {% else %}
-              {{ form.amount(class="form-control", id="amount") }}
+                {{ form.amount(class="form-control", id="amount", type="number", step="0.01", min="0") }}
             {% endif %}
-          </div>
+        </div>
+
          <!-- Category Dropdown -->
           <div class="form-group11">
             {{ form.category.label(class="form-control-label") }}

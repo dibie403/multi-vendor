@@ -1,0 +1,121 @@
+{% extends "layout.html" %}
+
+{% block content3 %}
+
+<style>
+  .top-title {
+  text-align: center;
+  font-size: 2rem;
+  margin-bottom: 1.5rem;
+  color: #2c3e50;
+}
+
+.seller-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1.5rem;
+  padding: 1rem;
+}
+
+.seller-card {
+  background: #fff;
+  border-radius: 1rem;
+  padding: 1.5rem;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+  text-align: center;
+  transition: transform 0.3s ease;
+}
+
+.seller-card:hover {
+  transform: translateY(-5px);
+}
+
+.seller-image-wrapper {
+  width: 100px;
+  height: 100px;
+  margin: 0 auto 1rem;
+  overflow: hidden;
+  border-radius: 50%;
+  border: 3px solid #1abc9c;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.seller-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.seller-info h3 {
+  font-size: 1.25rem;
+  margin-bottom: 0.5rem;
+  color: #34495e;
+}
+
+.seller-info p {
+  margin: 0.3rem 0;
+  color: #7f8c8d;
+  font-size: 0.95rem;
+}
+.top-title {
+  text-align: center;
+  font-size: 2.2rem;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 600;
+  color: #2c3e50;
+  margin-bottom: 0.5rem;
+}
+
+.top-subtitle {
+  display: block;
+  text-align: center;
+  font-size: 0.95rem;
+  font-family: 'Roboto', sans-serif;
+  color: #7f8c8d;
+  margin-bottom: 1.5rem;
+}
+
+
+</style>
+
+<h3 class="top-title">🏅 Top Sellers/Stores</h3>
+<small class="top-subtitle">Discover Top Vendors on Vendera Nigeria</small>
+
+<div style="text-align:center; margin-bottom: 1.5rem;">
+  <a href="{{ url_for('top_sellers', range='day') }}" class="btn btn-outline-primary {% if selected_range == 'day' %}active{% endif %}">Today</a>
+  <a href="{{ url_for('top_sellers', range='week') }}" class="btn btn-outline-primary {% if selected_range == 'week' %}active{% endif %}">This Week</a>
+  <a href="{{ url_for('top_sellers', range='month') }}" class="btn btn-outline-primary {% if selected_range == 'month' %}active{% endif %}">This Month</a>
+  <a href="{{ url_for('top_sellers', range='overall') }}" class="btn btn-outline-primary {% if selected_range == 'overall' %}active{% endif %}">Overall</a>
+</div>
+
+<div class="seller-grid">
+  {% for row in sellers %}
+    {% set seller = row[0] %}
+    <div class="seller-card">
+      <div class="seller-image-wrapper">
+        <img src="{{ url_for('static', filename='corasel/' + seller.shop_image_file) }}" alt="{{ seller.shop_name }}" class="seller-image">
+      </div>
+      <div class="seller-info">
+        <a href="{{ url_for('shop2',shop_name=seller.slug1)}}">
+        <h3>{{ seller.shop_name }} count <small><i class="bi bi-patch-check-fill text-primary" title="Verified"></i></small></h3></a>
+
+       <p>🗒️ <strong>About</strong><br>
+          {% if seller.shop_about %}
+            {{ seller.shop_about.split()[:10] | join(' ') }}{% if seller.shop_about.split()|length > 10 %}...{% endif %}
+          {% else %}
+            No description available.
+          {% endif %}
+        </p>
+
+        <p>🛒 <strong>Orders:</strong> {{ row.order_count }}</p>
+        <p>🛒 <strong>customers:</strong> {{ row.customer_count }}</p>
+        <p>🛒 <strong>visit:</strong> {{ row.visit_count }}</p>
+       
+        <p>💰 <strong>Sales:</strong> ₦{{ "{:,.2f}".format(row.total_sales or 0) }}</p>
+
+      </div>
+    </div>
+  {% endfor %}
+</div>
+
+{% endblock content3 %}

@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField,FileAllowed
-from wtforms import StringField,PasswordField,SubmitField,BooleanField,TextAreaField,SelectField,IntegerField,HiddenField,RadioField
+from wtforms import StringField,PasswordField,SubmitField,BooleanField,TextAreaField,SelectField,IntegerField,HiddenField,RadioField,FloatField
 from wtforms.validators import DataRequired,Length,Email,EqualTo,ValidationError,Optional,NumberRange
 from multivendor.models import User
 from flask_login import current_user
@@ -111,11 +111,11 @@ class AddProductForm(FlaskForm):
         validators=[DataRequired()]
     )
 
-    # Amount
-    amount = StringField(
-        'Amount', 
-        validators=[DataRequired(), Length(min=3, max=20)]
-    )
+    amount = FloatField("Amount", validators=[
+        DataRequired(message="Amount is required"),
+        NumberRange(min=0.01, message="Amount must be greater than 0")
+    ])
+    
 
     # Category Dropdown
     category = SelectField(

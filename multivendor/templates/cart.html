@@ -2,9 +2,12 @@
 {% extends "layout.html" %}
 
 {% block content3 %}
-<h1 class="section-title">Cart🛍️ </h1>
-<sub>Only Items you cart From This Seller Store Is Displayed Here</sub>
-<div class="content-section">
+<h2 class="mb-0">Cart/Checkout Info</h2>
+<small class="text-muted">Only Items you cart From This Seller Store Is Displayed Here</small>
+<div class="content-section mb-2">
+    {% if cart_count != 0 %}
+    <h6 class=" mb-2 sub">No. of items ( {{ cart_count }} )</h6>
+    {% endif %}
       <div>
         <div class="row product-grid">
           {% for cart_item in cart_items %}
@@ -28,9 +31,9 @@
                 <div class="modal-dialog modal-dialog-centered" role="document">
                     <div class="modal-content">
                         <div class="modal-header">
-                        	<a class="btn btn-outline-danger btn-sm mx-1 " data-toggle="modal" data-target="#deleteModal">
+                        	<a href="{{ url_for('delete_cart_item',product_id=cart_item.product_id,seller_id=cart_item.seller_id) }}"class="btn btn-outline-danger btn-sm mx-1 ">
 					                    <img src="{{ url_for('static', filename='images/trash.png') }}" alt="delete Product" style="width: 12px;">
-					                </a>
+					        </a>
                             <h5 class="modal-title">{{ cart_item.product.name }}</h5>
 
                             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -40,14 +43,16 @@
                         <div class="modal-body text-center">
                             <img src="{{ url_for('static', filename='product_images/' + cart_item.product.image) }}" class="img-fluid mb-3" alt="{{ cart_item.product.name }}">
                             <p>{{ cart_item.product.description }}</p>
-                            <p class="price">${{ cart_item.product.amount }}</p>
+                            <p class="price">N{{ cart_item.product.amount }}</p>
+                            <strong >QTY: {{cart_item.quantity}} </strong>
+
                             
                             
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
+            <!--<div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
 			  <div class="modal-dialog" role="document">
 			    <div class="modal-content">
 			      <div class="modal-header">
@@ -65,7 +70,7 @@
 			      </div>
 			    </div>
 			  </div>
-			</div>
+			</div>-->
 
             <!-- ✅ Order Success Modal -->
             <div class="modal fade" id="orderSuccessModal" tabindex="-1" role="dialog" aria-labelledby="orderSuccessLabel" aria-hidden="true">
@@ -93,8 +98,9 @@
             </div>
             
         {% else %}
-         <h3 class="text-primary text-center" style="color: #428bca;">No cart Items Yet!</h3>
+         <h3 class=" text-center">No cart Items Yet!</h3>
     {% endfor %}
+    
 </div>
 
 {% for page_num in range(1, total_pages + 1) %}
@@ -105,13 +111,25 @@
     {% endif %}
 {% endfor %}
 
+{% if cart_count == 0 %}
+        <form>
+            <div class="d-flex gap-3 mt-3">
+                <button type="button" class="btn btn-warning disabled">
+                    Checkout  {{ cart_count }} items🛒
+                </button>
+            </div>
+        </form>
+{% else %}
 <form id="checkoutForm" action="{{ url_for('checkout', seller_id=seller.id,track_code=track_code) }}" method="POST">
-                <div class="d-flex gap-3 mt-3">
-                    <button type="button" class="btn btn-warning" id="placeOrderBtn">
-                        Checkout  {{ cart_count }} items🛒
-                    </button>
-                </div>
-            </form>
+                        <div class="d-flex gap-3 mt-3">
+                            <button type="button" class="btn btn-warning btn-block" id="placeOrderBtn">
+                                Checkout ( Total cost: N{{total_amount}} )
+                            </button>
+                        </div>
+                    </form>
+{% endif %}
+
+
 <script>
     document.getElementById("placeOrderBtn").addEventListener("click", function (event) {
     event.preventDefault();  // ⛔ Prevent the default form submission
@@ -146,11 +164,5 @@
     });
     
 </script>
-  
-
-
-
-
-
 
 {% endblock %}

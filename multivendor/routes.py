@@ -1,12 +1,13 @@
 
 import os
 import secrets
+import uuid
 from PIL import Image
 from flask import render_template, url_for, flash, redirect, request, jsonify, session
-from multivendor import app,db,bcrypt,mail
+from multivendor import app,db,bcrypt,mail,cache
 from flask_login import login_user,current_user,logout_user,login_required
 from multivendor.forms import RegistrationForm,LoginForm,UpdateProfileForm,AddProductForm,UpdateshopForm,EditProductForm,RequestResetTokenForm,ResetPasswordForm,PersonalInfoForm
-from multivendor.models import User,Product,Love,CartItem,OrderItem,Order,Notification,Subscription,PersonalInfo
+from multivendor.models import User,Product,Love,CartItem,OrderItem,Order,Notification,Subscription,PersonalInfo,StoreVisit
 import re
 from datetime import datetime
 
@@ -15,12 +16,55 @@ from urllib.parse import quote,urlparse, urljoin
 from flask_mail import Message
 import smtplib
 import socket
+from flask import make_response
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
+from sqlalchemy import func, desc
+
+
+# Initialize Limiter
+limiter = Limiter(get_remote_address, app=app, default_limits=["100 per minute"])
 
 
 
 
+def save_picture(form_picture):
+    random_hex=secrets.token_hex(8)
+    _,f_ext=os.path.split(form_picture.filename)
+    picture_fn=random_hex +f_ext
+    picture_path=os.path.join(app.root_path, 'static/profile_pics', picture_fn)
 
+    output_size=(250,250)
+    i=Image.open(form_picture)
+    i.thumbnail(output_size)
+    i.save(picture_path)
 
+    return picture_fn
+
+def save_picture1(form_picture):
+    random_hex=secrets.token_hex(8)
+    _,f_ext=os.path.split(form_picture.filename)
+    picture_fn=random_hex +f_ext
+    picture_path=os.path.join(app.root_path, 'static/product_images', picture_fn)
+
+    output_size=(250,250)
+    i=Image.open(form_picture)
+    i.thumbnail(output_size)
+    i.save(picture_path)
+
+    return picture_fn
+def save_picture2(form_picture):
+    random_hex=secrets.token_hex(8)
+    _,f_ext=os.path.split(form_picture.filename)
+    picture_fn=random_hex +f_ext
+    picture_path=os.path.join(app.root_path, 'static/corasel', picture_fn)
+
+    output_size=(250,250)
+    i=Image.open(form_picture)
+    i.thumbnail(output_size)
+    i.save(picture_path)
+
+    return picture_fn
 
 # Add this once in your Flask app
 @app.context_processor
@@ -33,15 +77,35 @@ def inject_target_date():
     target_date = datetime(2025, 7, 12, 7, 7, 19, 960156)
     return dict(target_date=target_date)
 
+@app.context_processor
+def inject_notification_count():
+    if current_user.is_authenticated:
+        unread_count = Notification.query.filter_by(user_id=current_user.id, is_read=False).count()
+    else:
+        unread_count = 0
+    return dict(unread_notification_count=unread_count)
+
+
+
+
 
 @app.route("/")
 @app.route("/home/power")
 def home():
-    image_file = None
-    if current_user.is_authenticated:
-        image_file = url_for('static', filename='profile_pics/' + current_user.image_file)
+    page = request.args.get('page', 1, type=int)
 
-    return render_template('home.html',title='home',image_file=image_file)
+    # Fetch products with a single query
+    products = Product.query.paginate(page=page, per_page=10)
+
+    # Render the template
+    rendered = render_template('home.html', title='home', products=products)
+
+    # Create a response with caching headers
+    response = make_response(rendered)
+    response.headers['Cache-Control'] = 'public, max-age=300, s-maxage=600, stale-while-revalidate=900'
+    
+    return response
+
 
 
 
@@ -85,23 +149,21 @@ def send_welcome_email(user):
 
 @app.route("/home/register", methods=['GET', 'POST'])
 def register():
+    next_page = request.args.get("next")  # 👈 Preserve it during GET and POST
+
     if current_user.is_authenticated:
         return redirect(url_for('home'))
 
     form = RegistrationForm()
     if form.validate_on_submit():
         try:
-            # Convert status to boolean (True for seller, False for buyer)
             is_seller = form.status.data == "seller"
-
-            # If user is a seller, ensure they provide shop details
             if is_seller and (not form.shop_name.data or not form.shop_motto.data):
                 flash('Shop name and motto are required for sellers!', 'danger')
-                return render_template('register.html', form=form)
+                return render_template('register.html', form=form, next=next_page)
 
             hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
 
-            # Generate slugs
             username_slug = generate_slug(form.username.data)
             shop_slug = generate_slug(form.shop_name.data) if is_seller else None
 
@@ -110,26 +172,28 @@ def register():
                 email=form.email.data,
                 phone_number=form.phone.data,
                 password=hashed_password,
-                is_admin=False,  # Assuming default is False
+                is_admin=False,
                 shop_name=form.shop_name.data.upper() if is_seller else None,
                 shop_motto=form.shop_motto.data if is_seller else None,
-                status=is_seller,  # True for sellers, False for buyers
-                slug=username_slug,  # Slug for username
-                slug1=shop_slug  # Slug for shop name
+                status=is_seller,
+                slug=username_slug,
+                slug1=shop_slug
             )
 
             db.session.add(user)
             db.session.commit()
-
-            flash('Account created successfully!', 'success')
             send_welcome_email(user)
-            return redirect(url_for('login'))  # Redirect to login page
+            flash('Account created successfully!', 'success')
+
+            # ✅ Redirect back to login with ?next=...
+            return redirect(url_for('login', next=next_page))
 
         except Exception as e:
-            flash("An error occurred while processing your registration. Please try again.", "danger")
-            print(e)  # Debugging purposes
+            flash("An error occurred during registration.", "danger")
+            print(e)
 
-    return render_template('register.html', form=form)
+    return render_template('register.html', form=form, next=next_page)
+
 
 
 
@@ -145,32 +209,27 @@ def is_safe_url(target):
 @app.route("/login", methods=['GET', 'POST'])
 def login():
     form = LoginForm()
-    
-    # Capture the 'next' parameter
-    next_page = request.args.get("next")
-    print(f"Next page before login: {next_page}")  # Debugging
+    next_page = request.args.get("next")  # 🔐 Captured from URL query
 
     if current_user.is_authenticated:
         return redirect(next_page) if next_page and is_safe_url(next_page) else redirect(url_for('home'))
 
     if form.validate_on_submit():
         user = User.query.filter_by(email=form.email.data).first()
-
         if user and bcrypt.check_password_hash(user.password, form.password.data):
             login_user(user, remember=form.remember.data)
             flash("Login successful!", "success")
 
-            # Capture 'next' again after login
-            next_page = request.args.get("next")
-            if not next_page or not is_safe_url(next_page):
-                next_page = request.referrer  # Use previous page as a fallback
-
-            print(f"Redirecting to: {next_page}")  # Debugging output
-            return redirect(next_page) if next_page else redirect(url_for('home'))
+            # ✅ Redirect to original destination if it’s safe
+            if next_page and is_safe_url(next_page):
+                return redirect(next_page)
+            else:
+                return redirect(url_for('home'))
         else:
             flash("Unsuccessful login. Incorrect credentials.", "danger")
 
-    return render_template("login.html", title="Login", form=form)
+    return render_template("login.html", title="Login", form=form, next=next_page)
+
 
 
 @app.route("/logout")
@@ -197,72 +256,102 @@ def check_subscription_status(user):
     # If no conditions are met, return False
     return False
 
+from datetime import date
+
+def get_today_visits(seller_id):
+    today = date.today()
+    visit_count = StoreVisit.query.filter(
+        StoreVisit.seller_id == seller_id,
+        func.date(StoreVisit.visit_time) == today
+    ).count()
+    return visit_count
+
 
 @app.route("/store/<string:shop_name>")
 def shop2(shop_name):
     image_file = None
     page = request.args.get('page', 1, type=int)
-    user= User.query.filter_by(slug1=shop_name).first_or_404()
+    
+    # Query the user and product in one go
+    user = User.query.filter_by(slug1=shop_name).first_or_404()
     is_valid = check_subscription_status(user)
-    product=Product.query.filter_by(user_id=user.id).first()
-    products=Product.query.filter_by(user_id=user.id).order_by(Product.date.desc()).paginate(page=page, per_page=10)
+
+    # --- Begin visit logging logic ---
+    seller_id = user.id
+    today = date.today()
 
     if current_user.is_authenticated:
-        image_file = url_for('static', filename='profile_pics/' + current_user.image_file)
-        page = request.args.get('page', 1, type=int)
+        if current_user.id != seller_id:
+            already_visited = StoreVisit.query.filter_by(
+                user_id=current_user.id,
+                seller_id=seller_id
+            ).filter(func.date(StoreVisit.visit_time) == today).first()
 
-        user= User.query.filter_by(slug1=shop_name).first_or_404()
-        product=Product.query.filter_by(user_id=user.id).first()
-        products=Product.query.filter_by(user_id=user.id).order_by(Product.date.desc()).paginate(page=page, per_page=10)
-        seller_id=product.user_id if product else None
+            if not already_visited:
+                visit = StoreVisit(user_id=current_user.id, seller_id=seller_id)
+                db.session.add(visit)
+                db.session.commit()
+    else:
+        # Generate a unique session ID if not present
+        if 'visitor_session' not in session:
+            session['visitor_session'] = str(uuid.uuid4())
+
+        session_id = session['visitor_session']
+
+        already_visited = StoreVisit.query.filter_by(
+            session_id=session_id,
+            seller_id=seller_id
+        ).filter(func.date(StoreVisit.visit_time) == today).first()
+
+        if not already_visited:
+            visit = StoreVisit(user_id=None, seller_id=seller_id, session_id=session_id)
+            db.session.add(visit)
+            db.session.commit()
+
+    visit_count = get_today_visits(seller_id)
+    # --- End visit logging logic ---
+
+    # Fetch products with a single query
+    products_query = Product.query.filter_by(user_id=user.id).order_by(Product.date.desc())
+    products = products_query.paginate(page=page, per_page=12)
+
+    if current_user.is_authenticated:
+        # Efficient retrieval of loved products using set comprehension
+        loved_product_ids = {love.product_id for love in Love.query.filter_by(user_id=current_user.id).all()}
+
+        # Efficient retrieval of cart items
+        seller_id = products_query.first().user_id if products_query.first() else None
         cart_items = get_cart_items_for_seller(current_user.id, seller_id)
         cart_count = len(cart_items) if cart_items else 0
-        loved_products = {love.product_id for love in Love.query.filter_by(user_id=current_user.id).all()}
-        
-        print(user.shop_image_file)
 
-        return render_template('shop.html',title='shop',image_file=image_file,products=products,user=user,loved_products=loved_products,product=product,cart_count=cart_count,is_valid=is_valid,shop_theme=user.shop_theme)
+        return render_template('shop.html',
+                               title='shop',
+                               products=products,
+                               user=user,
+                               visit_count=visit_count,
+                               loved_products=loved_product_ids,
+                               cart_count=cart_count,
+                               is_valid=is_valid,
+                               shop_theme=user.shop_theme)
     else:
-        return render_template('shop.html',title='shop',image_file=image_file,products=products,product=product,user=user,shop_theme='white',is_valid=is_valid)
+        # Render and cache the response only for unauthenticated users
+        rendered = render_template('shop.html',
+                                   title='shop',
+                                   image_file=image_file,
+                                   products=products,
+                                   user=user,
+                                   shop_theme=user.shop_theme,
+                                   is_valid=is_valid)
+
+        response = make_response(rendered)
+        response.headers['Cache-Control'] = 'public, max-age=300, s-maxage=600, stale-while-revalidate=900'
+        return response
 
 
-def save_picture(form_picture):
-    random_hex=secrets.token_hex(8)
-    _,f_ext=os.path.split(form_picture.filename)
-    picture_fn=random_hex +f_ext
-    picture_path=os.path.join(app.root_path, 'static/profile_pics', picture_fn)
 
-    output_size=(250,250)
-    i=Image.open(form_picture)
-    i.thumbnail(output_size)
-    i.save(picture_path)
 
-    return picture_fn
 
-def save_picture1(form_picture):
-    random_hex=secrets.token_hex(8)
-    _,f_ext=os.path.split(form_picture.filename)
-    picture_fn=random_hex +f_ext
-    picture_path=os.path.join(app.root_path, 'static/product_images', picture_fn)
 
-    output_size=(250,250)
-    i=Image.open(form_picture)
-    i.thumbnail(output_size)
-    i.save(picture_path)
-
-    return picture_fn
-def save_picture2(form_picture):
-    random_hex=secrets.token_hex(8)
-    _,f_ext=os.path.split(form_picture.filename)
-    picture_fn=random_hex +f_ext
-    picture_path=os.path.join(app.root_path, 'static/corasel', picture_fn)
-
-    output_size=(250,250)
-    i=Image.open(form_picture)
-    i.thumbnail(output_size)
-    i.save(picture_path)
-
-    return picture_fn
 
 @app.route("/home/Profile-Edit", methods=['GET', 'POST'])
 def profile_edit():
@@ -288,6 +377,7 @@ def profile_edit():
             current_user.status = current_user.status # True for sellers, False for buyers
             current_user.slug = user_slug # Generate a slug
             current_user.slug1 =user_slug2 # save genrated slug to shop_name coloum in database
+            current_user.shop_name = form.shop_name.data
             
             db.session.commit()
             flash('Profile Updated Successfully!', 'success')
@@ -468,50 +558,69 @@ def unlike_like_product(product_id):
 @login_required
 def Loved_items(): 
     page = request.args.get('page', 1, type=int)
-    product= Product.query.filter_by(user_id=current_user.id).all() 
+    product= Product.query.filter_by(user_id=current_user.id).limit(10).all()
     user= User.query.filter_by(id=current_user.id).first_or_404()
-    loves= Love.query.filter_by(user_id=current_user.id).order_by(Love.date.desc()).paginate(page=page, per_page=2)
+    loves= Love.query.filter_by(user_id=current_user.id).order_by(Love.date.desc()).paginate(page=page, per_page=10)
     
     return render_template('loved_items.html', loves=loves,product=product,user=user,shop_theme=current_user.shop_theme)
 
 
 
+
+
 @app.route("/store/<string:shop_name>/Product-page/<product_id>", methods=['GET', 'POST'])
-@login_required
 def product_page(product_id, shop_name):
-    """Display product details and retrieve the last track code from session"""
+    print("💾 Fetching product from database...")  # <-- this will show up in terminal/log if DB is hit
 
     product = Product.query.filter_by(id=product_id).first_or_404()
-    seller_id = product.user_id if product else None
     seller = User.query.filter_by(id=product.user_id).first()
-    cart_items = get_cart_items_for_seller(current_user.id, seller_id)
-    
-    # ✅ Count the number of items in the cart
-    cart_count = len(cart_items) if cart_items else 0
+    if current_user.is_authenticated:
+        cart_items = get_cart_items_for_seller(current_user.id, product.user_id)
+        cart_count = len(cart_items) if cart_items else 0
+        track_code = generate_track_code()
 
-    track_code = generate_track_code()
+        rendered = render_template(
+            'product_view.html', 
+            product=product, 
+            cart_count=cart_count, 
+            track_code=track_code, 
+            seller_id=product.user_id, 
+            shop_theme=seller.shop_theme
+        )
+    else:
+         rendered = render_template(
+            'product_view.html', 
+            product=product, 
+            seller_id=product.user_id, 
+            shop_theme=seller.shop_theme
+        )
 
-    return render_template(
-        'product_view.html', 
-        product=product, 
-        cart_count=cart_count, 
-        track_code=track_code, 
-        seller_id=seller_id, 
-        shop_theme=seller.shop_theme
-    )
+    response = make_response(rendered)
+    response.cache_control.public = True
+    response.cache_control.max_age = 300  # 5 minutes
+
+    return response
 
 
 
 @app.route("/Product-View/<shop_name>/<int:product_id>", methods=['GET', 'POST'])
-@login_required
-def product_page_neutral(product_id,shop_name):
-    product=Product.query.filter_by(id=product_id).first_or_404()
-    seller_id=product.user_id if product else None
-    seller = User.query.filter_by(id=product.user_id).first()
-
-    track_code = generate_track_code()
+def product_page_neutral(product_id, shop_name):
+    # Fetch the product details (no changes needed)
+    product = Product.query.filter_by(id=product_id).first_or_404()
     
-    return render_template('product_view2Neutral.html',product=product,track_code=track_code,seller_id=seller_id,shop_theme=seller.shop_theme)
+    # Fetch seller info (can cache this if needed to avoid redundant queries)
+    seller = User.query.filter_by(id=product.user_id).first()
+    
+    # Generate a track code for this product (no changes needed)
+    track_code = generate_track_code()
+
+    return render_template(
+        'product_view2Neutral.html',
+        product=product,
+        track_code=track_code,
+        seller_id=product.user_id,
+        shop_theme=seller.shop_theme
+    )
 
 @app.route('/Product-page/delete/<int:product_id>', methods=['POST', 'GET'])
 @login_required
@@ -624,13 +733,13 @@ def edit_product(product_id):
 def cart(seller_id):
     """Show cart items only for the current store's seller"""
     page = request.args.get('page', 1, type=int)
-    per_page = 1  # Number of items per page
+    per_page = 10  # Number of items per page
 
     seller = User.query.filter_by(id=seller_id).first_or_404()
 
     cart_items1 = get_cart_items_for_seller(current_user.id, seller.id)  # This returns a list
     track_code = generate_track_code()
-
+    total_amount = sum(item.product.amount * item.quantity for item in cart_items1)
     # Sort by date in descending order
     cart_items1.sort(key=lambda item: item.date, reverse=True)  
 
@@ -654,6 +763,7 @@ def cart(seller_id):
                            total_pages=total_pages,
                            track_code= track_code,
                            cart_count=cart_count,
+                           total_amount=total_amount,
                            shop_theme=seller.shop_theme
                            )
 
@@ -666,9 +776,9 @@ def get_cart_items_for_seller(user_id, seller_id):
 
 
 
-@app.route("/Cart_Item/<int:product_id>", methods=['GET', 'POST'])
+@app.route("/Cart_Item/<title>/<int:product_id>", methods=['GET', 'POST'])
 @login_required
-def Cart_product(product_id):
+def Cart_product(product_id,title):
     product = Product.query.get_or_404(product_id)
     
     # Get the quantity safely (default to 1 if missing)
@@ -691,8 +801,10 @@ def Cart_product(product_id):
         db.session.add(cart_product)
         db.session.commit()
         print("Added to cart")
-
-    return redirect(url_for('product_page', product_id=product.id, username=product.seller.slug,shop_name=product.seller.shop_name))
+    if title=='shop':
+        return redirect(url_for('shop2', shop_name=product.seller.slug1))
+    else:
+        return redirect(url_for('product_page', product_id=product.id,shop_name=product.seller.slug1))
 
 @app.route("/delete_cart/<int:product_id>,<int:seller_id>", methods=['GET', 'POST'])
 @login_required
@@ -704,13 +816,14 @@ def delete_cart_item(product_id,seller_id):
 
 
 def generate_track_code():
-    """Generate a unique 6-digit track code"""
+    """Generate a unique 6-digit track code as a string"""
     while True:
-        track_code = random.randint(100000, 999999)  # Generate a 6-digit number
+        track_code = str(random.randint(100000, 999999))  # Convert to string immediately
         existing_order = Order.query.filter_by(track_code=track_code).first()
 
         if not existing_order:
-            return track_code  # Ensure uniqueness
+            return track_code
+
 
 
 @app.route("/checkout/<int:seller_id>/<string:track_code>", methods=['GET', 'POST'])
@@ -728,14 +841,14 @@ def checkout(seller_id,track_code):
     #track_code = generate_track_code()
     # Calculate total amount
     total_amount = sum(item.product.amount * item.quantity for item in cart_items)
-    print(total_amount)
+    #print(total_amount)
     # Create an order
     order = Order(user_id=current_user.id, seller_id=seller_id,total_amount=total_amount,track_code=track_code)
     db.session.add(order)
     db.session.commit()
-    print(order)
-    notification=Notification(user_id=seller.id,content=f'{current_user.username} place an order with trackcode number: {track_code}',initiator=current_user.id)
-    print(notification)
+    #print(order)
+    notification=Notification(user_id=seller.id,content=f'{current_user.username} place an order with trackcode number: {track_code}',initiator=current_user.id,is_read=False)
+    #print(notification)
     db.session.add(notification)
     db.session.commit
 
@@ -785,10 +898,11 @@ def send_order_whatsapp(seller_id, track_code):
     return redirect(whatsapp_url)
 
 
-@app.route("/Loved_items/place/order<int:seller_id>,<int:product_id>,<string:track_code>", methods=['GET', 'POST'])
+@app.route("/Loved_items/place/order<int:seller_id>/<int:product_id>/<string:track_code>", methods=['GET', 'POST'])
 @login_required
 def checkout2(seller_id,product_id,track_code):
     """Process checkout for a specific seller"""
+    seller = User.query.filter_by(id=seller_id).first_or_404()
     product=Product.query.filter_by(id=product_id).first()
     """Get quantity"""
     quantity = request.form.get('quantity', type=int)
@@ -803,6 +917,10 @@ def checkout2(seller_id,product_id,track_code):
     db.session.add(order)
     db.session.commit()
     print(order)
+    notification=Notification(user_id=seller.id,content=f'{current_user.username} place an order with trackcode number: {track_code}',initiator=current_user.id)
+    #print(notification)
+    db.session.add(notification)
+    db.session.commit
 
     order_item = OrderItem(
         order_id=order.id,
@@ -817,7 +935,8 @@ def checkout2(seller_id,product_id,track_code):
     
     
     flash("Your order has been placed successfully!", "success")
-    return redirect(url_for('Loved_items'))
+    return redirect(url_for('product_page_neutral', product_id=product.id,shop_name=seller.slug1,success="true"))
+
 
 
 
@@ -832,36 +951,37 @@ import calendar
 from collections import defaultdict
 import calendar
 
+from sqlalchemy import func, extract
+
+
+
+
+from sqlalchemy import func, extract
+from collections import defaultdict
 
 @app.route("/seller/orders")
+@limiter.limit("10 per second")
 @login_required
 def seller_orders():
-    """Display seller orders with pagination and calculate analytics"""
-
-    is_valid = check_subscription_status(current_user)#check subcription status first
-    # 📌 Get current page number from the request (default to 1)
+    """Display seller orders with pagination and analytics."""
+    is_valid = check_subscription_status(current_user)
     page = request.args.get("page", 1, type=int)
-
-    # 📌 Fetch orders for the current page (10 orders per page)
     per_page = 10
+
+    # Paginate orders
     pagination = (
         Order.query.filter_by(seller_id=current_user.id)
         .order_by(Order.created_at.desc())
         .paginate(page=page, per_page=per_page, error_out=False)
     )
+    orders = pagination.items
 
-    orders = pagination.items  # ✅ Current page orders
+    # ✅ Total orders count (cheap)
+    total_orders = db.session.query(func.count(Order.id)).filter_by(seller_id=current_user.id).scalar()
 
-    # 📌 Fetch **all** orders for accurate analytics
-    all_orders = Order.query.filter_by(seller_id=current_user.id).all()
+    # ✅ Total revenue (cheap)
+    total_revenue_raw = db.session.query(func.sum(Order.total_amount)).filter_by(seller_id=current_user.id).scalar() or 0
 
-    # ✅ Get total orders count
-    total_orders = len(all_orders)
-
-    # ✅ Calculate total revenue from all orders
-    total_revenue = sum(order.total_amount for order in all_orders)
-
-    # ✅ Format total revenue
     def format_number(value):
         if value >= 1_000_000:
             return f"{value / 1_000_000:.1f}M"
@@ -869,40 +989,49 @@ def seller_orders():
             return f"{value / 1_000:.0f}k"
         return str(value)
 
-    formatted_total_revenue = format_number(total_revenue)
+    formatted_total_revenue = format_number(total_revenue_raw)
 
-    # ✅ Extract unique customers from all orders
-    unique_customers = {}
-    for order in all_orders:
-        if order.user_id not in unique_customers:
-            unique_customers[order.user_id] = {
-                "name": order.user.username,
-                "phone_number": order.user.phone_number,
-            }
+    # ✅ Get unique customer user IDs efficiently
+    user_ids = [row[0] for row in db.session.query(Order.user_id)
+                .filter_by(seller_id=current_user.id).distinct()]
+    user_details = User.query.filter(User.id.in_(user_ids)).all()
 
+    unique_customers = {
+        user.id: {"name": user.username, "phone_number": user.phone_number}
+        for user in user_details
+    }
     total_customers = len(unique_customers)
 
-    # ✅ Monthly revenue calculations
+    # ✅ Monthly revenue using GROUP BY SQL
+    monthly_data = db.session.query(
+        extract('month', Order.created_at).label('month'),
+        func.sum(Order.total_amount)
+    ).filter_by(seller_id=current_user.id).group_by('month').all()
+
     monthly_revenue = defaultdict(float)
-    for order in all_orders:
-        order_month = order.created_at.month
-        monthly_revenue[order_month] += order.total_amount
+    for month, amount in monthly_data:
+        monthly_revenue[int(month)] = float(amount)
 
     sales_data = {
         "months": [calendar.month_abbr[m] for m in range(1, 13)],
         "revenue": [monthly_revenue[m] for m in range(1, 13)],
     }
 
-    # 📌 Order Status Data for Pie Chart
-    status_count = {"Pending": 0, "Shipped": 0, "Delivered": 0, "Cancelled": 0}
-    for order in all_orders:
-        if order.status in status_count:
-            status_count[order.status] += 1
+    # ✅ Order status counts using GROUP BY SQL
+    raw_status_data = db.session.query(
+        Order.status, func.count(Order.id)
+    ).filter_by(seller_id=current_user.id).group_by(Order.status).all()
 
-    return render_template(
+    status_count = {"Pending": 0, "Shipped": 0, "Delivered": 0, "Cancelled": 0}
+    for status, count in raw_status_data:
+        if status in status_count:
+            status_count[status] = count
+
+    # ✅ Render and cache the page
+    rendered = render_template(
         "seller_orders.html",
         orders=orders,
-        pagination=pagination,  # ✅ Pass pagination object
+        pagination=pagination,
         total_orders=total_orders,
         total_revenue=formatted_total_revenue,
         total_customers=total_customers,
@@ -910,8 +1039,20 @@ def seller_orders():
         sales_data=sales_data,
         status_data=status_count,
         shop_theme=current_user.shop_theme,
-        is_valid=is_valid
+        is_valid=is_valid,
     )
+
+    response = make_response(rendered)
+    response.headers["Cache-Control"] = "public, max-age=300, s-maxage=600, stale-while-revalidate=900"
+    return response
+
+
+
+
+
+
+
+
 
 
 @app.route("/seller/order_items/<int:order_id>")
@@ -927,12 +1068,12 @@ def get_order_items(order_id):
 
     return jsonify({
         "track_code": order.track_code,
-        "total_cost": f"${total_cost:.2f}",  # ✅ Format total cost
+        "total_cost": f"₦{total_cost:.2f}",  # ✅ Format total cost
         "items": [
             {
                 "product_name": item.product.name,
                 "quantity": item.quantity,
-                "amount": f"${item.amount:.2f}",
+                "amount": f"₦{item.amount:.2f}",
                 "product_image": url_for('static', filename=f'product_images/{item.product.image}')
             }
             for item in order.order_items
@@ -942,11 +1083,24 @@ def get_order_items(order_id):
 @app.route("/buyer/orders")
 @login_required
 def buyer_orders():
+    """Display paginated orders for the logged-in buyer"""
     
-    """Display all orders for the logged-in buyer"""
-    orders = Order.query.filter_by(user_id=current_user.id).order_by(Order.created_at.desc()).all()
+    # Get the current page number from the URL query string (?page=2), default to 1
+    page = request.args.get('page', 1, type=int)
+    
+    # Query and paginate orders
+    orders_paginated = (
+        Order.query
+        .filter_by(user_id=current_user.id)
+        .order_by(Order.created_at.desc())
+        .paginate(page=page, per_page=10)
+    )
 
-    return render_template("buyer_orders.html", orders=orders)
+    return render_template(
+        "buyer_orders.html",
+        orders=orders_paginated.items,     # list of Order objects for this page
+        pagination=orders_paginated,       # full pagination object for next/prev etc.
+    )
 
 @app.route("/buyer/order_items/<int:order_id>")
 @login_required
@@ -960,12 +1114,12 @@ def get_order_itemss(order_id):
 
     return jsonify({
         "track_code": order.track_code,
-        "total_cost": f"${total_cost:.2f}",  # ✅ Format total cost
+        "total_cost": f"₦{total_cost:.2f}",  # ✅ Format total cost
         "items": [
             {
                 "product_name": item.product.name,
                 "quantity": item.quantity,
-                "amount": f"${item.amount:.2f}",
+                "amount": f"₦{item.amount:.2f}",
                 "product_image": url_for('static', filename=f'product_images/{item.product.image}')
             }
             for item in order.order_items
@@ -1074,22 +1228,27 @@ def search_orders():
             "track_code": order.track_code,
             "buyer": order.user.username,
             "total_amount": order.total_amount,
-            "status": order.status
+            "status": order.status,
+            "date" : order.created_at
         }
         for order in filtered_orders
     ]
 
     return jsonify(orders_data)
 
+
+
 @app.route("/search_products", methods=["POST"])
 def search_products():
-    search_query = request.form.get("content")
-    user_id = request.form.get("user_id")  # Ensure you get the correct user ID
+    search_query = request.form.get("content", "").strip()
+    user_id = request.form.get("user_id")
+    page = int(request.form.get("page", 1))
+    per_page = 1
 
-    products = Product.query.filter(
+    pagination = Product.query.filter(
         Product.name.ilike(f"%{search_query}%"),
         Product.user_id == user_id
-    ).all()
+    ).paginate(page=page, per_page=per_page, error_out=False)
 
     product_list = [
         {
@@ -1097,33 +1256,98 @@ def search_products():
             "name": product.name,
             "amount": product.amount,
             "image": product.image,
-            "description":product.description,
-            "shop_slug": product.seller.slug1 
+            "description": product.description,
+            "shop_slug": product.seller.slug1  # make sure relationship is set up
         }
-        for product in products
+        for product in pagination.items
     ]
 
-    return jsonify(product_list)
+    return jsonify({
+        "products": product_list,
+        "total": pagination.total,
+        "pages": pagination.pages,
+        "current_page": pagination.page,
+        "has_next": pagination.has_next,
+        "has_prev": pagination.has_prev
+    })
+
+
+
+from math import ceil
+
+@app.route("/home/find_products", methods=["POST"])
+def find_products():
+    search_query = request.form.get("content")
+    page = int(request.form.get("page", 1))  # Default to page 1
+    per_page = 2  # Number of products per page
+
+    products_query = Product.query.filter(
+        Product.name.ilike(f"%{search_query}%")
+    )
+
+    paginated_products = products_query.paginate(page=page, per_page=per_page, error_out=False)
+
+    product_list = [
+        {
+            "id": product.id,
+            "name": product.name,
+            "amount": product.amount,
+            "image": product.image,
+            "description": product.description,
+            "shop_slug": product.seller.slug1
+        }
+        for product in paginated_products.items
+    ]
+
+    return jsonify({
+        "products": product_list,
+        "has_next": paginated_products.has_next,
+        "has_prev": paginated_products.has_prev,
+        "total_pages": paginated_products.pages,
+        "current_page": paginated_products.page
+    })
 
 
 
 @app.route('/notification', methods=['GET', 'POST'])
 @login_required
 def notification():
-    notifications = Notification.query.filter_by(user_id=current_user.id).order_by(Notification.date.desc()).limit(10).all()
-    enriched_notifications = []
+    # Join Notification and User (as initiator) in a single query
+    notifications = (
+        db.session.query(Notification, User)
+        .join(User, User.id == Notification.initiator)
+        .filter(Notification.user_id == current_user.id)
+        .order_by(Notification.date.desc())
+        .limit(10)
+        .all()
+    )
 
-    for notification in notifications:
-        initiator = User.query.get(notification.initiator)  # Fetch the initiator
-        enriched_notifications.append({
+    # Mark all as read
+    for notification, initiator in notifications:
+        if not notification.is_read:
+            notification.is_read = True
+
+    db.session.commit()
+
+    # Restructure for template
+    enriched_notifications = [
+        {
             'notification': notification,
-            'initiator': initiator,
-        })
-
-        print(enriched_notifications)
+            'initiator': initiator
+        }
+        for notification, initiator in notifications
+    ]
 
     image_file = url_for('static', filename='profile_pics/' + current_user.image_file)
-    return render_template('notification.html',title='Notification',notifications=enriched_notifications,image_file=image_file,shop_theme=current_user.shop_theme)
+    return render_template(
+        'notification.html',
+        title='Notification',
+        notifications=enriched_notifications,
+        image_file=image_file,
+        shop_theme=current_user.shop_theme
+    )
+
+
 
 @app.route('/pricing', methods=['GET', 'POST'])
 def pricing():
@@ -1427,3 +1651,92 @@ def personal_info():
                 cooldown_remaining = int(300 - elapsed)
 
     return render_template("personal_info.html", form=form, show_verification=show_verification, cooldown=cooldown_remaining,shop_theme=current_user.shop_theme)
+
+
+
+
+
+@app.route('/top-sellers')
+def top_sellers():
+    range_filter = request.args.get('range', 'overall')
+    now = datetime.utcnow()
+
+    # Define date filter for non-overall
+    if range_filter == 'day':
+        start_date = now.date()
+    elif range_filter == 'week':
+        start_date = now - timedelta(days=now.weekday())
+    elif range_filter == 'month':
+        start_date = now.replace(day=1)
+    else:
+        start_date = None
+
+    if range_filter == 'overall':
+        visit_subquery = db.session.query(
+            StoreVisit.seller_id,
+            func.count(StoreVisit.id).label('visit_count')
+        ).group_by(StoreVisit.seller_id).subquery()
+
+        order_subquery = db.session.query(
+            Order.seller_id,
+            func.count(Order.id).label('order_count'),
+            func.coalesce(func.sum(Order.total_amount), 0).label('total_sales'),
+            func.count(func.distinct(Order.user_id)).label('customer_count')
+        ).group_by(Order.seller_id).subquery()
+
+        VISIT_WEIGHT = 0.25
+        ORDER_WEIGHT = 0.25
+        SALES_WEIGHT = 0.3
+        CUSTOMER_WEIGHT = 0.2
+
+        query = db.session.query(
+            User,
+            func.coalesce(visit_subquery.c.visit_count, 0).label('visit_count'),
+            func.coalesce(order_subquery.c.order_count, 0).label('order_count'),
+            func.coalesce(order_subquery.c.total_sales, 0).label('total_sales'),
+            func.coalesce(order_subquery.c.customer_count, 0).label('customer_count'),
+            (
+                VISIT_WEIGHT * func.coalesce(visit_subquery.c.visit_count, 0) +
+                ORDER_WEIGHT * func.coalesce(order_subquery.c.order_count, 0) +
+                SALES_WEIGHT * func.coalesce(order_subquery.c.total_sales, 0) +
+                CUSTOMER_WEIGHT * func.coalesce(order_subquery.c.customer_count, 0)
+            ).label('score')
+        ).outerjoin(visit_subquery, User.id == visit_subquery.c.seller_id
+        ).outerjoin(order_subquery, User.id == order_subquery.c.seller_id
+        ).filter(
+            User.shop_name.isnot(None),
+            User.is_verified == True
+        ).order_by(desc('score'))
+
+    else:
+        order_subquery = db.session.query(
+            Order.seller_id,
+            func.count(Order.id).label('order_count'),
+            func.coalesce(func.sum(Order.total_amount), 0).label('total_sales')
+        ).filter(Order.created_at >= start_date
+        ).group_by(Order.seller_id).subquery()
+
+        query = db.session.query(
+            User,
+            func.coalesce(order_subquery.c.order_count, 0).label('order_count'),
+            func.coalesce(order_subquery.c.total_sales, 0).label('total_sales')
+        ).outerjoin(order_subquery, User.id == order_subquery.c.seller_id
+        ).filter(
+            User.shop_name.isnot(None),
+            User.is_verified == True
+        ).order_by(
+            desc('order_count'),
+            desc('total_sales')
+        )
+
+    sellers = query.limit(10).all()
+    rendered = render_template('top_sellers.html', sellers=sellers, selected_range=range_filter)
+
+    # ✅ Apply Vercel Edge Caching (5 min public cache)
+    response = make_response(rendered)
+    response.headers['Cache-Control'] = 'public, max-age=300, s-maxage=600, stale-while-revalidate=900'
+    return response
+
+
+
+

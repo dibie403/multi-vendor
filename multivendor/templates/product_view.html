@@ -47,7 +47,7 @@
                 <div class="color-option selected"></div>
             </div>
 
-           <form action="{{ url_for('Cart_product', product_id=product.id) }}" method="POST">
+           <form action="{{ url_for('Cart_product', product_id=product.id,title='store') }}" method="POST">
                 <!-- Quantity Selector -->
                 <div class="d-flex align-items-center gap-3 mt-3">
                     <label for="quantity">Quantity:</label>
@@ -68,14 +68,28 @@
         </div>
     </div>
 
+    {%if cart_count == 0 %}
+
     <!-- Buttons -->
-            <form id="checkoutForm" action="{{ url_for('checkout', seller_id=product.user_id,track_code=track_code) }}" method="POST">
+            <form >
                 <div class="d-flex gap-3 mt-3">
-                    <button type="button" class="btn btn-warning" id="placeOrderBtn">
+                    <button type="button" class="btn btn-warning disabled">
                         Place Order {{ cart_count }} 🛒
                     </button>
                 </div>
             </form>
+    {% else %}
+           <!-- <form id="checkoutForm" action="{{ url_for('checkout', seller_id=product.user_id,track_code=track_code) }}" method="POST">
+                <div class="d-flex gap-3 mt-3">
+                    <button type="button" class="btn btn-warning" id="placeOrderBtn">
+                        Place Order( {{ cart_count }} items)
+                    </button>
+                </div>
+            </form>-->
+            <a href="{{ url_for('cart', seller_id=product.user_id) }}" class="btn btn-warning btn-success">Place Order( {{ cart_count }} items)</a>
+    {% endif %}
+
+    
   </div>
 
  </div>
@@ -190,6 +204,8 @@ document.getElementById("placeOrderBtn").addEventListener("click", function (eve
             document.getElementById("whatsappBtn").setAttribute("href", whatsappUrl);
         }
     });
+
+
 </script>
 
 

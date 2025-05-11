@@ -1,0 +1,169 @@
+@app.route("/seller/orders")
+@limiter.limit("10 per second")  # Max 10 requests per second
+@login_required
+def seller_orders():
+    """Display seller orders with pagination and analytics."""
+
+    is_valid = check_subscription_status(current_user)
+
+    # Get current page
+    page = request.args.get("page", 1, type=int)
+    per_page = 10
+
+    # 📌 Paginate orders for the seller
+    pagination = (
+        Order.query.filter_by(seller_id=current_user.id)
+        .order_by(Order.created_at.desc())
+        .paginate(page=page, per_page=per_page, error_out=False)
+    )
+    orders = pagination.items
+
+    # 📌 Fetch all orders (for analytics)
+    all_orders = Order.query.filter_by(seller_id=current_user.id).all()
+
+    # ✅ Total orders count
+    total_orders = len(all_orders)
+
+    # ✅ Total revenue
+    total_revenue = sum(order.total_amount for order in all_orders)
+
+    def format_number(value):
+        if value >= 1_000_000:
+            return f"{value / 1_000_000:.1f}M"
+        elif value >= 1_000:
+            return f"{value / 1_000:.0f}k"
+        return str(value)
+
+    formatted_total_revenue = format_number(total_revenue)
+
+    # ✅ Get unique customer IDs using DISTINCT
+    unique_customer_ids = db.session.query(Order.user_id).filter_by(seller_id=current_user.id).distinct().all()
+    user_ids = [row[0] for row in unique_customer_ids]
+
+    # ✅ Fetch user details in one query
+    user_details = User.query.filter(User.id.in_(user_ids)).all()
+
+    # ✅ Build customer data dict
+    unique_customers = {
+        user.id: {"name": user.username, "phone_number": user.phone_number}
+        for user in user_details
+    }
+
+    total_customers = len(unique_customers)
+
+    # ✅ Monthly revenue
+    monthly_revenue = defaultdict(float)
+    for order in all_orders:
+        order_month = order.created_at.month
+        monthly_revenue[order_month] += order.total_amount
+
+    sales_data = {
+        "months": [calendar.month_abbr[m] for m in range(1, 13)],
+        "revenue": [monthly_revenue[m] for m in range(1, 13)],
+    }
+
+    # ✅ Order status for pie chart
+    status_count = {"Pending": 0, "Shipped": 0, "Delivered": 0, "Cancelled": 0}
+    for order in all_orders:
+        if order.status in status_count:
+            status_count[order.status] += 1
+
+    return render_template(
+        "seller_orders.html",
+        orders=orders,
+        pagination=pagination,
+        total_orders=total_orders,
+        total_revenue=formatted_total_revenue,
+        total_customers=total_customers,
+        unique_customers=unique_customers,
+        sales_data=sales_data,
+        status_data=status_count,
+        shop_theme=current_user.shop_theme,
+        is_valid=is_valid,
+    )
+    # ✅ Wrap and cache-control
+    response = make_response(rendered)
+    response.headers["Cache-Control"] = "public, max-age=300, s-maxage=600, stale-while-revalidate=900"
+    return response
+
+
+
+@app.route("/store/<string:shop_name>")
+
+def shop2(shop_name):
+    image_file = None
+    page = request.args.get('page', 1, type=int)
+    
+    # Query the user and product in one go
+    user = User.query.filter_by(slug1=shop_name).first_or_404()
+    is_valid = check_subscription_status(user)
+
+     # --- Begin visit logging logic ---
+    seller_id = user.id
+    today = date.today()
+
+    if current_user.is_authenticated:
+        if current_user.id != seller_id:
+            already_visited = StoreVisit.query.filter_by(
+                user_id=current_user.id,
+                seller_id=seller_id
+            ).filter(func.date(StoreVisit.visit_time) == today).first()
+
+            if not already_visited:
+                visit = StoreVisit(user_id=current_user.id, seller_id=seller_id)
+                db.session.add(visit)
+                db.session.commit()
+    else:
+        # Generate a unique session ID if not present
+        if 'visitor_session' not in session:
+            session['visitor_session'] = str(uuid.uuid4())
+
+        session_id = session['visitor_session']
+
+        already_visited = StoreVisit.query.filter_by(
+            session_id=session_id,
+            seller_id=seller_id
+        ).filter(func.date(StoreVisit.visit_time) == today).first()
+
+        if not already_visited:
+            visit = StoreVisit(user_id=None, seller_id=seller_id, session_id=session_id)
+            db.session.add(visit)
+            db.session.commit()
+
+    visit_count = get_today_visits(seller_id)
+    # --- End visit logging logic ---
+
+    # Fetch products with a single query
+    products_query = Product.query.filter_by(user_id=user.id).order_by(Product.date.desc())
+    products = products_query.paginate(page=page, per_page=12)
+
+
+    if current_user.is_authenticated:
+        
+
+        # Efficient retrieval of loved products using set comprehension
+        loved_product_ids = {love.product_id for love in Love.query.filter_by(user_id=current_user.id).all()}
+
+        # Efficient retrieval of cart items
+        seller_id = products_query.first().user_id if products_query.first() else None
+        cart_items = get_cart_items_for_seller(current_user.id, seller_id)
+        cart_count = len(cart_items) if cart_items else 0
+
+        return render_template('shop.html',
+                               title='shop',
+                               products=products,
+                               user=user,
+                               visit_count=visit_count,
+                               loved_products=loved_product_ids,
+                               cart_count=cart_count,
+                               is_valid=is_valid,
+                               shop_theme=user.shop_theme)
+    else:
+        return render_template('shop.html',
+                               title='shop',
+                               image_file=image_file,
+                               products=products,
+                               user=user,
+                               shop_theme=user.shop_theme,
+                               is_valid=is_valid)
+    

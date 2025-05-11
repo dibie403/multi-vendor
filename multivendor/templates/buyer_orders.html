@@ -14,6 +14,7 @@
                     <th>Total Amount</th>
                     <th>Status</th>
                     <th>Actions</th>
+                    <th>Date</th>
                 </tr>
             </thead>
             <tbody>
@@ -22,7 +23,7 @@
                     <td>{{ loop.index }}</td>
                     <td>{{ order.track_code }}</td>
                     <td>{{ order.seller.shop_name }}</td>
-                    <td>${{ order.total_amount }}</td>
+                    <td>₦{{ order.total_amount }}</td>
                     <td>
                         <span class=" {% if order.status == 'Pending' %}badge-warning{% elif order.status == 'Shipped' %}badge-info{% elif order.status == 'Delivered' %}badge-success{% else %}badge-secondary{% endif %}">
                             {{ order.status }}
@@ -33,6 +34,8 @@
                             View Items
                         </button>
                     </td>
+                    <td>{{ order.created_at.strftime('%a, %d %b %Y') }}</td>
+
                 </tr>
                 
                 {% endfor %}
@@ -115,5 +118,32 @@ document.addEventListener("DOMContentLoaded", function() {
 
 
 </script>
+<!-- Pagination Controls -->
+<nav aria-label="Order Pagination">
+    <ul class="pagination justify-content-center">
+        {% if pagination.has_prev %}
+            <li class="page-item">
+                <a class="page-link" href="{{ url_for('buyer_orders', page=pagination.prev_num) }}">Previous</a>
+            </li>
+        {% endif %}
+        
+        {% for num in pagination.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}
+            {% if num %}
+                <li class="page-item {% if num == pagination.page %}active{% endif %}">
+                    <a class="page-link" href="{{ url_for('buyer_orders', page=num) }}">{{ num }}</a>
+                </li>
+            {% else %}
+                <li class="page-item disabled"><span class="page-link">...</span></li>
+            {% endif %}
+        {% endfor %}
+
+        {% if pagination.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="{{ url_for('buyer_orders', page=pagination.next_num) }}">Next</a>
+            </li>
+        {% endif %}
+    </ul>
+</nav>
+
 
 {% endblock %}

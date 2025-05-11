@@ -9,27 +9,27 @@
     <li data-target="#carouselExampleIndicators" data-slide-to="2"></li>
   </ol>
 
-  <div class="carousel-inner">
+   <div class="carousel-inner">
     <div class="carousel-item active">
-      <img src="{{ url_for('static', filename='images/20250207_051158.jpg') }}" class="d-block w-100" alt="Slide 1">
+      <img src="{{ url_for('static', filename='corasel/20250414_160300.jpg') }}" class="d-block w-100" alt="Slide 1">
       <div class="carousel-caption custom-caption">
-        <h4>🔥 Big Sale Today!</h4>
-        <p>Up to 50% OFF on selected items.</p>
+        <h4>--</h4>
+        <p>--</p>
       </div>
     </div>
 
     <div class="carousel-item">
-     <img src="{{ url_for('static', filename='images/corosel.png') }}" class="d-block w-100" alt="Slide 2">
+      <img src="{{ url_for('static', filename='corasel/image2coro.png') }}" class="d-block w-100" alt="Slide 2">
       <div class="carousel-caption custom-caption">
-        <h4>🛍️ Shop the Trend</h4>
-        <p>New arrivals, great deals!</p>
+        <h4 style="color:white;">🛍️ Shop the Trend</h4>
+        <strong style="color:green" ;>New arrivals, great deals!</strong>
       </div>
     </div>
 
     <div class="carousel-item">
-      <img src="{{ url_for('static', filename='images/corosel.png') }}" class="d-block w-100" alt="Slide 3">
+      <img src="{{ url_for('static', filename='corasel/imagee1coro.png') }}" class="d-block w-100" alt="Slide 3">
       <div class="carousel-caption custom-caption">
-        <h4>🚚 Free Shipping!</h4>
+        <h4 style="color:white;">🚚 Free Shipping!</h4>
         <p>Orders above $99 only.</p>
       </div>
     </div>
@@ -44,6 +44,10 @@
     <span class="sr-only">Next</span>
   </a>
 </div>
+  <marquee behavior="scroll" direction="left" class="text-muted " scrollamount="4">
+            <small class="top-subtitle">Purchase items from Different Stores And Get In Touch instantly </p>
+    </marquee>     
+
 <!--<div class="search-box mt-4">
     <form method="POST" action="#" style="display: flex; align-items: center;">
       <input 
@@ -66,7 +70,7 @@
 {% block content2 %}
   <h3>Our Sidebar</h3>
   <div class="text muted">
-  <p>You can put any information here you'd like.</p>
+  <p class="text-muted">You can put any information here you'd like.</p>
   </div>
   <ul class="list-group">
     <li class="list-group-item">
@@ -76,7 +80,7 @@
       <a href="#">Announcements</a>
     </li>
     <li class="list-group-item">
-      <a href="calendars.html">Calendars</a>
+      <a href="{{url_for('top_sellers')}}">Top Sellers</a>
     </li>
     <li class="list-group-item">
       <a href="etc.html">etc</a>
@@ -84,61 +88,222 @@
   </ul>
 {% endblock %}
 
+
 {% block content3 %}
-<div class="content-section">
-
-
-
-  <h1 class="my-4 section-title">Featured Products 🛍️ </h1>
-
-  <div>
-    <div class="row product-grid">
-      {% for i in range(12): %}
-      <!-- Product 1 -->
-      <div class="col-6 col-sm-4 col-md-2 product-item" data-toggle="modal" data-target="#productModal1">
-        <div class="product-card">
-
-          <div class="image-container">
-            <img src="{{ url_for('static', filename='product_images/a4e99f7d40fab227ecfbc1ef268e453foutput.png') }}" class="card-img-top" alt="Wireless Headphones">
-            
-               <button class="love-icon" onclick="event.stopPropagation(); toggleLove(this)">🤍</button>
-          
-
-          </div>
-          <div class="card-body text-center">
-            <small class="card-title">Wireless Headphones</small>
-            <p class="card-text price">$59.99</p>
-          </div>
-        </div>
-      </div>
-
-      <!-- Product Modal 1 -->
-      <div class="modal fade" id="productModal1" tabindex="-1" role="dialog" aria-labelledby="productModalLabel1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered" role="document">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title">Wireless Headphones</h5>
-              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-              </button>
-            </div>
-            <div class="modal-body text-center">
-              <img src="{{ url_for('static', filename='images/download2.jpeg') }}" class="img-fluid mb-3" alt="Wireless Headphones">
-              <p>High-quality wireless headphones with noise cancellation and long battery life.</p>
-              <p class="price" href="{{ url_for('notification') }}">$59.99</p>
-              <button class="btn btn-add-cart" href="{{ url_for('notification') }}">Add to cart 🛒</button>
-              <button class="btn btn-warning" href="{{url_for('register')}}">View product 🛒</button>
-            </div>
-          </div>
-        </div>
-      </div>
-    {% endfor %}     
+<!-- Spinner -->
+<div id="loadingSpinner" style="display: none; text-align: center; margin: 20px;">
+    <div class="spinner-border text-success" role="status">
+        <span class="sr-only">Loading...</span>
+    </div>
 </div>
+
+<!-- Search and Filter Icon -->
+<div class="d-flex align-items-center justify-content-between mt-2">
+    <!-- Search Box -->
+    <div class="search-box11 form" style="flex-grow: 1; max-width: 70%;">
+        <form id="searchForm">
+            <div class="input-group">
+                <input type="text" name="content" id="searchInput" class="form-control" placeholder="Search...">
+                <div class="input-group-append">
+                    <button type="submit" class="btn btn-primary">Search</button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- Filter Icon Button -->
+    <div class="ml-3">
+        <button id="filterButton" class="btn btn-outline-secondary" title="Filter">
+            <i class="fas fa-filter"></i> <!-- Font Awesome icon -->
+        </button>
+    </div>
+</div>
+
+<!-- Search Results -->
+<ul id="searchResults" class="mt-3"></ul>
+
+<div class="content-section">
+    <h1 class="my-4 section-title mb-1">General Marketplace 🛍️ </h1>
+    <small class="top-subtitle">Shop Varieties Of Items From Different Stores</small>
+
+    <div>
+        <div class="row product-grid">
+            {% for product in products %}
+                <!-- Product Item -->
+                <div class="col-6 col-sm-4 col-md-2 product-item" data-toggle="modal" data-target="#productModal{{ product.id }}">
+                    <div class="product-card">
+                        <div class="image-container">
+                            <img src="{{ url_for('static', filename='product_images/' + product.image) }}" class="card-img-top" alt="{{ product.name }}">
+                            {% if current_user.is_authenticated %}
+                                <button class="love-icon {% if product.id in loved_products %}active{% endif %}" 
+                                        data-product-id="{{ product.id }}" 
+                                        onclick="event.stopPropagation(); toggleLove(this)">
+                                    {% if product.id in loved_products %}💚{% else %}🤍{% endif %}
+                                </button>
+                            {% else %}
+                               <button class="love-icon" onclick="event.stopPropagation(); toggleLove(this)">🤍</button>
+                            {% endif %}
+                        </div>
+                        <div class="card-body text-center">
+                            <small class="card-title">{{ product.name }}</small>
+                            <p class="card-text price">${{ product.amount }}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Product Modal -->
+                <div class="modal fade" id="productModal{{ product.id }}" tabindex="-1" role="dialog" aria-labelledby="productModalLabel{{ product.id }}" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">{{ product.name }}</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body text-center">
+                                <img src="{{ url_for('static', filename='product_images/' + product.image) }}" class="img-fluid mb-3" alt="{{ product.name }}">
+                                <p>{{ product.description }}</p>
+                                <p class="price">${{ product.amount }}</p>
+                                <a class="btn btn-add-cart" href="{{ url_for('product_page_neutral', product_id=product.id, shop_name=product.seller.slug1) }}">View product 🛒</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+
+        <!-- Load More Button Container -->
+        <div id="loadMoreButtonContainer" class="text-center" style="margin-top: 20px;"></div>
+    </div>
+</div>
+
 <script>
 function toggleLove(icon) {
   icon.classList.toggle('active');
   icon.textContent = icon.classList.contains('active') ? '💚' : '🤍';
 }
+
+let currentPage = 1; // Initialize to the first page
+
+document.getElementById("searchForm").addEventListener("submit", function (event) {
+    event.preventDefault();
+
+    let searchQuery = document.getElementById("searchInput").value.trim();
+
+    // Call the function to load products for the current page
+    loadProducts(searchQuery, currentPage);
+});
+
+function loadProducts(searchQuery, page) {
+    const spinner = document.getElementById("loadingSpinner");
+    spinner.style.display = "block"; // Show spinner
+
+    fetch("/home/find_products", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: `content=${encodeURIComponent(searchQuery)}&page=${page}`
+    })
+    .then(response => response.json())
+    .then(data => {
+        const productGrid = document.querySelector(".product-grid");
+        const loadMoreButtonContainer = document.getElementById("loadMoreButtonContainer");
+        productGrid.innerHTML = "";
+
+        const contentBlock = document.querySelector("#content2");
+        if (contentBlock) contentBlock.style.display = "none";
+
+        if (data.products.length === 0) {
+            productGrid.innerHTML = "<p>No products found.</p>";
+        } else {
+            let output = "";
+            data.products.forEach(product => {
+                output += `
+                    <div class="col-6 col-sm-4 col-md-2 product-item">
+                        <div class="product-card open-modal" data-target="#productModal${product.id}">
+                            <div class="image-container">
+                                <img src="/static/product_images/${product.image}" class="card-img-top" alt="${product.name}">
+                            </div>
+                            <div class="card-body text-center">
+                                <small class="card-title">${product.name}</small>
+                                <p class="card-text price">$${product.amount}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal fade" id="productModal${product.id}" tabindex="-1" role="dialog" aria-labelledby="productModalLabel${product.id}" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title">${product.name}</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body text-center">
+                                    <img src="/static/product_images/${product.image}" class="img-fluid mb-3" alt="${product.name}">
+                                    <p class="product-description">${product.description}</p>
+                                    <p class="price"><strong>Price: </strong>$${product.amount}</p>
+                                    <button class="btn btn-add-cart view-product" data-product-id="${product.id}" data-seller-shop_name="${product.shop_slug}">View product 🛒</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            productGrid.innerHTML = output;
+
+            document.querySelectorAll(".open-modal").forEach(button => {
+                button.addEventListener("click", function () {
+                    const target = this.getAttribute("data-target");
+                    $(target).modal("show");
+                });
+            });
+
+            loadMoreButtonContainer.innerHTML = "";
+
+            if (data.has_next) {
+                const loadMoreButton = document.createElement("button");
+                loadMoreButton.classList.add("btn", "btn-primary");
+                loadMoreButton.textContent = "Load More";
+                loadMoreButton.style.maxWidth = "200px";
+                loadMoreButton.style.marginTop = "20px";
+
+                loadMoreButton.addEventListener("click", function () {
+                    currentPage++;
+                    loadProducts(searchQuery, currentPage);
+                });
+
+                loadMoreButtonContainer.appendChild(loadMoreButton);
+            }
+        }
+    })
+    .catch(error => {
+        console.error("Error fetching products:", error);
+        alert("An error occurred. Please try again.");
+    })
+    .finally(() => {
+        spinner.style.display = "none"; // Hide spinner whether success or error
+    });
+}
+
+
+// ✅ Handle "Add to Cart" and "View Product" Clicks
+document.addEventListener("click", function (event) {
+    if (event.target.classList.contains("view-product")) {
+        let productId = event.target.getAttribute("data-product-id");
+        let shop_name = event.target.getAttribute("data-seller-shop_name");
+        window.location.href = `/Product-View/${shop_name}/${productId}`;
+    }
+});
+document.getElementById('filterButton').addEventListener('click', function() {
+    // Show your filter options
+    alert('Filter options will appear here!');
+});
+
+
+
 </script>
 
 {% endblock %}

@@ -55,23 +55,23 @@
     </div>
 
     <!-- Buttons -->
-            <form id="checkoutForm" action="{{ url_for('checkout2', seller_id=product.user_id,track_code=track_code,product_id=product.id) }}" method="POST">
-                <!-- Quantity Selector -->
-                <div class="d-flex align-items-center gap-3 mt-3">
-                    <label for="quantity">Quantity:</label>
-                    <div class="quantity-container d-flex align-items-center">
-                        <button type="button" class="btn-quantity" onclick="decreaseQuantity()">−</button>
-                        <input type="number" id="quantity" name="quantity" min="1" value="1">
-                        <button type="button" class="btn-quantity" onclick="increaseQuantity()">+</button>
-                    </div>
-                </div>
-                <div class="d-flex gap-3 mt-3">
-                    <button type="button" class="btn btn-warning" id="placeOrderBtn">
-                        Place Order {{ cart_count }} 🛒
-                    </button>
-                </div>
-            </form>
-  </div>
+<form id="checkoutForm" action="{{ url_for('checkout2', seller_id=product.user_id, track_code=track_code, product_id=product.id) }}" method="POST">
+    <!-- Quantity Selector -->
+    <div class="d-flex align-items-center gap-3 mt-3">
+        <label for="quantity">Quantity:</label>
+        <div class="quantity-container d-flex align-items-center">
+            <button type="button" class="btn-quantity" onclick="decreaseQuantity()">−</button>
+            <input type="number" id="quantity" name="quantity" min="1" value="1">
+            <button type="button" class="btn-quantity" onclick="increaseQuantity()">+</button>
+        </div>
+    </div>
+    <div class="d-flex gap-3 mt-3">
+        <button type="submit" class="btn btn-warning">
+            Place Order {{ cart_count }} 🛒
+        </button>
+    </div>
+</form>
+
 
  </div>
 <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
@@ -154,25 +154,16 @@ function decreaseQuantity() {
 }
 
 
-document.getElementById("placeOrderBtn").addEventListener("click", function (event) {
-    event.preventDefault();  // ⛔ Prevent the default form submission
-
-    let form = document.getElementById("checkoutForm");
-    let formData = new FormData(form);
-
-    fetch(form.action, {
-        method: "POST",
-        body: formData
-    })
-    .then(response => response.text())  // Handle response if needed
-    .then(data => {
-        console.log("Order placed:", data);
-
-        // ✅ Show success modal after form submission
+document.addEventListener("DOMContentLoaded", function () {
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get("success") === "true") {
         $("#orderSuccessModal").modal("show");
-    })
-    .catch(error => console.error("Error:", error));
+    }
 });
+
+
+
+
 
 
     // ✅ Update WhatsApp Button with Track Code

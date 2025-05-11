@@ -10,6 +10,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <!-- ✅ Bootstrap Icons CDN -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
+    <!-- Font Awesome CDN (place this in your <head>) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
 
 
 
@@ -109,7 +112,7 @@
    <div class="row">
       {% block content1_wrapper %}
          {% if self.content1()|trim %}
-            <div class="col-md-8 mb-4">
+            <div class="col-md-8 mb-0">
                {% block content1 %}{% endblock %}
             </div>
          {% endif %}
@@ -144,7 +147,7 @@
       {% endblock %}
    </div>
 </main>
-
+  {% if title== "home" %}
 
     <footer class="bg-steel pt-4">
       <div class="container">
@@ -192,6 +195,42 @@
         </div>
       </div>
     </footer>
+  {% endif %}
+  {% if title=='shop' %}
+    <footer class="bg-steel pt-4">
+      <div class="container">
+        <div class="row">
+          <div class="col-md-3 footer-text">
+            <h5 class=' text-white1'>About Store</h5>
+            <p>{{user.shop_about}}</p>
+          </div>
+        <div class="col-md-3 ">
+            <h5 class='text-white1'>Contact Us</h5>
+            <ul class="list-unstyled footer-text">
+              <li>Email: {{user.email}}</li>
+              <li>Phone: {{user.phone_number}}</li>
+              {% if user.is_verified %}
+              <li>Address: {{user.personal_info.address}},{{user.personal_info.state}},Nigeria.</li>
+              {% else %}
+              <li>Address: Nigeria</li>
+              {% endif %}
+            </ul>
+          </div>
+        <div class="col-md-3 ">
+            <h5 class='text-white1'>Message Us directly</h5>
+            <ul class="list-unstyled footer-text">
+             <p>📧 Have any complain? Message me directly
+             <br> 
+              <a href="{{ url_for('notify_vendor', phone_number=user.phone_number) }}" class="btn btn-sm btn-success">
+                Send a message
+              </a>
+            </p>
+            </ul>
+          </div>
+    </div>
+  </footer>
+  {% endif %}
+
 
      <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->

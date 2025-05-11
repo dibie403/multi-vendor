@@ -1,7 +1,7 @@
 body {
   background: #fafafa;
   color: #333333;
-  margin-top: 5rem;
+  margin-top: 4rem;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
@@ -38,6 +38,9 @@ h1, h2, h3, h4, h5, h6 {
 }
 .footer-text{
   color:#FFD700;
+}
+.text-white1{
+  color:#ffffff;
 }
 .account-img2 {
   height: 25px;
@@ -85,7 +88,7 @@ h1, h2, h3, h4, h5, h6 {
 /* Shop Search & Icon Section */
 .container11 {
   background: #f8f9fa; /* Light Gray */
-  padding: 5px;
+  padding: 2px;
   border-radius: 10px;
 }
 
@@ -454,6 +457,10 @@ h1, h2, h3, h4, h5, h6 {
   margin: 5px 0;
 }
 
+.sub{
+  color: #228B22;
+}
+
 /* Add to Cart Button */
 .btn-add-cart {
   background-color: #1A5D1A;
@@ -619,5 +626,25 @@ h1, h2, h3, h4, h5, h6 {
     .cart-btn i, .search-btn i {
         font-size: 20px;
     }
+
+.top-title1 {
+  text-align: center;
+  font-size: 1rem;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 200;
+  color: #2c3e50;
+  margin-bottom: 0.5rem;
+}
+
+.top-subtitle {
+  text-align: center;
+  font-size: 0.95rem;
+  font-family: 'Roboto', sans-serif;
+  color: #7f8c8d;
+  
+}
+
+
+
 
     

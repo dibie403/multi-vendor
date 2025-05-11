@@ -15,20 +15,20 @@ class User(db.Model,UserMixin):
     password = db.Column(db.String(60), nullable=False)
     shop_image_file = db.Column(db.String(255), nullable=True, default='default2.jpg')
     is_admin = db.Column(db.Boolean, nullable=False,default=False)
-    shop_name= db.Column(db.String(20), nullable=True, unique=True)
+    shop_name= db.Column(db.String(25), nullable=True, unique=True,index=True)
     shop_motto= db.Column(db.Text, nullable=True,unique=True)
     shop_about= db.Column(db.Text, nullable=True,unique=False)
     shop_theme = db.Column(db.Text, nullable=True, default=None)
     phone_number = db.Column(db.String(20), unique=True, nullable=False)
     status = db.Column(db.Boolean, nullable=False,default=False)
     slug = db.Column(db.String(100), unique=True, nullable=False)
-    slug1=db.Column(db.String(100), unique=True, nullable=True)
+    slug1=db.Column(db.String(100), nullable=True)
     
     is_subscribed = db.Column(db.Boolean, default=False)
     subscription_end = db.Column(db.DateTime, nullable=True)
     date = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     is_super = db.Column(db.Boolean, default=False,nullable=True)
-    is_verified = db.Column(db.Boolean, default=False,nullable=True)
+    is_verified = db.Column(db.Boolean, default=False,nullable=True,index=True)
 
     subscription = db.relationship('Subscription', backref='user', uselist=False)
     products = db.relationship('Product', backref='seller', lazy=True)
@@ -59,19 +59,19 @@ class User(db.Model,UserMixin):
     
     
     def __repr__(self):
-        return f"User('{self.slug}', '{self.is_verified}','{self.is_subscribed}', '{self.subscription_end}')"
+        return f"User('{self.  is_verified}', '{self.is_verified}','{self.is_subscribed}', '{self.subscription_end}', {self.shop_name})"
 
 class Product(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(100), nullable=False)
+    name = db.Column(db.String(100), nullable=False,index=True)
     description = db.Column(db.Text, nullable=False)
     amount =db.Column(db.Float, nullable=False)
     category =db.Column(db.String(100), nullable=False)
     date = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False,index=True)
     image = db.Column(db.String(255), nullable=False)
     shelf = db.Column(db.String(100), nullable=False)
-    slug = db.Column(db.String(100), unique=True, nullable=False)
+    slug = db.Column(db.String(100), unique=True, nullable=False, index=True)
 
 
     
@@ -121,8 +121,8 @@ class Order(db.Model):
     seller_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)  # Seller
     status = db.Column(db.String(50), nullable=False, default="Pending")  # Pending, Completed, Canceled
     total_amount = db.Column(db.Float, nullable=False, default=0.0)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    track_code= db.Column(db.Integer, nullable=False)
+    created_at = db.Column(db.DateTime, index=True, default=datetime.utcnow)
+    track_code= db.Column(db.String, nullable=False, index=True)
 
     user = db.relationship('User', foreign_keys=[user_id], backref='orders')
     seller = db.relationship('User', foreign_keys=[seller_id], backref='received_orders')
@@ -146,11 +146,13 @@ class OrderItem(db.Model):
 
 class Notification(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False, index=True)
     content = db.Column(db.Text, nullable=False)
     date = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
-    initiator= db.Column(db.Integer, nullable=False,default=None)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    initiator= db.Column(db.Integer, nullable=False,default=None, index=True)
+    is_read = db.Column(db.Boolean, default=False)  # <-- Add this if it doesn't exist
+    
+    
     
     
 
@@ -164,7 +166,7 @@ class Notification(db.Model):
 
 class Subscription(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    user_id = user_id = db.Column(db.Integer, db.ForeignKey('user.id'), unique=True,nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), unique=True,nullable=False)
     plan = db.Column(db.String(50))
     amount = db.Column(db.Integer)
     reference = db.Column(db.String(100))
@@ -186,3 +188,14 @@ class PersonalInfo(db.Model):
     day_of_birth = db.Column(db.Integer, nullable=False)
     month_of_birth = db.Column(db.Integer, nullable=False)
     year_of_birth = db.Column(db.Integer, nullable=False)
+
+class StoreVisit(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True, index=True)  # nullable for anonymous
+    seller_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False, index=True)
+    visit_time = db.Column(db.DateTime, default=datetime.utcnow)
+    session_id = db.Column(db.String(100), nullable=True, index=True)  # for anonymous visitors
+    
+    visitor = db.relationship('User', foreign_keys=[user_id], backref='visits_made')
+    seller = db.relationship('User', foreign_keys=[seller_id], backref='store_visits')
+    
